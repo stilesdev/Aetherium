@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mstiles92/Aetherium-Timer.git"
+    "url": "git+https://github.com/mstiles92/Aetherium.git"
   },
   "author": "Matthew Stiles",
   "private": true,
   "license": "CDDL-1.1",
   "bugs": {
-    "url": "https://github.com/mstiles92/Aetherium-Timer/issues"
+    "url": "https://github.com/mstiles92/Aetherium/issues"
   },
-  "homepage": "https://github.com/mstiles92/Aetherium-Timer#readme",
+  "homepage": "https://github.com/mstiles92/Aetherium#readme",
   "devDependencies": {
     "webpack": "^3.0.0"
   },
