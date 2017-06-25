@@ -16,5 +16,12 @@
   "bugs": {
     "url": "https://github.com/mstiles92/Aetherium-Timer/issues"
   },
-  "homepage": "https://github.com/mstiles92/Aetherium-Timer#readme"
+  "homepage": "https://github.com/mstiles92/Aetherium-Timer#readme",
+  "devDependencies": {
+    "webpack": "^3.0.0"
+  },
+  "dependencies": {
+    "firebase": "^4.1.3",
+    "vue": "^2.3.4"
+  }
 }
