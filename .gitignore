@@ -5,3 +5,7 @@ node_modules/
 firebase-debug.log
 firebase.config.js
 dist/bundle.js
+dist/*.eot
+dist/*.svg
+dist/*.ttf
+dist/*.woff*

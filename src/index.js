@@ -1,8 +1,11 @@
+import 'bootstrap/dist/js/bootstrap';
 import * as firebase from 'firebase';
-import * as $ from 'jquery';
+import 'jquery';
 import Vue from 'vue';
 
 import * as config from '../firebase.config';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap-theme.css';
 import './style.css';
 
 $(() => {
