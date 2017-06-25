@@ -1,0 +1,20 @@
+{
+  "name": "aetherium",
+  "version": "0.0.1",
+  "description": "A web-based twisty puzzle timer with real-time syncing of times across devices.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mstiles92/Aetherium-Timer.git"
+  },
+  "author": "Matthew Stiles",
+  "private": true,
+  "license": "CDDL-1.1",
+  "bugs": {
+    "url": "https://github.com/mstiles92/Aetherium-Timer/issues"
+  },
+  "homepage": "https://github.com/mstiles92/Aetherium-Timer#readme"
+}
