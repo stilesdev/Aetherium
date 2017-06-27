@@ -3,4 +3,4 @@
 
     </div>
 </template>
-<script src="./Timer.js"></script>
+<script src="./Stats.js"></script>

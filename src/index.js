@@ -9,6 +9,10 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import './style.css';
 import Aetherium from './modules/Aetherium.js';
 
+import Timer from './templates/Timer.vue';
+import Stats from './templates/Stats.vue';
+import History from './templates/History.vue';
+
 $(() => {
     window.vApp = new Vue({
         el: '#app',
@@ -40,6 +44,11 @@ $(() => {
             runExport: function(event) {
 
             }
+        },
+        components: {
+            'timer-view': Timer,
+            'stats-view': Stats,
+            'history-view': History
         }
     });
 
