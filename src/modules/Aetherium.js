@@ -33,6 +33,16 @@ export default class Aetherium {
         this.initUserListeners();
     }
 
+    handleLogin(user) {
+        this.user = user;
+        this.initUserListeners();
+    }
+
+    handleLogout() {
+        this.user = null;
+        this.detachListeners();
+    }
+
     initUserListeners() {
         if (this.activeCategory === null || this.user === null) {
             return;

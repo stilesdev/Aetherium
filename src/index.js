@@ -62,11 +62,9 @@ $(() => {
 
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
-            vApp.aetherium.user = user;
-            vApp.aetherium.initUserListeners();
+            vApp.aetherium.handleLogin(user);
         } else {
-            vApp.aetherium.detachListeners();
-            vApp.aetherium.user = null;
+            vApp.aetherium.handleLogout();
         }
     })
 });
