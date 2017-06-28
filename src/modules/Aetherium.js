@@ -1,6 +1,7 @@
 import * as firebase from 'firebase';
 import * as moment from 'moment';
 import {Session, Solve} from './Models';
+let ScramblerWorker = require('worker-loader?name=GenerateScramblerWorker.js!../workers/GenerateScramblerWorker.js');
 
 export default class Aetherium {
     constructor() {
@@ -9,11 +10,27 @@ export default class Aetherium {
         this.activeCategory = null;
         this.user = null;
         this.session = null;
+        this.scramble = null;
+        this.scrambleLabel = 'Generating scramble...';
+        this.scrambleImage = null;
 
         this.allSolvesRef = null;
         this.sessionIdRef = null;
         this.sessionRef = null;
         this.sessionSolvesRef = null;
+
+        this.scramblerWorker = new ScramblerWorker();
+        this.scramblerWorker.addEventListener('message', (event) => {
+            console.log('Received message');
+            console.log(event.data);
+            if (event.data === null) {
+                this.scramble = null;
+                this.scrambleLabel = 'Invalid scrambler!';
+            } else {
+                this.scramble = this.scrambleLabel = event.data.scramble;
+                this.scrambleImage = event.data.svg;
+            }
+        });
 
         firebase.database().ref('/puzzles').on('value', snapshot => {
             this.puzzles = snapshot.val();
@@ -127,5 +144,12 @@ export default class Aetherium {
         });
 
         this.createSession();
+    }
+
+    newScramble() {
+        this.scrambleLabel = 'Generating scramble...';
+        this.scrambleImage = null;
+
+        this.scramblerWorker.postMessage({scrambler: this.activeCategory.scrambler});
     }
 };
