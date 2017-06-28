@@ -23,6 +23,8 @@
   "devDependencies": {
     "css-loader": "^0.28.4",
     "file-loader": "^0.11.2",
+    "html-loader": "^0.4.5",
+    "html-webpack-plugin": "^2.29.0",
     "style-loader": "^0.18.2",
     "vue-loader": "^12.2.1",
     "vue-template-compiler": "^2.3.4",

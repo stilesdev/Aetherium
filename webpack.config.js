@@ -1,3 +1,4 @@
+let HtmlWebpackPlugin = require('html-webpack-plugin');
 let path = require('path');
 let webpack = require('webpack');
 
@@ -27,6 +28,12 @@ module.exports = {
                 use: [
                     'vue-loader'
                 ]
+            },
+            {
+                test: /\.html$/,
+                use: [
+                    'html-loader'
+                ]
             }
         ]
     },
@@ -35,6 +42,10 @@ module.exports = {
             jQuery: 'jquery',
             $: 'jquery',
             jquery: 'jquery'
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: 'src/index.html'
         })
     ],
     resolve: {
