@@ -8,7 +8,8 @@
 </head>
 <body>
 <div id="app">
-    <nav class="navbar navbar-default">
+    <!-- Main header -->
+    <nav v-if="aetherium" class="navbar navbar-default">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
@@ -36,6 +37,14 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
+                    <li v-if="aetherium.activePuzzle && aetherium.activeCategory">
+                        <p class="navbar-text">Current Puzzle: {{aetherium.activePuzzle.name}} - {{aetherium.activeCategory.name}}</p>
+                    </li>
+
+                    <li>
+                        <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#puzzlesModal">Change Puzzle</button>
+                    </li>
+
                     <li class="dropdown" v-if="aetherium && aetherium.user">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                             <img id="userPhoto" v-bind:src="aetherium.user.photoURL" />
@@ -68,9 +77,41 @@
         </div><!-- /.container-fluid -->
     </nav>
 
+    <!-- Vue Components for each tab -->
     <timer-view v-if="ui.activeTab === 'timer'"></timer-view>
     <stats-view v-if="ui.activeTab === 'stats'"></stats-view>
     <history-view v-if="ui.activeTab === 'history'"></history-view>
+
+    <!-- Puzzle selection modal -->
+    <div v-if="aetherium && aetherium.puzzles" class="modal fade" id="puzzlesModal" tabindex="-1" role="dialog" aria-labelledby="puzzlesModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times</span></button>
+                    <h4 class="modal-title" id="puzzlesModalLabel">Select Puzzle</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="puzzleSelect">Puzzle</label>
+                        <select class="form-control" id="puzzleSelect">
+                            <option v-for="puzzle in aetherium.puzzles">{{puzzle.name}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="categorySelect">Category</label>
+                        <select class="form-control" id="categorySelect">
+                            <option v-for="category in aetherium.activePuzzle.categories">{{category.name}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

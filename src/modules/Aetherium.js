@@ -39,12 +39,12 @@ export default class Aetherium {
     }
 
     setPuzzle(puzzle) {
-        this.activePuzzle = puzzle;
+        this.activePuzzle = this.puzzles[puzzle];
         this.setCategory('default');
     }
 
     setCategory(category) {
-        this.activeCategory = this.puzzles[this.activePuzzle].categories[category];
+        this.activeCategory = this.activePuzzle.categories[category];
         this.initUserListeners();
     }
 
