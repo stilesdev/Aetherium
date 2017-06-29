@@ -13,6 +13,11 @@ import Timer from './templates/Timer.vue';
 import Stats from './templates/Stats.vue';
 import History from './templates/History.vue';
 
+window.puzzlesLoaded = function(p) {
+    window.puzzles = p;
+};
+import './lib/tnoodle.js';
+
 $(() => {
     window.vApp = new Vue({
         el: '#app',

@@ -37,7 +37,7 @@ export default class Aetherium {
             if (this.activePuzzle === null) {
                 this.setPuzzle(333);
             }
-        })
+        });
     }
 
     setPuzzle(puzzle) {
@@ -147,9 +147,13 @@ export default class Aetherium {
     }
 
     newScramble() {
-        this.scrambleLabel = 'Generating scramble...';
-        this.scrambleImage = null;
+        if (window.puzzles) {
+            this.scrambleLabel = 'Generating scramble...';
+            this.scrambleImage = null;
 
-        this.scramblerWorker.postMessage({scrambler: this.activeCategory.scrambler});
+            this.scramblerWorker.postMessage({puzzle: window.puzzles[this.activeCategory.scrambler]});
+        } else {
+            setTimeout(this.newScramble, 100);
+        }
     }
 };
