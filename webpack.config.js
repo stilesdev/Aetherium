@@ -1,3 +1,4 @@
+let CopyWebpackPlugin = require('copy-webpack-plugin');
 let HtmlWebpackPlugin = require('html-webpack-plugin');
 let path = require('path');
 let webpack = require('webpack');
@@ -46,7 +47,10 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: 'src/index.html'
-        })
+        }),
+        new CopyWebpackPlugin([
+            { from: 'src/lib'}
+        ])
     ],
     resolve: {
         alias: {

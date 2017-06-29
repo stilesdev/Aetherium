@@ -21,8 +21,6 @@ export default class Aetherium {
 
         this.scramblerWorker = new ScramblerWorker();
         this.scramblerWorker.addEventListener('message', (event) => {
-            console.log('Received message');
-            console.log(event.data);
             if (event.data === null) {
                 this.scramble = null;
                 this.scrambleLabel = 'Invalid scrambler!';
@@ -147,13 +145,6 @@ export default class Aetherium {
     }
 
     newScramble() {
-        if (window.puzzles) {
-            this.scrambleLabel = 'Generating scramble...';
-            this.scrambleImage = null;
-
-            this.scramblerWorker.postMessage({puzzle: window.puzzles[this.activeCategory.scrambler]});
-        } else {
-            setTimeout(this.newScramble, 100);
-        }
+        this.scramblerWorker.postMessage({scrambler: this.activeCategory.scrambler});
     }
 };
