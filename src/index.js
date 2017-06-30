@@ -45,6 +45,12 @@ $(() => {
             runExport: function(event) {
 
             },
+            openOptionsModal: function() {
+                $('#optionsModal').modal();
+            },
+            onOptionsModalSave: function() {
+
+            },
             onPuzzleModalOpen: function() {
                 vApp.ui.puzzleSelection = vApp.aetherium.activePuzzle.key;
                 vApp.ui.categorySelection = vApp.aetherium.activeCategory.key;

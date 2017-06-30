@@ -54,6 +54,8 @@
                             <li><a href="#" v-on:click="runExport">Export</a></li>
                             <li><a href="#" v-on:click="runImport">Import</a></li>
                             <li role="separator" class="divider"></li>
+                            <li><a href="#" v-on:click="openOptionsModal">Options</a></li>
+                            <li role="separator" class="divider"></li>
                             <li><a href="#" v-on:click="logout">Log out {{ aetherium.user.displayName ? aetherium.user.displayName : aetherium.user.email }}</a></li>
                         </ul>
                     </li>
@@ -109,6 +111,47 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="onPuzzleModalSave">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Options Modal -->
+    <div class="modal fade" id="optionsModal" tabindex="-1" role="dialog" aria-labelledby="optionsModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="optionsModalLabel">Options</h4>
+                </div>
+
+                <div class="modal-body">
+                    <label for="showTimerOptionsGroup">Timer Display</label>
+                    <div class="btn-group" id="showTimerOptionsGroup" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="timerDisplayOptions" id="showTimer" autocomplete="off" checked>Show
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="timerDisplayOptions" id="hideTimer" autocomplete="off">Hide
+                        </label>
+                    </div>
+
+                    <hr/>
+
+                    <label for="timerTriggerOptionsGroup">Timer Trigger</label>
+                    <div class="btn-group" id="timerTriggerOptionsGroup" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="timerTriggerOptions" id="spacebarTimerTrigger" autocomplete="off" checked>Spacebar
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="timerTriggerOptions" id="stackmatTimerTrigger" autocomplete="off">Stackmat
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="onOptionsModalSave">Save</button>
                 </div>
             </div>
         </div>
