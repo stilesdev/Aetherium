@@ -42,7 +42,7 @@
                     </li>
 
                     <li>
-                        <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#puzzlesModal">Change Puzzle</button>
+                        <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#puzzlesModal" v-on:click="onPuzzleModalOpen">Change Puzzle</button>
                     </li>
 
                     <li class="dropdown" v-if="aetherium && aetherium.user">
@@ -94,20 +94,21 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="puzzleSelect">Puzzle</label>
-                        <select class="form-control" id="puzzleSelect">
-                            <option v-for="puzzle in aetherium.puzzles">{{puzzle.name}}</option>
+                        <select class="form-control" id="puzzleSelect" v-model="ui.puzzleSelection">
+                            <option v-for="puzzle in aetherium.puzzles" v-bind:value="puzzle.key">{{puzzle.name}}</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="categorySelect">Category</label>
-                        <select class="form-control" id="categorySelect">
-                            <option v-for="category in aetherium.activePuzzle.categories">{{category.name}}</option>
+                        <select class="form-control" id="categorySelect" v-model="ui.categorySelection">
+                            <option v-for="category in aetherium.puzzles[ui.puzzleSelection].categories" v-bind:value="category.key">{{category.name}}</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="onPuzzleModalSave">Save</button>
                 </div>
             </div>
         </div>

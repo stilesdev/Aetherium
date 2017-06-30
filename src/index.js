@@ -18,12 +18,13 @@ $(() => {
         el: '#app',
         data: {
             aetherium: null,
-            puzzles: null,
             ui: {
                 activeTab: 'timer',
                 emailField: '',
-                passwordField: ''
-            }
+                passwordField: '',
+                puzzleSelection: 333,
+                categorySelection: 'default'
+            },
         },
         methods: {
             emailLogin: function(event) {
@@ -43,6 +44,14 @@ $(() => {
             },
             runExport: function(event) {
 
+            },
+            onPuzzleModalOpen: function() {
+                vApp.ui.puzzleSelection = vApp.aetherium.activePuzzle.key;
+                vApp.ui.categorySelection = vApp.aetherium.activeCategory.key;
+            },
+            onPuzzleModalSave: function() {
+                vApp.aetherium.setPuzzle(vApp.ui.puzzleSelection);
+                vApp.aetherium.setCategory(vApp.ui.categorySelection);
             }
         },
         components: {
