@@ -65,14 +65,14 @@ export default class Aetherium {
 
         this.detachListeners();
 
-        this.allSolvesRef = firebase.database().ref(`/users/${this.user.uid}/allSolves/${this.activePuzzle}/${this.activeCategory.key}`);
-        this.sessionIdRef = firebase.database().ref(`/users/${this.user.uid}/currentSessionIds/${this.activePuzzle}/${this.activeCategory.key}`);
+        this.allSolvesRef = firebase.database().ref(`/users/${this.user.uid}/allSolves/${this.activePuzzle.key}/${this.activeCategory.key}`);
+        this.sessionIdRef = firebase.database().ref(`/users/${this.user.uid}/currentSessionIds/${this.activePuzzle.key}/${this.activeCategory.key}`);
 
         this.sessionIdRef.once('value').then(snapshot => {
             if (!snapshot.exists()) {
                 this.createSession();
             } else {
-                this.sessionRef = firebase.database().ref(`/users/${this.user.uid}/sessions/${this.activePuzzle}/${this.activeCategory.key}/${snapshot.val()}`);
+                this.sessionRef = firebase.database().ref(`/users/${this.user.uid}/sessions/${this.activePuzzle.key}/${this.activeCategory.key}/${snapshot.val()}`);
             }
 
             this.sessionIdRef.on('value', snapshot => {
@@ -86,7 +86,7 @@ export default class Aetherium {
                     this.sessionSolvesRef.off();
                 }
 
-                this.sessionSolvesRef = firebase.database().ref(`/users/${this.user.uid}/sessions/${this.activePuzzle}/${this.activeCategory.key}/solves`);
+                this.sessionSolvesRef = firebase.database().ref(`/users/${this.user.uid}/sessions/${this.activePuzzle.key}/${this.activeCategory.key}/solves`);
 
                 this.sessionSolvesRef.on('child_added', snapshot => {
                     this.session.addSolve(Solve.fromSnapshot(snapshot));
@@ -126,7 +126,7 @@ export default class Aetherium {
     }
 
     createSession() {
-        this.sessionRef = firebase.database().ref(`/users/${this.user.uid}/sessions/${this.activePuzzle}/${this.activeCategory.key}`).push();
+        this.sessionRef = firebase.database().ref(`/users/${this.user.uid}/sessions/${this.activePuzzle.key}/${this.activeCategory.key}`).push();
         let date = moment().utc().hour(0).minute(0).second(0).millisecond(0);
         this.sessionRef.set({
             date: date.valueOf(),
