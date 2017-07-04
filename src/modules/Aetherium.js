@@ -155,4 +155,28 @@ export default class Aetherium {
         this.scramble.svg = null;
         this.scramblerWorker.postMessage({scrambler: this.activeCategory.scrambler});
     }
+
+    addSolve(delta) {
+        let newSolve = {
+            time: delta,
+            penalty: '',
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            scramble: this.scramble.text
+        };
+
+        let newSolveRef = this.sessionSolvesRef.push();
+        newSolveRef.set(newSolve);
+        this.allSolvesRef.child(newSolveRef.key).set(newSolve);
+    }
+
+    setPenalty(solve, penalty) {
+        let newPenalty = (solve.penalty === penalty) ? '' : penalty;
+        this.sessionSolvesRef.child(`${solve.uid}/penalty`).set(newPenalty);
+        this.allSolvesRef.child(`${solve.uid}/penalty`).set(newPenalty);
+    }
+
+    deleteSolve(solveUid) {
+        this.sessionSolvesRef.child(solveUid).remove();
+        this.allSolvesRef.child(solveUid).remove();
+    }
 };
