@@ -87,6 +87,9 @@ export default {
             }
 
             this.aetherium.newScramble();
+        },
+        closeSession: function () {
+            this.aetherium.closeSession();
         }
     },
     watch: {
