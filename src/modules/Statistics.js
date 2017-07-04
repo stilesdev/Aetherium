@@ -1,5 +1,5 @@
 export function mean(solves) {
-    return (solves.length === 0) ? 0 : meanOfRange(solves, 0, solves.length - 1);
+    return meanOfRange(solves, 0, solves.length - 1);
 }
 
 export function best(solves) {
@@ -40,7 +40,7 @@ export function worst(solves) {
 }
 
 export function stdDev(solves) {
-    let mean = mean(solves);
+    let mean = meanOfRange(solves, 0, solves.length - 1);
 
     if (mean <= 0) {
         return mean;
@@ -96,6 +96,10 @@ export function bestAo100(solves) {
 }
 
 function meanOfRange(solves, startIdx, endIdx) {
+    if (endIdx <= startIdx) {
+        return 0;
+    }
+
     let mean = 0;
 
     for (let i = startIdx; i <= endIdx; i++) {
