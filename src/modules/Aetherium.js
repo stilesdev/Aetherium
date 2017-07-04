@@ -10,9 +10,14 @@ export default class Aetherium {
         this.activeCategory = null;
         this.user = null;
         this.session = null;
-        this.scramble = null;
-        this.scrambleLabel = 'Generating scramble...';
-        this.scrambleImage = null;
+        this.scramble = {
+            text: 'Generating scramble...',
+            svg: ''
+        };
+        this.options = {
+            showTimer: true,
+            timerTrigger: 'spacebar'
+        };
 
         this.allSolvesRef = null;
         this.sessionIdRef = null;
@@ -22,11 +27,11 @@ export default class Aetherium {
         this.scramblerWorker = new ScramblerWorker();
         this.scramblerWorker.addEventListener('message', (event) => {
             if (event.data === null) {
-                this.scramble = null;
-                this.scrambleLabel = 'Invalid scrambler!';
+                this.scramble.text = 'Invalid scrambler!';
+                this.scramble.svg = null;
             } else {
-                this.scramble = this.scrambleLabel = event.data.scramble;
-                this.scrambleImage = event.data.svg;
+                this.scramble.text = event.data.scramble;
+                this.scramble.svg = event.data.svg;
             }
         });
 
@@ -145,6 +150,8 @@ export default class Aetherium {
     }
 
     newScramble() {
+        this.scramble.text = 'Generating scramble...';
+        this.scramble.svg = null;
         this.scramblerWorker.postMessage({scrambler: this.activeCategory.scrambler});
     }
 };
