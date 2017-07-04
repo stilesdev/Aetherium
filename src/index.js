@@ -25,6 +25,10 @@ $(() => {
                 puzzleSelection: 333,
                 categorySelection: 'default'
             },
+            options: {
+                showTimer: true,
+                timerTrigger: 'spacebar'
+            }
         },
         methods: {
             emailLogin: function(event) {
@@ -49,7 +53,8 @@ $(() => {
                 $('#optionsModal').modal();
             },
             onOptionsModalSave: function() {
-
+                vApp.aetherium.options.showTimer = vApp.options.showTimer;
+                vApp.aetherium.options.timerTrigger = vApp.options.timerTrigger
             },
             onPuzzleModalOpen: function() {
                 vApp.ui.puzzleSelection = vApp.aetherium.activePuzzle.key;

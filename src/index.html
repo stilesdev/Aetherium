@@ -80,7 +80,7 @@
     </nav>
 
     <!-- Vue Components for each tab -->
-    <timer-view v-if="ui.activeTab === 'timer' && aetherium" v-bind:aetherium="aetherium"></timer-view>
+    <timer-view v-if="ui.activeTab === 'timer' && aetherium" v-bind:aetherium="aetherium" v-bind:timer-trigger="aetherium.options.timerTrigger"></timer-view>
     <stats-view v-if="ui.activeTab === 'stats'"></stats-view>
     <history-view v-if="ui.activeTab === 'history'"></history-view>
 
@@ -128,10 +128,10 @@
                 <div class="modal-body">
                     <label for="showTimerOptionsGroup">Timer Display</label>
                     <div class="btn-group" id="showTimerOptionsGroup" data-toggle="buttons">
-                        <label class="btn btn-default active">
+                        <label class="btn btn-default active" v-on:click="options.showTimer = true">
                             <input type="radio" name="timerDisplayOptions" id="showTimer" autocomplete="off" checked>Show
                         </label>
-                        <label class="btn btn-default">
+                        <label class="btn btn-default" v-on:click="options.showTimer = false">
                             <input type="radio" name="timerDisplayOptions" id="hideTimer" autocomplete="off">Hide
                         </label>
                     </div>
@@ -140,10 +140,10 @@
 
                     <label for="timerTriggerOptionsGroup">Timer Trigger</label>
                     <div class="btn-group" id="timerTriggerOptionsGroup" data-toggle="buttons">
-                        <label class="btn btn-default active">
+                        <label class="btn btn-default active" v-on:click="options.timerTrigger = 'spacebar'">
                             <input type="radio" name="timerTriggerOptions" id="spacebarTimerTrigger" autocomplete="off" checked>Spacebar
                         </label>
-                        <label class="btn btn-default">
+                        <label class="btn btn-default" v-on:click="options.timerTrigger = 'stackmat'">
                             <input type="radio" name="timerTriggerOptions" id="stackmatTimerTrigger" autocomplete="off">Stackmat
                         </label>
                     </div>
@@ -157,5 +157,6 @@
         </div>
     </div>
 </div>
+<script src="stackmat.js"></script>
 </body>
 </html>

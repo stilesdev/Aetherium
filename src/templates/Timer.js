@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import {Solve} from '../modules/Models.js';
 
 let timerStart = 0;
+let stackmatStarted = false;
 
 export default {
     data: function() {
@@ -10,7 +11,7 @@ export default {
             timerLabel: '00:00.00'
         }
     },
-    props: ['aetherium'],
+    props: ['aetherium', 'timerTrigger'],
     created: function() {
         let vApp = this;
 
@@ -40,19 +41,36 @@ export default {
         onSpacebarPress: function() {
             if (this.aetherium.options.timerTrigger === 'spacebar') {
                 if (timerStart === 0) {
-                    timerStart = moment().valueOf();
-
-                    if (this.aetherium.options.showTimer) {
-                        setTimeout(this.updateTimer, 10);
-                    } else {
-                        this.timerLabel = 'Solve!';
-                    }
+                    this.startTimer();
                 } else {
                     let stop = moment().valueOf();
                     let start = timerStart;
                     timerStart = 0;
                     this.completeSolve(stop - start);
                 }
+            }
+        },
+        onStackmatSignalReceived: function(state) {
+            if (stackmatStarted && !state.running) {
+                // Timer just stopped
+                stackmatStarted = false;
+                timerStart = 0;
+                this.completeSolve(state.time_milli);
+            } else if (!stackmatStarted && state.running) {
+                // Timer just started
+                stackmatStarted = true;
+                this.startTimer();
+            } else if (!stackmatStarted && state.time_milli === 0) {
+                this.timerLabel = '00:00.00';
+            }
+        },
+        startTimer: function() {
+            timerStart = moment().valueOf();
+
+            if (this.aetherium.options.showTimer) {
+                setTimeout(this.updateTimer, 10);
+            } else {
+                this.timerLabel = 'Solve!';
             }
         },
         updateTimer: function() {
@@ -69,6 +87,28 @@ export default {
             }
 
             this.aetherium.newScramble();
+        }
+    },
+    watch: {
+        timerTrigger: function(val) {
+            timerStart = 0;
+            this.timerLabel = '00:00.00';
+            console.log(val);
+
+            switch(val) {
+                case 'spacebar': {
+                    stackmat.stop();
+                    break;
+                }
+                case 'stackmat': {
+                    stackmat.setCallBack(this.onStackmatSignalReceived);
+                    stackmat.init();
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
         }
     }
 }
