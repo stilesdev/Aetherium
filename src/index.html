@@ -80,7 +80,7 @@
     </nav>
 
     <!-- Vue Components for each tab -->
-    <timer-view v-if="ui.activeTab === 'timer'"></timer-view>
+    <timer-view v-if="ui.activeTab === 'timer' && aetherium" v-bind:aetherium="aetherium"></timer-view>
     <stats-view v-if="ui.activeTab === 'stats'"></stats-view>
     <history-view v-if="ui.activeTab === 'history'"></history-view>
 
