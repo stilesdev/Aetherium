@@ -92,7 +92,7 @@ export default class Aetherium {
                     this.sessionSolvesRef.off();
                 }
 
-                this.sessionSolvesRef = firebase.database().ref(`/users/${this.user.uid}/sessions/${this.activePuzzle.key}/${this.activeCategory.key}/solves`);
+                this.sessionSolvesRef = firebase.database().ref(`/users/${this.user.uid}/sessions/${this.activePuzzle.key}/${this.activeCategory.key}/${this.session.uid}/solves`);
 
                 this.sessionSolvesRef.on('child_added', snapshot => {
                     this.session.addSolve(Solve.fromSnapshot(snapshot));
