@@ -81,8 +81,8 @@
 
     <!-- Vue Components for each tab -->
     <timer-view v-if="ui.activeTab === 'timer' && aetherium" v-bind:aetherium="aetherium" v-bind:timer-trigger="aetherium.options.timerTrigger"></timer-view>
-    <stats-view v-if="ui.activeTab === 'stats'"></stats-view>
-    <history-view v-if="ui.activeTab === 'history'"></history-view>
+    <stats-view v-if="ui.activeTab === 'stats' && aetherium" v-bind:session="aetherium.session"></stats-view>
+    <history-view v-if="ui.activeTab === 'history' && aetherium" v-bind:aetherium="aetherium"></history-view>
 
     <!-- Puzzle selection modal -->
     <div v-if="aetherium && aetherium.puzzles" class="modal fade" id="puzzlesModal" tabindex="-1" role="dialog" aria-labelledby="puzzlesModalLabel">
