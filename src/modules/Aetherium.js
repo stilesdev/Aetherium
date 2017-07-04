@@ -50,6 +50,7 @@ export default class Aetherium {
 
     setCategory(category) {
         this.activeCategory = this.activePuzzle.categories[category];
+        this.newScramble();
         this.initUserListeners();
     }
 
