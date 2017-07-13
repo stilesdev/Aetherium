@@ -35,7 +35,7 @@ self.generateScramble = function(scrambler) {
             self.postMessage({scramble: null, svg: null});
         }
     } else {
-        setTimeout(self.generateScramble(scrambler), 100);
+        setTimeout(self.generateScramble, 100, scrambler);
     }
 };
 
