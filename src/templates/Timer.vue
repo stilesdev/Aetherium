@@ -59,7 +59,9 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <h4 v-else>Loading...</h4>
+                            <div v-else>
+                                <h4 v-if="aetherium.user">Loading...</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -96,7 +98,10 @@
                                 </table>
                             </div>
 
-                            <h4 v-else>Loading...</h4>
+                            <div v-else>
+                                <h4 v-if="aetherium.user">Loading...</h4>
+                                <h4 class="alert-warning" v-else>Not logged in - your times will not be saved!</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -108,10 +113,12 @@
                         </div>
                         <div id="scrambleImage" class="panel-body infoPanel">
                             <div v-html="aetherium.scramble.svg"></div>
-                            <hr/>
-                            <label for="sessionControls">Session Management</label>
-                            <div class="center-block" id="sessionControls">
-                                <button class="btn btn-primary" type="button" v-if="aetherium.session && aetherium.session.date" v-on:click="closeSession()">Close session for {{aetherium.session.date.format('M/D/YYYY')}}</button>
+                            <div v-if="aetherium.user">
+                                <hr/>
+                                <label for="sessionControls">Session Management</label>
+                                <div class="center-block" id="sessionControls">
+                                    <button class="btn btn-primary" type="button" v-if="aetherium.session && aetherium.session.date" v-on:click="closeSession()">Close session for {{aetherium.session.date.format('M/D/YYYY')}}</button>
+                                </div>
                             </div>
                         </div>
                     </div>
