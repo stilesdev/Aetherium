@@ -15,20 +15,20 @@ export default {
     created: function() {
         let vApp = this;
 
-        $(document).keydown(function(event) {
+        $(document).on('keydown.aetherium', function(event) {
             if (event.which === 32) {
                 event.preventDefault();
             }
         });
 
-        $(document).keyup(function(event) {
+        $(document).on('keyup.aetherium', function(event) {
             if (event.which === 32) {
                 vApp.onSpacebarPress();
             }
         });
     },
     destroyed: function() {
-        $(document).off();
+        $(document).off('.aetherium');
     },
     methods: {
         formatSolve: Solve.formatTime,
