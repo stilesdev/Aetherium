@@ -1,19 +1,16 @@
 import 'bootstrap/dist/js/bootstrap';
-import * as firebase from 'firebase';
-import 'jquery';
+import * as $ from 'jquery';
 import Vue from 'vue';
 
-import * as config from '../firebase.config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import './style.css';
-import Aetherium from './modules/Aetherium.js';
 
-import Timer from './templates/Timer.vue';
-import Stats from './templates/Stats.vue';
-import History from './templates/History.vue';
+import Store from './store/Store';
+import Aetherium from './components/Aetherium.vue';
 
 $(() => {
+    /*
     window.vApp = new Vue({
         el: '#app',
         data: {
@@ -71,20 +68,14 @@ $(() => {
             'history-view': History
         }
     });
+    */
 
-    try {
-        firebase.initializeApp(config);
-    } catch (e) {
-        console.error(e);
-    }
 
-    vApp.aetherium = new Aetherium();
 
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            vApp.aetherium.handleLogin(user);
-        } else {
-            vApp.aetherium.handleLogout();
-        }
-    })
+    window.firebase = require('firebase'); // For testing purposes in browser window only
+    window.vApp = new Vue({
+        el: '#app',
+        render: h => h(Aetherium),
+        store: Store
+    });
 });

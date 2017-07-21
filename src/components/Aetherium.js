@@ -1,6 +1,4 @@
-import Timer from './Timer.vue';
-import Stats from './Stats.vue';
-import History from './History.vue';
+import Login from './Login.vue';
 
 export default {
     data: function() {
@@ -17,5 +15,5 @@ export default {
     methods: {
 
     },
-    components: { Timer, Stats, History }
+    components: { Login }
 }
