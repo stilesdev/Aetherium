@@ -2,7 +2,7 @@
     <div id="app">
         <div class="container">
             <div class="login">
-                <form>
+                <form v-on:submit="submit">
                     <div class="form-group">
                         <label for="emailInput">Email Address</label>
                         <div class="input-group">
@@ -17,7 +17,7 @@
                             <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password">
                         </div>
                     </div>
-                    <button type="button" class="btn btn-default" v-on:click="submit">Login</button>
+                    <button class="btn btn-default">Login</button>
                 </form>
             </div>
         </div>
@@ -33,7 +33,8 @@
             }
         },
         methods: {
-            submit: function() {
+            submit: function(event) {
+                event.preventDefault();
                 this.$store.dispatch('emailLogin', {email: this.email, password: this.password})
             }
         }
