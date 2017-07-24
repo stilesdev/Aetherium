@@ -1,5 +1,6 @@
 import Login from './Login.vue';
 import Navbar from './Navbar.vue';
+import Timer from './views/Timer.vue';
 
 export default {
     data: function() {
@@ -10,16 +11,10 @@ export default {
     computed: {
         loggedIn() {
             return this.$store.state.userId !== null;
+        },
+        activeView() {
+            return this.$store.state.activeView;
         }
     },
-    created: function() {
-        // Initialize event listeners, etc
-    },
-    destroyed: function() {
-        // Destroy event listeners, etc
-    },
-    methods: {
-
-    },
-    components: { Login, Navbar }
+    components: { Login, Navbar, Timer }
 }
