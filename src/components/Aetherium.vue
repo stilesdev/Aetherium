@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <login v-if="!$store.state.userId"></login>
+        <login v-if="!loggedIn"></login>
         <div v-else>
             <navbar></navbar>
         </div>

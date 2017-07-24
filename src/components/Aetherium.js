@@ -7,6 +7,11 @@ export default {
 
         }
     },
+    computed: {
+        loggedIn() {
+            return this.$store.state.userId !== null;
+        }
+    },
     created: function() {
         // Initialize event listeners, etc
     },
