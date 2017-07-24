@@ -33,6 +33,12 @@ const mutations = {
     },
     [Types.SET_ACTIVE_VIEW] (state, newView) {
         state.activeView = newView;
+    },
+    [Types.SET_ACTIVE_PUZZLE] (state, puzzleKey) {
+        state.activePuzzle = puzzleKey;
+    },
+    [Types.SET_ACTIVE_CATEGORY] (state, categoryKey) {
+        state.activeCategory = categoryKey;
     }
 };
 

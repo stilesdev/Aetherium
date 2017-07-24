@@ -26,6 +26,19 @@
                         </li>
                     </ul>
 
+                    <form class="navbar-form navbar-left" v-if="puzzles">
+                        <div class="form-group">
+                            <select class="form-control" v-model="activePuzzle">
+                                <option v-for="puzzle in puzzles" v-bind:value="puzzle.key">{{ puzzle.name }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" v-model="activeCategory">
+                                <option v-for="category in puzzles[activePuzzle].categories" v-bind:value="category.key">{{ category.name }}</option>
+                            </select>
+                        </div>
+                    </form>
+
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
