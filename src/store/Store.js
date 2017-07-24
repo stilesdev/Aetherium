@@ -3,6 +3,7 @@ import * as firebaseConfig from '../../firebase.config';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import * as Types from './MutationTypes';
+let ScramblerWorker = require('worker-loader?name=GenerateScramblerWorker.js!../workers/GenerateScramblerWorker.js');
 
 const state = {
     userId: null,
@@ -10,6 +11,7 @@ const state = {
     activeView: 'timer',
     activePuzzle: 333,
     activeCategory: 'default',
+    scramblerWorker: new ScramblerWorker(),
     scramble: {
         text: 'Generating scramble...',
         svg: null
@@ -39,6 +41,9 @@ const mutations = {
     },
     [Types.SET_ACTIVE_CATEGORY] (state, categoryKey) {
         state.activeCategory = categoryKey;
+    },
+    [Types.RECEIVE_SCRAMBLE] (state, scramble) {
+        state.scramble = scramble;
     }
 };
 
@@ -48,6 +53,12 @@ const actions = {
     },
     logout(context) {
         firebase.auth().signOut().catch(error => alert(error.message));
+    },
+    requestScramble(context) {
+        context.commit(Types.RECEIVE_SCRAMBLE, { text: 'Generating scramble...', svg: null });
+        context.state.scramblerWorker.postMessage({
+            scrambler: context.state.puzzles[context.state.activePuzzle].categories[context.state.activeCategory].scrambler
+        })
     }
 };
 
@@ -60,6 +71,22 @@ const plugins = [
     store => {
         firebase.database().ref('/puzzles').on('value', snapshot => {
             store.commit(Types.RECEIVE_PUZZLES, snapshot.val());
+        })
+    },
+    store => {
+        store.state.scramblerWorker.addEventListener('message', event => {
+            if (event.data === null) {
+                store.commit(Types.RECEIVE_SCRAMBLE, { text: 'Invalid scrambler!', svg: null });
+            } else {
+                store.commit(Types.RECEIVE_SCRAMBLE, { text: event.data.scramble, svg: event.data.svg });
+            }
+        })
+    },
+    store => {
+        store.subscribe((mutation, state) => {
+            if (mutation.type === Types.SET_ACTIVE_CATEGORY) {
+                store.dispatch('requestScramble');
+            }
         })
     }
 ];
