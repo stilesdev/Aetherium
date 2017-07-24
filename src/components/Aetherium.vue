@@ -2,7 +2,7 @@
     <div id="app">
         <login v-if="!$store.state.userId"></login>
         <div v-else>
-            Logged in!
+            <navbar></navbar>
         </div>
     </div>
 </template>

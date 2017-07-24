@@ -1,4 +1,5 @@
 import Login from './Login.vue';
+import Navbar from './Navbar.vue';
 
 export default {
     data: function() {
@@ -15,5 +16,5 @@ export default {
     methods: {
 
     },
-    components: { Login }
+    components: { Login, Navbar }
 }

@@ -7,6 +7,7 @@ import * as Types from './MutationTypes';
 const state = {
     userId: null,
     puzzles: null,
+    activeView: 'timer',
     activePuzzle: 333,
     activeCategory: 'default',
     scramble: {
@@ -29,6 +30,9 @@ const mutations = {
     },
     [Types.RECEIVE_PUZZLES] (state, puzzles) {
         state.puzzles = puzzles;
+    },
+    [Types.SET_ACTIVE_VIEW] (state, newView) {
+        state.activeView = newView;
     }
 };
 
