@@ -70,7 +70,13 @@ const plugins = [
     },
     store => {
         firebase.database().ref('/puzzles').on('value', snapshot => {
+            const firstRun = store.state.puzzles === null;
+
             store.commit(Types.RECEIVE_PUZZLES, snapshot.val());
+
+            if (firstRun) {
+                store.dispatch('requestScramble');
+            }
         })
     },
     store => {
