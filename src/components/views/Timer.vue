@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <div class="container-fluid">
-            <div id="timerTouchArea" v-on:touchend="">
+            <div id="timerTouchArea" v-on:touchend="onSpacebarPress">
                 <div class="row">
                     <div id="scrambleArea" class="col-md-10 col-md-offset-1">
                         <h3 id="scrambleLabel" v-if="scramble.text">{{ scramble.text }}</h3>
@@ -10,7 +10,7 @@
                 </div>
                 <div class="row">
                     <div id="timerArea">
-                        <h1 id="timerLabel">00:00.00</h1>
+                        <h1 id="timerLabel">{{ timerLabel }}</h1>
                     </div>
                 </div>
             </div>
