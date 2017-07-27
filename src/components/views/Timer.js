@@ -86,5 +86,25 @@ export default {
 
             //TODO: commit new solve to store
         }
+    },
+    watch: {
+        timerTrigger: function(val) {
+            this.timerStart = 0;
+            this.timerLabel = '00:00.00';
+
+            switch (val) {
+                case 'spacebar':
+                    stackmat.stop();
+                    break;
+
+                case 'stackmat':
+                    stackmat.setCallBack(this.onStackmatSignalReceived);
+                    stackmat.init();
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 }
