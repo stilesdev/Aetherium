@@ -3,6 +3,7 @@ import * as firebaseConfig from '../../firebase.config';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import * as Types from './MutationTypes';
+import { Solve, Session } from '../modules/Models';
 let ScramblerWorker = require('worker-loader?name=GenerateScramblerWorker.js!../workers/GenerateScramblerWorker.js');
 
 const state = {
@@ -44,6 +45,12 @@ const mutations = {
     },
     [Types.RECEIVE_SCRAMBLE] (state, scramble) {
         state.scramble = scramble;
+    },
+    [Types.SET_OPTION_SHOWTIMER] (state, showTimer) {
+        state.option.showTimer = showTimer;
+    },
+    [Types.SET_OPTION_TIMERTRIGGER] (state, timerTrigger) {
+        state.option.timerTrigger = timerTrigger;
     }
 };
 
