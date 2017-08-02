@@ -14,6 +14,18 @@
                     </div>
                 </div>
             </div>
+
+            <div id="timerInfoArea">
+                <div class="col-md-3 visible-md visible-lg">
+                    <stats-panel></stats-panel>
+                </div>
+                <div class="col-md-6 col-xs-12 col-sm-12">
+
+                </div>
+                <div class="col-md-3 visible-md visible-lg">
+
+                </div>
+            </div>
         </div>
     </div>
 </template>
