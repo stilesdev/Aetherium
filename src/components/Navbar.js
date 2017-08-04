@@ -1,5 +1,6 @@
 import * as $ from 'jquery';
-import * as Types from '../store/MutationTypes';
+import * as Mutations from '../store/MutationTypes';
+import * as Actions from '../store/ActionTypes';
 
 export default {
     data: function() {
@@ -13,7 +14,7 @@ export default {
                 return this.$store.state.activeView;
             },
             set(value) {
-                this.$store.commit(Types.SET_ACTIVE_VIEW, value);
+                this.$store.commit(Mutations.SET_ACTIVE_VIEW, value);
             }
         },
         puzzles() {
@@ -24,7 +25,7 @@ export default {
                 return this.$store.state.activePuzzle;
             },
             set(value) {
-                this.$store.commit(Types.SET_ACTIVE_PUZZLE, value);
+                this.$store.commit(Mutations.SET_ACTIVE_PUZZLE, value);
                 this.activeCategory = 'default';
             }
         },
@@ -33,7 +34,7 @@ export default {
                 return this.$store.state.activeCategory;
             },
             set(value) {
-                this.$store.commit(Types.SET_ACTIVE_CATEGORY, value);
+                this.$store.commit(Mutations.SET_ACTIVE_CATEGORY, value);
             }
         }
     },
@@ -45,7 +46,7 @@ export default {
             // TODO: Save user account options
         },
         logout() {
-            this.$store.dispatch('logout')
+            this.$store.dispatch(Actions.LOGOUT);
         }
     }
 }

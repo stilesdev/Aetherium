@@ -25,6 +25,8 @@
 </template>
 
 <script>
+    import * as Actions from '../store/ActionTypes';
+
     export default {
         data: function() {
             return {
@@ -35,7 +37,7 @@
         methods: {
             submit: function(event) {
                 event.preventDefault();
-                this.$store.dispatch('emailLogin', {email: this.email, password: this.password})
+                this.$store.dispatch(Actions.EMAIL_LOGIN, {email: this.email, password: this.password})
             }
         }
     }
