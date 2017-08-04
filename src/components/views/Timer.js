@@ -1,6 +1,7 @@
 import * as moment from 'moment';
 import * as $ from 'jquery';
 import * as StatsPanel from '../StatsPanel.vue';
+import * as ScramblePanel from '../ScramblePanel.vue';
 import {Solve} from '../../modules/Models';
 
 export default {
@@ -109,6 +110,7 @@ export default {
         }
     },
     components: {
-        'stats-panel': StatsPanel
+        'stats-panel': StatsPanel,
+        'scramble-panel': ScramblePanel
     }
 }

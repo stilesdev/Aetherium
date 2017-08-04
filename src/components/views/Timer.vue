@@ -23,7 +23,7 @@
 
                 </div>
                 <div class="col-md-3 visible-md visible-lg">
-
+                    <scramble-panel></scramble-panel>
                 </div>
             </div>
         </div>
