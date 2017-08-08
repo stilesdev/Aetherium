@@ -8,6 +8,7 @@ let ScramblerWorker = require('worker-loader?name=GenerateScramblerWorker.js!../
 
 const state = {
     userId: null,
+    sessionId: null,
     puzzles: null,
     activeView: 'timer',
     activePuzzle: 333,
@@ -20,6 +21,12 @@ const state = {
     options: {
         showTimer: true,
         timerTrigger: 'spacebar'
+    },
+    refs: {
+        user: null,
+        records: null,
+        session: null,
+        stats: null
     }
 };
 
@@ -30,6 +37,23 @@ const getters = {
 const mutations = {
     [Mutations.RECEIVE_USER_ID] (state, userId) {
         state.userId = userId;
+
+        if (userId) {
+            state.refs.user = firebase.database().ref(`/users/${userId}`);
+            state.refs.records = firebase.database().ref(`/records/${userId}`);
+
+            state.refs.user.once('value').then(snapshot => {
+                state.sessionId = snapshot.val().currentSession;
+                state.refs.session = firebase.database().ref(`/solves/${userId}/${state.sessionId}`);
+                state.refs.stats = firebase.database().ref(`/stats/${userId}/${state.sessionId}`);
+            });
+        } else {
+            state.sessionId = null;
+            state.refs.user = null;
+            state.refs.records = null;
+            state.refs.session = null;
+            state.refs.stats = null;
+        }
     },
     [Mutations.RECEIVE_PUZZLES] (state, puzzles) {
         state.puzzles = puzzles;
