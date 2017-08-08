@@ -41,16 +41,18 @@ const mutations = {
         if (userId) {
             state.refs.user = firebase.database().ref(`/users/${userId}`);
             state.refs.records = firebase.database().ref(`/records/${userId}`);
-
-            state.refs.user.once('value').then(snapshot => {
-                state.sessionId = snapshot.val().currentSession;
-                state.refs.session = firebase.database().ref(`/solves/${userId}/${state.sessionId}`);
-                state.refs.stats = firebase.database().ref(`/stats/${userId}/${state.sessionId}`);
-            });
         } else {
-            state.sessionId = null;
             state.refs.user = null;
             state.refs.records = null;
+        }
+    },
+    [Mutations.RECEIVE_SESSION_ID] (state, sessionId) {
+        state.session = sessionId;
+
+        if (sessionId) {
+            state.refs.session = firebase.database().ref(`/solves/${state.userId}/${sessionId}`);
+            state.refs.stats = firebase.database().ref(`/stats/${state.userId}/${sessionId}`);
+        } else {
             state.refs.session = null;
             state.refs.stats = null;
         }
@@ -82,6 +84,19 @@ const actions = {
     [Actions.EMAIL_LOGIN] (context, credentials) {
         firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password).catch(error => alert(error.message));
     },
+    [Actions.COMPLETE_LOGIN] (context, userId) {
+        context.commit(Mutations.RECEIVE_USER_ID, userId);
+
+        if (userId) {
+            context.state.refs.user.once('value').then(snapshot => {
+                if (snapshot.exists()) {
+
+                } else {
+                    // TODO: Finish this - create user snapshot? Or should it be created when user signs up?
+                }
+            });
+        }
+    },
     [Actions.LOGOUT] (context) {
         firebase.auth().signOut().catch(error => alert(error.message));
     },
@@ -89,6 +104,18 @@ const actions = {
         context.commit(Mutations.RECEIVE_SCRAMBLE, { text: 'Generating scramble...', svg: null });
         context.state.scramblerWorker.postMessage({
             scrambler: context.state.puzzles[context.state.activePuzzle].categories[context.state.activeCategory].scrambler
+        })
+    },
+    [Actions.STORE_SOLVE] (context, solve) {
+        const puzzle = context.state.activePuzzle;
+        const category = context.state.activeCategory;
+
+        const newSolveRef = context.state.refs.session.child(`solves/${puzzle}/${category}`).push();
+        newSolveRef.set({
+            time: solve.time,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            scramble: solve.scramble,
+            penalty: ''
         })
     }
 };
