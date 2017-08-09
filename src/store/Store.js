@@ -21,41 +21,19 @@ const state = {
     options: {
         showTimer: true,
         timerTrigger: 'spacebar'
-    },
-    refs: {
-        user: null,
-        records: null,
-        session: null,
-        stats: null
     }
 };
 
 const getters = {
-
+    //TODO: implement getters for firebase refs?
 };
 
 const mutations = {
     [Mutations.RECEIVE_USER_ID] (state, userId) {
         state.userId = userId;
-
-        if (userId) {
-            state.refs.user = firebase.database().ref(`/users/${userId}`);
-            state.refs.records = firebase.database().ref(`/records/${userId}`);
-        } else {
-            state.refs.user = null;
-            state.refs.records = null;
-        }
     },
     [Mutations.RECEIVE_SESSION_ID] (state, sessionId) {
         state.session = sessionId;
-
-        if (sessionId) {
-            state.refs.session = firebase.database().ref(`/solves/${state.userId}/${sessionId}`);
-            state.refs.stats = firebase.database().ref(`/stats/${state.userId}/${sessionId}`);
-        } else {
-            state.refs.session = null;
-            state.refs.stats = null;
-        }
     },
     [Mutations.RECEIVE_PUZZLES] (state, puzzles) {
         state.puzzles = puzzles;
@@ -73,10 +51,10 @@ const mutations = {
         state.scramble = scramble;
     },
     [Mutations.SET_OPTION_SHOWTIMER] (state, showTimer) {
-        state.option.showTimer = showTimer;
+        state.options.showTimer = showTimer;
     },
     [Mutations.SET_OPTION_TIMERTRIGGER] (state, timerTrigger) {
-        state.option.timerTrigger = timerTrigger;
+        state.options.timerTrigger = timerTrigger;
     }
 };
 
@@ -84,17 +62,32 @@ const actions = {
     [Actions.EMAIL_LOGIN] (context, credentials) {
         firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password).catch(error => alert(error.message));
     },
-    [Actions.COMPLETE_LOGIN] (context, userId) {
-        context.commit(Mutations.RECEIVE_USER_ID, userId);
+    [Actions.COMPLETE_LOGIN] (context, user) {
+        if (user) {
+            context.commit(Mutations.RECEIVE_USER_ID, user.uid);
 
-        if (userId) {
-            context.state.refs.user.once('value').then(snapshot => {
-                if (snapshot.exists()) {
+            firebase.database().ref(`/users/${user.uid}`).once('value').then(snapshot => {
+                const userData = snapshot.val();
 
-                } else {
-                    // TODO: Finish this - create user snapshot? Or should it be created when user signs up?
-                }
+                context.commit(Mutations.RECEIVE_SESSION_ID, userData.currentSession);
+
+                context.commit(Mutations.SET_OPTION_SHOWTIMER, userData.options.showTimer);
+                context.commit(Mutations.SET_OPTION_TIMERTRIGGER, userData.options.timerTrigger);
+
+                firebase.database().ref('/puzzles').on('value', snapshot => {
+                    const firstRun = context.state.puzzles === null;
+
+                    context.commit(Mutations.RECEIVE_PUZZLES, snapshot.val());
+
+                    if (firstRun) {
+                        context.commit(Mutations.SET_ACTIVE_PUZZLE, userData.currentPuzzle.puzzle);
+                        context.commit(Mutations.SET_ACTIVE_CATEGORY, userData.currentPuzzle.category);
+                    }
+                });
             });
+        } else {
+            context.commit(Mutations.RECEIVE_USER_ID, null);
+            context.commit(Mutations.RECEIVE_SESSION_ID, null);
         }
     },
     [Actions.LOGOUT] (context) {
@@ -110,7 +103,7 @@ const actions = {
         const puzzle = context.state.activePuzzle;
         const category = context.state.activeCategory;
 
-        const newSolveRef = context.state.refs.session.child(`solves/${puzzle}/${category}`).push();
+        const newSolveRef = firebase.database().ref(`/solves/${context.state.userId}/${context.state.sessionId}/solves/${puzzle}/${category}`).push();
         newSolveRef.set({
             time: solve.time,
             timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -121,38 +114,34 @@ const actions = {
 };
 
 const plugins = [
-    store => {
-        firebase.auth().onAuthStateChanged(user => {
-            store.commit(Mutations.RECEIVE_USER_ID, user ? user.uid : null);
-        })
-    },
-    store => {
-        firebase.database().ref('/puzzles').on('value', snapshot => {
-            const firstRun = store.state.puzzles === null;
+    store => firebase.auth().onAuthStateChanged(user => store.dispatch(Actions.COMPLETE_LOGIN, user)),
+    store => store.state.scramblerWorker.addEventListener('message', event => {
+        if (event.data === null) {
+            store.commit(Mutations.RECEIVE_SCRAMBLE, { text: 'Invalid scrambler!', svg: null });
+        } else {
+            store.commit(Mutations.RECEIVE_SCRAMBLE, { text: event.data.scramble, svg: event.data.svg });
+        }
+    }),
+    store => store.subscribe((mutation, state) => {
+        const userRef = firebase.database().ref(`/users/${state.userId}`);
 
-            store.commit(Mutations.RECEIVE_PUZZLES, snapshot.val());
+        if (mutation.type === Mutations.SET_OPTION_SHOWTIMER) {
+            userRef.child('options/showTimer').set(state.options.showTimer);
+        }
 
-            if (firstRun) {
-                store.dispatch(Actions.REQUEST_SCRAMBLE);
-            }
-        })
-    },
-    store => {
-        store.state.scramblerWorker.addEventListener('message', event => {
-            if (event.data === null) {
-                store.commit(Mutations.RECEIVE_SCRAMBLE, { text: 'Invalid scrambler!', svg: null });
-            } else {
-                store.commit(Mutations.RECEIVE_SCRAMBLE, { text: event.data.scramble, svg: event.data.svg });
-            }
-        })
-    },
-    store => {
-        store.subscribe((mutation, state) => {
-            if (mutation.type === Mutations.SET_ACTIVE_CATEGORY) {
-                store.dispatch(Actions.REQUEST_SCRAMBLE);
-            }
-        })
-    }
+        if (mutation.type === Mutations.SET_OPTION_TIMERTRIGGER) {
+            userRef.child('options/timerTrigger').set(state.options.timerTrigger);
+        }
+
+        if (mutation.type === Mutations.SET_ACTIVE_PUZZLE) {
+            userRef.child('currentPuzzle/puzzle').set(state.activePuzzle);
+        }
+
+        if (mutation.type === Mutations.SET_ACTIVE_CATEGORY) {
+            userRef.child('/currentPuzzle/category').set(state.activeCategory);
+            store.dispatch(Actions.REQUEST_SCRAMBLE);
+        }
+    })
 ];
 
 try {
