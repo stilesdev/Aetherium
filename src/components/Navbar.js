@@ -26,7 +26,6 @@ export default {
             },
             set(value) {
                 this.$store.commit(Mutations.SET_ACTIVE_PUZZLE, value);
-                this.activeCategory = 'default';
             }
         },
         activeCategory: {

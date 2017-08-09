@@ -80,8 +80,12 @@ const actions = {
                     context.commit(Mutations.RECEIVE_PUZZLES, snapshot.val());
 
                     if (firstRun) {
-                        context.commit(Mutations.SET_ACTIVE_PUZZLE, userData.currentPuzzle.puzzle);
-                        context.commit(Mutations.SET_ACTIVE_CATEGORY, userData.currentPuzzle.category);
+                        firebase.database().ref(`/users/${user.uid}/currentPuzzle/puzzle`).on('value', snapshot => {
+                            context.commit(Mutations.SET_ACTIVE_PUZZLE, snapshot.val());
+                        });
+                        firebase.database().ref(`/users/${user.uid}/currentPuzzle/category`).on('value', snapshot => {
+                            context.commit(Mutations.SET_ACTIVE_CATEGORY, snapshot.val());
+                        });
                     }
                 });
             });
@@ -135,6 +139,7 @@ const plugins = [
 
         if (mutation.type === Mutations.SET_ACTIVE_PUZZLE) {
             userRef.child('currentPuzzle/puzzle').set(state.activePuzzle);
+            store.commit(Mutations.SET_ACTIVE_CATEGORY, 'default');
         }
 
         if (mutation.type === Mutations.SET_ACTIVE_CATEGORY) {
