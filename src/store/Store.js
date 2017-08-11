@@ -47,6 +47,10 @@ const mutations = {
     [Mutations.SET_ACTIVE_CATEGORY] (state, categoryKey) {
         state.activeCategory = categoryKey;
     },
+    [Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY] (state, puzzle) {
+        state.activePuzzle = puzzle.puzzle;
+        state.activeCategory = puzzle.category;
+    },
     [Mutations.RECEIVE_SCRAMBLE] (state, scramble) {
         state.scramble = scramble;
     },
@@ -80,11 +84,8 @@ const actions = {
                     context.commit(Mutations.RECEIVE_PUZZLES, snapshot.val());
 
                     if (firstRun) {
-                        firebase.database().ref(`/users/${user.uid}/currentPuzzle/puzzle`).on('value', snapshot => {
-                            context.commit(Mutations.SET_ACTIVE_PUZZLE, snapshot.val());
-                        });
-                        firebase.database().ref(`/users/${user.uid}/currentPuzzle/category`).on('value', snapshot => {
-                            context.commit(Mutations.SET_ACTIVE_CATEGORY, snapshot.val());
+                        firebase.database().ref(`/users/${user.uid}/currentPuzzle`).on('value', snapshot => {
+                            context.commit(Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY, snapshot.val());
                         });
                     }
                 });
@@ -144,6 +145,10 @@ const plugins = [
 
         if (mutation.type === Mutations.SET_ACTIVE_CATEGORY) {
             userRef.child('/currentPuzzle/category').set(state.activeCategory);
+            store.dispatch(Actions.REQUEST_SCRAMBLE);
+        }
+
+        if (mutation.type === Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY) {
             store.dispatch(Actions.REQUEST_SCRAMBLE);
         }
     })
