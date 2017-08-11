@@ -25,7 +25,15 @@ const state = {
 };
 
 const getters = {
-    //TODO: implement getters for firebase refs?
+    puzzlesRef() {
+        return firebase.database().ref('/puzzles');
+    },
+    userRef(state) {
+        return firebase.database().ref(`/users/${state.userId}`);
+    },
+    solvesRef(state) {
+        return firebase.database().ref(`/solves/${state.userId}/${state.sessionId}/solves/${state.activePuzzle}/${state.activeCategory}`);
+    }
 };
 
 const mutations = {
@@ -70,7 +78,7 @@ const actions = {
         if (user) {
             context.commit(Mutations.RECEIVE_USER_ID, user.uid);
 
-            firebase.database().ref(`/users/${user.uid}`).once('value').then(snapshot => {
+            context.getters.userRef.once('value').then(snapshot => {
                 const userData = snapshot.val();
 
                 context.commit(Mutations.RECEIVE_SESSION_ID, userData.currentSession);
@@ -78,13 +86,13 @@ const actions = {
                 context.commit(Mutations.SET_OPTION_SHOWTIMER, userData.options.showTimer);
                 context.commit(Mutations.SET_OPTION_TIMERTRIGGER, userData.options.timerTrigger);
 
-                firebase.database().ref('/puzzles').on('value', snapshot => {
+                context.getters.puzzlesRef.on('value', snapshot => {
                     const firstRun = context.state.puzzles === null;
 
                     context.commit(Mutations.RECEIVE_PUZZLES, snapshot.val());
 
                     if (firstRun) {
-                        firebase.database().ref(`/users/${user.uid}/currentPuzzle`).on('value', snapshot => {
+                        context.getters.userRef.child('currentPuzzle').on('value', snapshot => {
                             context.commit(Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY, snapshot.val());
                         });
                     }
@@ -105,10 +113,7 @@ const actions = {
         })
     },
     [Actions.STORE_SOLVE] (context, solve) {
-        const puzzle = context.state.activePuzzle;
-        const category = context.state.activeCategory;
-
-        const newSolveRef = firebase.database().ref(`/solves/${context.state.userId}/${context.state.sessionId}/solves/${puzzle}/${category}`).push();
+        const newSolveRef = context.getters.solvesRef.push();
         newSolveRef.set({
             time: solve.time,
             timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -128,23 +133,21 @@ const plugins = [
         }
     }),
     store => store.subscribe((mutation, state) => {
-        const userRef = firebase.database().ref(`/users/${state.userId}`);
-
         if (mutation.type === Mutations.SET_OPTION_SHOWTIMER) {
-            userRef.child('options/showTimer').set(state.options.showTimer);
+            store.getters.userRef.child('options/showTimer').set(state.options.showTimer);
         }
 
         if (mutation.type === Mutations.SET_OPTION_TIMERTRIGGER) {
-            userRef.child('options/timerTrigger').set(state.options.timerTrigger);
+            store.getters.userRef.child('options/timerTrigger').set(state.options.timerTrigger);
         }
 
         if (mutation.type === Mutations.SET_ACTIVE_PUZZLE) {
-            userRef.child('currentPuzzle/puzzle').set(state.activePuzzle);
+            store.getters.userRef.child('currentPuzzle/puzzle').set(state.activePuzzle);
             store.commit(Mutations.SET_ACTIVE_CATEGORY, 'default');
         }
 
         if (mutation.type === Mutations.SET_ACTIVE_CATEGORY) {
-            userRef.child('/currentPuzzle/category').set(state.activeCategory);
+            store.getters.userRef.child('/currentPuzzle/category').set(state.activeCategory);
             store.dispatch(Actions.REQUEST_SCRAMBLE);
         }
 
