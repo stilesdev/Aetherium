@@ -3,6 +3,7 @@ import * as $ from 'jquery';
 import * as StatsPanel from '../StatsPanel.vue';
 import * as ScramblePanel from '../ScramblePanel.vue';
 import {Solve} from '../../modules/Models';
+import * as Actions from '../../store/ActionTypes';
 
 export default {
     data: function() {
@@ -86,7 +87,7 @@ export default {
         completeSolve(delta) {
             this.timerLabel = Solve.formatTime(delta);
 
-            //TODO: commit new solve to store
+            this.$store.dispatch(Actions.STORE_SOLVE, delta);
         }
     },
     watch: {

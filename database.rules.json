@@ -9,6 +9,12 @@
         ".read": "$user_id === auth.uid",
         ".write": "$user_id === auth.uid"
       }
+    },
+    "solves": {
+      "$user_id": {
+        ".read": "$user_id === auth.uid",
+        ".write": "$user_id === auth.uid"
+      }
     }
   }
 }

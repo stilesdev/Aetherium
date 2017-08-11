@@ -1,5 +1,6 @@
 import * as firebase from 'firebase';
 import * as firebaseConfig from '../../firebase.config';
+import * as moment from 'moment';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import * as Mutations from './MutationTypes';
@@ -31,8 +32,14 @@ const getters = {
     userRef(state) {
         return firebase.database().ref(`/users/${state.userId}`);
     },
-    solvesRef(state) {
-        return firebase.database().ref(`/solves/${state.userId}/${state.sessionId}/solves/${state.activePuzzle}/${state.activeCategory}`);
+    solvesRootRef(state) {
+        return firebase.database().ref(`/solves/${state.userId}`)
+    },
+    sessionRef(state, getters) {
+        return getters.solvesRootRef.child(`${state.sessionId}`);
+    },
+    solvesRef(state, getters) {
+        return getters.sessionRef.child(`solves/${state.activePuzzle}/${state.activeCategory}`);
     }
 };
 
@@ -41,7 +48,7 @@ const mutations = {
         state.userId = userId;
     },
     [Mutations.RECEIVE_SESSION_ID] (state, sessionId) {
-        state.session = sessionId;
+        state.sessionId = sessionId;
     },
     [Mutations.RECEIVE_PUZZLES] (state, puzzles) {
         state.puzzles = puzzles;
@@ -81,8 +88,6 @@ const actions = {
             context.getters.userRef.once('value').then(snapshot => {
                 const userData = snapshot.val();
 
-                context.commit(Mutations.RECEIVE_SESSION_ID, userData.currentSession);
-
                 context.commit(Mutations.SET_OPTION_SHOWTIMER, userData.options.showTimer);
                 context.commit(Mutations.SET_OPTION_TIMERTRIGGER, userData.options.timerTrigger);
 
@@ -95,12 +100,17 @@ const actions = {
                         context.getters.userRef.child('currentPuzzle').on('value', snapshot => {
                             context.commit(Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY, snapshot.val());
                         });
+
+                        context.getters.userRef.child('currentSessionId').on('value', snapshot => {
+                            context.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
+                        })
                     }
                 });
             });
         } else {
             context.commit(Mutations.RECEIVE_USER_ID, null);
             context.commit(Mutations.RECEIVE_SESSION_ID, null);
+            // TODO: unset everything set in if block above
         }
     },
     [Actions.LOGOUT] (context) {
@@ -112,14 +122,37 @@ const actions = {
             scrambler: context.state.puzzles[context.state.activePuzzle].categories[context.state.activeCategory].scrambler
         })
     },
-    [Actions.STORE_SOLVE] (context, solve) {
-        const newSolveRef = context.getters.solvesRef.push();
-        newSolveRef.set({
-            time: solve.time,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            scramble: solve.scramble,
-            penalty: ''
-        })
+    [Actions.CHECK_SESSION] (context) {
+        return new Promise((resolve, reject) => {
+            if (!context.state.sessionId) {
+                const date = moment().utc().dayOfYear(moment().dayOfYear()).startOf('day');
+                const newSessionRef = context.getters.solvesRootRef.push();
+
+                context.getters.userRef.child('currentSessionId').set(newSessionRef.key).then(() => {
+                    newSessionRef.set({
+                        date: date.format('M/D/YYYY'),
+                        timestamp: date.valueOf()
+                    });
+
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
+        });
+    },
+    [Actions.CLOSE_SESSION] (context) {
+        context.getters.userRef.child('currentSessionId').set(null);
+    },
+    [Actions.STORE_SOLVE] (context, delta) {
+        context.dispatch(Actions.CHECK_SESSION).then(() => {
+            context.getters.solvesRef.push().set({
+                time: delta,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                scramble: context.state.scramble.text,
+                penalty: ''
+            });
+        });
     }
 };
 
@@ -147,7 +180,7 @@ const plugins = [
         }
 
         if (mutation.type === Mutations.SET_ACTIVE_CATEGORY) {
-            store.getters.userRef.child('/currentPuzzle/category').set(state.activeCategory);
+            store.getters.userRef.child('currentPuzzle/category').set(state.activeCategory);
             store.dispatch(Actions.REQUEST_SCRAMBLE);
         }
 

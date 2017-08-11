@@ -2,4 +2,6 @@ export const EMAIL_LOGIN = 'EMAIL_LOGIN';
 export const COMPLETE_LOGIN = 'COMPLETE_LOGIN';
 export const LOGOUT = 'LOGOUT';
 export const REQUEST_SCRAMBLE = 'REQUEST_SCRAMBLE';
+export const CHECK_SESSION = 'CHECK_SESSION';
+export const CLOSE_SESSION = 'CLOSE_SESSION';
 export const STORE_SOLVE = 'STORE_SOLVE';
