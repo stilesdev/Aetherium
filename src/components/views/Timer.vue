@@ -4,8 +4,8 @@
             <div id="timerTouchArea" v-on:touchend="onSpacebarPress">
                 <div class="row">
                     <div id="scrambleArea" class="col-md-10 col-md-offset-1">
-                        <h3 id="scrambleLabel" v-if="scramble.text">{{ scramble.text }}</h3>
-                        <h3 v-else>No valid scrambler available for this puzzle</h3>
+                        <h3 v-if="scramble.text">{{ scramble.text }}</h3>
+                        <h3 v-else>Generating scramble...</h3>
                     </div>
                 </div>
                 <div class="row">

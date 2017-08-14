@@ -125,7 +125,7 @@ const actions = {
         firebase.auth().signOut().catch(error => alert(error.message));
     },
     [Actions.REQUEST_SCRAMBLE] (context) {
-        context.commit(Mutations.RECEIVE_SCRAMBLE, { text: 'Generating scramble...', svg: null });
+        context.commit(Mutations.RECEIVE_SCRAMBLE, { text: null, svg: null });
         context.state.scramblerWorker.postMessage({
             scrambler: context.state.puzzles[context.state.activePuzzle].categories[context.state.activeCategory].scrambler
         })
@@ -160,6 +160,8 @@ const actions = {
                 scramble: context.state.scramble.text,
                 penalty: ''
             });
+
+            context.dispatch(Actions.REQUEST_SCRAMBLE);
         });
     },
     [Actions.SET_PENALTY] (context, update) {
@@ -175,7 +177,7 @@ const plugins = [
     store => firebase.auth().onAuthStateChanged(user => store.dispatch(Actions.COMPLETE_LOGIN, user)),
     store => store.state.scramblerWorker.addEventListener('message', event => {
         if (event.data === null) {
-            store.commit(Mutations.RECEIVE_SCRAMBLE, { text: 'Invalid scrambler!', svg: null });
+            store.commit(Mutations.RECEIVE_SCRAMBLE, { text: 'No valid scrambler for this puzzle', svg: null });
         } else {
             store.commit(Mutations.RECEIVE_SCRAMBLE, { text: event.data.scramble, svg: event.data.svg });
         }
