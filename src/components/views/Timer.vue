@@ -20,7 +20,7 @@
                     <stats-panel></stats-panel>
                 </div>
                 <div class="col-md-6 col-xs-12 col-sm-12">
-
+                    <solves-panel></solves-panel>
                 </div>
                 <div class="col-md-3 visible-md visible-lg">
                     <scramble-panel></scramble-panel>

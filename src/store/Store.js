@@ -3,6 +3,7 @@ import * as firebaseConfig from '../../firebase.config';
 import * as moment from 'moment';
 import Vue from 'vue';
 import Vuex from 'vuex';
+import { Solve } from '../modules/Models';
 import * as Mutations from './MutationTypes';
 import * as Actions from './ActionTypes';
 let ScramblerWorker = require('worker-loader?name=GenerateScramblerWorker.js!../workers/GenerateScramblerWorker.js');
@@ -14,6 +15,7 @@ const state = {
     activeView: 'timer',
     activePuzzle: 333,
     activeCategory: 'default',
+    solves: [],
     scramblerWorker: new ScramblerWorker(),
     scramble: {
         text: 'Generating scramble...',
@@ -74,6 +76,12 @@ const mutations = {
     },
     [Mutations.SET_OPTION_TIMERTRIGGER] (state, timerTrigger) {
         state.options.timerTrigger = timerTrigger;
+    },
+    [Mutations.CLEAR_SOLVES] (state) {
+        state.solves = [];
+    },
+    [Mutations.ADD_SOLVE] (state, solve) {
+        state.solves.push(solve);
     }
 };
 
@@ -153,6 +161,13 @@ const actions = {
                 penalty: ''
             });
         });
+    },
+    [Actions.SET_PENALTY] (context, update) {
+        const newPenalty = (solve.penalty === update.penalty) ? '' : update.penalty;
+        context.getters.solvesRef.child(update.solve.uid).set({penalty : newPenalty});
+    },
+    [Actions.DELETE_SOLVE] (context, solveId) {
+        context.getters.solvesRef.child(solveId).remove();
     }
 };
 
@@ -187,7 +202,25 @@ const plugins = [
         if (mutation.type === Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY) {
             store.dispatch(Actions.REQUEST_SCRAMBLE);
         }
-    })
+    }),
+    store => {
+        let prevPuzzle = store.state.activePuzzle;
+        let prevCategory = store.state.activeCategory;
+
+        store.subscribe((mutation, state) => {
+            if (mutation.type === Mutations.SET_ACTIVE_CATEGORY || mutation.type === Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY) {
+                store.getters.sessionRef.child(`solves/${prevPuzzle}/${prevCategory}`).off();
+                store.commit(Mutations.CLEAR_SOLVES);
+
+                store.getters.solvesRef.on('child_added', snapshot => {
+                    store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
+                });
+            }
+
+            prevPuzzle = state.activePuzzle;
+            prevCategory = state.activeCategory;
+        });
+    }
 ];
 
 try {

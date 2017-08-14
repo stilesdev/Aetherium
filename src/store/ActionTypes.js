@@ -5,3 +5,5 @@ export const REQUEST_SCRAMBLE = 'REQUEST_SCRAMBLE';
 export const CHECK_SESSION = 'CHECK_SESSION';
 export const CLOSE_SESSION = 'CLOSE_SESSION';
 export const STORE_SOLVE = 'STORE_SOLVE';
+export const SET_PENALTY = 'SET_PENALTY';
+export const DELETE_SOLVE = 'DELETE_SOLVE';
