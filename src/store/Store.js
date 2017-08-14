@@ -220,7 +220,10 @@ const plugins = [
             prevPuzzle = state.activePuzzle;
             prevCategory = state.activeCategory;
         });
-    }
+    },
+    store => store.subscribe((mutation, state) => {
+        console.log(mutation);
+    })
 ];
 
 try {
