@@ -105,13 +105,13 @@ const actions = {
                     context.commit(Mutations.RECEIVE_PUZZLES, snapshot.val());
 
                     if (firstRun) {
+                        context.getters.userRef.child('currentSessionId').on('value', snapshot => {
+                            context.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
+                        });
+
                         context.getters.userRef.child('currentPuzzle').on('value', snapshot => {
                             context.commit(Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY, snapshot.val());
                         });
-
-                        context.getters.userRef.child('currentSessionId').on('value', snapshot => {
-                            context.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
-                        })
                     }
                 });
             });
