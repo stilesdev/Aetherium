@@ -2,6 +2,10 @@ export function mean(solves) {
     return meanOfRange(solves, 0, solves.length - 1);
 }
 
+export function count(solves) {
+    return solves.length;
+}
+
 export function best(solves) {
     if (solves.length === 0) return 0;
 

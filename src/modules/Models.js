@@ -12,15 +12,13 @@ export class Solve {
      * @param {number} timestamp - the timestamp taken when the solve was completed
      * @param {string} scramble - the scramble generated for this solve
      * @param {string} penalty - the penalty, if any, received during this solve
-     * @param {string} comments - any comments entered by the user
      */
-    constructor(uid, time, timestamp, scramble, penalty, comments) {
+    constructor(uid, time, timestamp, scramble, penalty) {
         this.uid = uid;
         this.time = time;
         this.timestamp = timestamp;
         this.scramble = scramble;
         this.penalty = penalty;
-        this.comments = comments;
     }
 
     /**
@@ -32,7 +30,7 @@ export class Solve {
     static fromSnapshot(solveSnapshot) {
         let val = solveSnapshot.val();
 
-        return new this(solveSnapshot.key, val.time, val.timestamp, val.scramble, val.penalty, val.comments);
+        return new this(solveSnapshot.key, val.time, val.timestamp, val.scramble, val.penalty);
     }
 
     /**
@@ -141,9 +139,7 @@ export class Session {
     /**
      * Create a new Session
      */
-    constructor(uid) {
-        this.uid = uid;
-        this.date = null;
+    constructor() {
         this.solves = [];
         this.stats = {
             mean: 0,
@@ -193,7 +189,6 @@ export class Session {
                 solve.timestamp = data.timestamp;
                 solve.scramble = data.scramble;
                 solve.penalty = data.penalty;
-                solve.comments = data.comments;
             }
         });
 

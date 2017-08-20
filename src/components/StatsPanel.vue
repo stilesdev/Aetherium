@@ -58,7 +58,7 @@
         },
         computed: {
             stats() {
-                return null; //TODO: Populate statistics from store
+                return this.$store.state.stats;
             }
         },
         methods: {

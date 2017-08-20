@@ -4,6 +4,7 @@ import * as moment from 'moment';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { Solve } from '../modules/Models';
+import * as Stats from '../modules/Statistics';
 import * as Mutations from './MutationTypes';
 import * as Actions from './ActionTypes';
 let ScramblerWorker = require('worker-loader?name=GenerateScramblerWorker.js!../workers/GenerateScramblerWorker.js');
@@ -16,6 +17,7 @@ const state = {
     activePuzzle: 333,
     activeCategory: 'default',
     solves: [],
+    stats: null,
     scramblerWorker: new ScramblerWorker(),
     scramble: {
         text: 'Generating scramble...',
@@ -42,6 +44,12 @@ const getters = {
     },
     solvesRef(state, getters) {
         return getters.sessionRef.child(`solves/${state.activePuzzle}/${state.activeCategory}`);
+    },
+    statsRootRef(state) {
+        return firebase.database().ref(`/stats/${state.userId}`);
+    },
+    statsRef(state, getters) {
+        return getters.statsRootRef.child(`${state.activePuzzle}/${state.activeCategory}/${state.sessionId}`);
     }
 };
 
@@ -76,6 +84,9 @@ const mutations = {
     },
     [Mutations.ADD_SOLVE] (state, solve) {
         state.solves.push(solve);
+    },
+    [Mutations.RECEIVE_STATS] (state, stats) {
+        state.stats = stats;
     }
 };
 
@@ -104,6 +115,11 @@ const actions = {
                         timestamp: date.valueOf()
                     });
 
+                    context.getters.statsRef.set({
+                        date: date.format('M/D/YYYY'),
+                        timestamp: date.valueOf()
+                    });
+
                     resolve();
                 });
             } else {
@@ -121,17 +137,36 @@ const actions = {
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
                 scramble: context.state.scramble.text,
                 penalty: ''
-            });
+            }).then(() => context.dispatch(Actions.UPDATE_STATS));
 
             context.dispatch(Actions.REQUEST_SCRAMBLE);
         });
     },
     [Actions.SET_PENALTY] (context, update) {
-        const newPenalty = (solve.penalty === update.penalty) ? '' : update.penalty;
+        const newPenalty = (update.solve.penalty === update.penalty) ? '' : update.penalty;
         context.getters.solvesRef.child(update.solve.uid).set({penalty : newPenalty});
     },
     [Actions.DELETE_SOLVE] (context, solveId) {
         context.getters.solvesRef.child(solveId).remove();
+    },
+    [Actions.UPDATE_STATS] (context) {
+        context.getters.statsRef.update({
+            mean: Stats.mean(context.state.solves),
+            count: Stats.count(context.state.solves),
+            best: Stats.best(context.state.solves),
+            worst: Stats.worst(context.state.solves),
+            stdDev: Stats.stdDev(context.state.solves),
+            mo3: Stats.mo3(context.state.solves),
+            ao5: Stats.ao5(context.state.solves),
+            ao12: Stats.ao12(context.state.solves),
+            ao50: Stats.ao50(context.state.solves),
+            ao100: Stats.ao100(context.state.solves),
+            bestMo3: Stats.bestMo3(context.state.solves),
+            bestAo5: Stats.bestAo5(context.state.solves),
+            bestAo12: Stats.bestAo12(context.state.solves),
+            bestAo50: Stats.bestAo50(context.state.solves),
+            bestAo100: Stats.bestAo100(context.state.solves)
+        });
     }
 };
 
@@ -183,6 +218,7 @@ const plugins = [
         store.subscribe((mutation, state) => {
             if (mutation.type === Mutations.RECEIVE_ACTIVE_PUZZLE) {
                 store.getters.sessionRef.child(`solves/${prevPuzzle}/${prevCategory}`).off();
+                store.getters.solvesRootRef.child(`${prevPuzzle}/${prevCategory}/${store.state.userId}`).off();
                 prevPuzzle = state.activePuzzle;
                 prevCategory = state.activeCategory;
 
@@ -190,6 +226,10 @@ const plugins = [
 
                 store.getters.solvesRef.on('child_added', snapshot => {
                     store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
+                });
+
+                store.getters.statsRef.on('value', snapshot => {
+                    store.commit(Mutations.RECEIVE_STATS, snapshot.val());
                 });
 
                 store.dispatch(Actions.REQUEST_SCRAMBLE);
