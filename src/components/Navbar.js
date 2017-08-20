@@ -1,3 +1,4 @@
+import * as firebase from 'firebase';
 import * as $ from 'jquery';
 import * as Mutations from '../store/MutationTypes';
 import * as Actions from '../store/ActionTypes';
@@ -45,7 +46,7 @@ export default {
             // TODO: Save user account options
         },
         logout() {
-            this.$store.dispatch(Actions.LOGOUT);
+            firebase.auth().signOut().catch(error => alert(error.message));
         }
     }
 }

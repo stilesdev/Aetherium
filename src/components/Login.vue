@@ -25,7 +25,7 @@
 </template>
 
 <script>
-    import * as Actions from '../store/ActionTypes';
+    import * as firebase from 'firebase';
 
     export default {
         data: function() {
@@ -37,7 +37,7 @@
         methods: {
             submit: function(event) {
                 event.preventDefault();
-                this.$store.dispatch(Actions.EMAIL_LOGIN, {email: this.email, password: this.password})
+                firebase.auth().signInWithEmailAndPassword(this.email, this.password);
             }
         }
     }

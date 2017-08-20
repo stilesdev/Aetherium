@@ -80,43 +80,8 @@ const mutations = {
 };
 
 const actions = {
-    [Actions.EMAIL_LOGIN] (context, credentials) {
-        firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password).catch(error => alert(error.message));
-    },
-    [Actions.COMPLETE_LOGIN] (context, user) {
-        if (user) {
-            context.commit(Mutations.RECEIVE_USER_ID, user.uid);
-
-            context.getters.userRef.once('value').then(snapshot => {
-                const userData = snapshot.val();
-
-                context.commit(Mutations.SET_OPTION_SHOWTIMER, userData.options.showTimer);
-                context.commit(Mutations.SET_OPTION_TIMERTRIGGER, userData.options.timerTrigger);
-
-                context.getters.puzzlesRef.on('value', snapshot => {
-                    const firstRun = context.state.puzzles === null;
-
-                    context.commit(Mutations.RECEIVE_PUZZLES, snapshot.val());
-
-                    if (firstRun) {
-                        context.getters.userRef.child('currentSessionId').on('value', snapshot => {
-                            context.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
-                        });
-
-                        context.getters.userRef.child('currentPuzzle').on('value', snapshot => {
-                            context.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, snapshot.val());
-                        });
-                    }
-                });
-            });
-        } else {
-            context.commit(Mutations.RECEIVE_USER_ID, null);
-            context.commit(Mutations.RECEIVE_SESSION_ID, null);
-            // TODO: unset everything set in if block above
-        }
-    },
-    [Actions.LOGOUT] (context) {
-        firebase.auth().signOut().catch(error => alert(error.message));
+    [Actions.SET_OPTIONS] (context, payload) {
+        context.getters.userRef.child('options').set(payload);
     },
     [Actions.SET_ACTIVE_PUZZLE] (context, payload) {
         context.getters.userRef.child('currentPuzzle').set({ puzzle: payload.puzzle, category: payload.category });
@@ -171,7 +136,9 @@ const actions = {
 };
 
 const plugins = [
-    store => firebase.auth().onAuthStateChanged(user => store.dispatch(Actions.COMPLETE_LOGIN, user)),
+    store => firebase.auth().onAuthStateChanged(user => {
+        store.commit(Mutations.RECEIVE_USER_ID, user ? user.uid : null);
+    }),
     store => store.state.scramblerWorker.addEventListener('message', event => {
         if (event.data === null) {
             store.commit(Mutations.RECEIVE_SCRAMBLE, { text: 'No valid scrambler for this puzzle', svg: null });
@@ -179,15 +146,36 @@ const plugins = [
             store.commit(Mutations.RECEIVE_SCRAMBLE, { text: event.data.scramble, svg: event.data.svg });
         }
     }),
-    store => store.subscribe((mutation, state) => {
-        if (mutation.type === Mutations.SET_OPTION_SHOWTIMER) {
-            store.getters.userRef.child('options/showTimer').set(state.options.showTimer);
-        }
-
-        if (mutation.type === Mutations.SET_OPTION_TIMERTRIGGER) {
-            store.getters.userRef.child('options/timerTrigger').set(state.options.timerTrigger);
-        }
+    store => store.getters.puzzlesRef.on('value', snapshot => {
+        store.commit(Mutations.RECEIVE_PUZZLES, snapshot.val());
     }),
+    store => {
+        let prevUserId = store.state.userId;
+
+        store.subscribe((mutation, state) => {
+            if (mutation.type === Mutations.RECEIVE_USER_ID) {
+                firebase.database().ref(`/users/${prevUserId}/options`).off();
+                firebase.database().ref(`/users/${prevUserId}/currentSessionId`).off();
+                firebase.database().ref(`/users/${prevUserId}/currentPuzzle`).off();
+                prevUserId = state.userId;
+
+                if (state.userId) {
+                    store.getters.userRef.child('options').on('value', snapshot => {
+                        store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer);
+                        store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger);
+                    });
+
+                    store.getters.userRef.child('currentSessionId').on('value', snapshot => {
+                        store.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
+                    });
+
+                    store.getters.userRef.child('currentPuzzle').on('value', snapshot => {
+                        store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, snapshot.val());
+                    });
+                }
+            }
+        });
+    },
     store => {
         let prevPuzzle = store.state.activePuzzle;
         let prevCategory = store.state.activeCategory;
@@ -195,14 +183,14 @@ const plugins = [
         store.subscribe((mutation, state) => {
             if (mutation.type === Mutations.RECEIVE_ACTIVE_PUZZLE) {
                 store.getters.sessionRef.child(`solves/${prevPuzzle}/${prevCategory}`).off();
+                prevPuzzle = state.activePuzzle;
+                prevCategory = state.activeCategory;
+
                 store.commit(Mutations.CLEAR_SOLVES);
 
                 store.getters.solvesRef.on('child_added', snapshot => {
                     store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
                 });
-
-                prevPuzzle = state.activePuzzle;
-                prevCategory = state.activeCategory;
 
                 store.dispatch(Actions.REQUEST_SCRAMBLE);
             }

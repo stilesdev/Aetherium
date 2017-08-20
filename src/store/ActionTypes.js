@@ -1,6 +1,4 @@
-export const EMAIL_LOGIN = 'EMAIL_LOGIN';
-export const COMPLETE_LOGIN = 'COMPLETE_LOGIN';
-export const LOGOUT = 'LOGOUT';
+export const SET_OPTIONS = 'SET_OPTIONS';
 export const SET_ACTIVE_PUZZLE = 'SET_ACTIVE_PUZZLE';
 export const REQUEST_SCRAMBLE = 'REQUEST_SCRAMBLE';
 export const CHECK_SESSION = 'CHECK_SESSION';
