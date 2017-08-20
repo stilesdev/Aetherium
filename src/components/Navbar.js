@@ -25,7 +25,7 @@ export default {
                 return this.$store.state.activePuzzle;
             },
             set(value) {
-                this.$store.commit(Mutations.SET_ACTIVE_PUZZLE, { puzzle: value, category: 'default' });
+                this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value, category: 'default' });
             }
         },
         activeCategory: {
@@ -33,7 +33,7 @@ export default {
                 return this.$store.state.activeCategory;
             },
             set(value) {
-                this.$store.commit(Mutations.SET_ACTIVE_PUZZLE, { puzzle: this.activePuzzle, category: value });
+                this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: this.activePuzzle, category: value });
             }
         }
     },

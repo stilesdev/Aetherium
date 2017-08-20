@@ -58,7 +58,7 @@ const mutations = {
     [Mutations.SET_ACTIVE_VIEW] (state, newView) {
         state.activeView = newView;
     },
-    [Mutations.SET_ACTIVE_PUZZLE] (state, payload) {
+    [Mutations.RECEIVE_ACTIVE_PUZZLE] (state, payload) {
         state.activePuzzle = payload.puzzle;
         state.activeCategory = payload.category;
     },
@@ -104,7 +104,7 @@ const actions = {
                         });
 
                         context.getters.userRef.child('currentPuzzle').on('value', snapshot => {
-                            context.commit(Mutations.SET_ACTIVE_PUZZLE, snapshot.val());
+                            context.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, snapshot.val());
                         });
                     }
                 });
@@ -117,6 +117,9 @@ const actions = {
     },
     [Actions.LOGOUT] (context) {
         firebase.auth().signOut().catch(error => alert(error.message));
+    },
+    [Actions.SET_ACTIVE_PUZZLE] (context, payload) {
+        context.getters.userRef.child('currentPuzzle').set({ puzzle: payload.puzzle, category: payload.category });
     },
     [Actions.REQUEST_SCRAMBLE] (context) {
         context.commit(Mutations.RECEIVE_SCRAMBLE, { text: null, svg: null });
@@ -184,17 +187,13 @@ const plugins = [
         if (mutation.type === Mutations.SET_OPTION_TIMERTRIGGER) {
             store.getters.userRef.child('options/timerTrigger').set(state.options.timerTrigger);
         }
-
-        if (mutation.type === Mutations.SET_ACTIVE_PUZZLE) {
-            store.getters.userRef.child('currentPuzzle').set({ puzzle: state.activePuzzle, category: state.activeCategory });
-        }
     }),
     store => {
         let prevPuzzle = store.state.activePuzzle;
         let prevCategory = store.state.activeCategory;
 
         store.subscribe((mutation, state) => {
-            if (mutation.type === Mutations.SET_ACTIVE_PUZZLE) {
+            if (mutation.type === Mutations.RECEIVE_ACTIVE_PUZZLE) {
                 store.getters.sessionRef.child(`solves/${prevPuzzle}/${prevCategory}`).off();
                 store.commit(Mutations.CLEAR_SOLVES);
 
@@ -210,7 +209,8 @@ const plugins = [
         });
     },
     store => store.subscribe((mutation, state) => {
-        console.log(mutation);
+        console.log(mutation.type);
+        console.log(mutation.payload);
     })
 ];
 
