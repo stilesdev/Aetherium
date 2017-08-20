@@ -3,7 +3,7 @@
         <div class="container-fluid">
             <div id="timerTouchArea" v-on:touchend="onSpacebarPress">
                 <div class="row">
-                    <div id="scrambleArea" class="col-md-10 col-md-offset-1">
+                    <div id="scrambleArea" class="col-md-10 col-md-offset-1" v-if="showScramble">
                         <h3 v-if="scramble.text">{{ scramble.text }}</h3>
                         <h3 v-else>Generating scramble...</h3>
                     </div>

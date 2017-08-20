@@ -11,6 +11,7 @@ export default {
         return {
             timerStart: 0,
             timerLabel: '00:00.00',
+            showScramble: true,
             stackmatStarted: false
         }
     },
@@ -72,6 +73,7 @@ export default {
         },
         startTimer() {
             this.timerStart = moment().valueOf();
+            this.showScramble = false;
 
             if (this.showTimer) {
                 setTimeout(this.updateTimer, 10);
@@ -89,6 +91,7 @@ export default {
             this.timerLabel = Solve.formatTime(delta);
 
             this.$store.dispatch(Actions.STORE_SOLVE, delta);
+            this.showScramble = true;
         }
     },
     watch: {
