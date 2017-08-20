@@ -85,6 +85,12 @@ const mutations = {
     [Mutations.ADD_SOLVE] (state, solve) {
         state.solves.push(solve);
     },
+    [Mutations.UPDATE_SOLVE] (state, payload) {
+        Vue.set(state.solves, state.solves.findIndex(solve => solve.uid === payload.uid), payload.solve);
+    },
+    [Mutations.DELETE_SOLVE] (state, solveId) {
+        state.solves.splice(state.solves.findIndex(solve => solve.uid = solveId), 1);
+    },
     [Mutations.RECEIVE_STATS] (state, stats) {
         state.stats = stats;
     }
@@ -144,10 +150,10 @@ const actions = {
     },
     [Actions.SET_PENALTY] (context, update) {
         const newPenalty = (update.solve.penalty === update.penalty) ? '' : update.penalty;
-        context.getters.solvesRef.child(update.solve.uid).set({penalty : newPenalty});
+        context.getters.solvesRef.child(update.solve.uid).update({penalty : newPenalty}).then(() => context.dispatch(Actions.UPDATE_STATS));
     },
     [Actions.DELETE_SOLVE] (context, solveId) {
-        context.getters.solvesRef.child(solveId).remove();
+        context.getters.solvesRef.child(solveId).remove().then(() => context.dispatch(Actions.UPDATE_STATS));
     },
     [Actions.UPDATE_STATS] (context) {
         context.getters.statsRef.update({
@@ -226,6 +232,14 @@ const plugins = [
 
                 store.getters.solvesRef.on('child_added', snapshot => {
                     store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
+                });
+
+                store.getters.solvesRef.on('child_changed', snapshot => {
+                    store.commit(Mutations.UPDATE_SOLVE, { uid: snapshot.key, solve: Solve.fromSnapshot(snapshot) });
+                });
+
+                store.getters.solvesRef.on('child_removed', snapshot => {
+                    store.commit(Mutations.DELETE_SOLVE, snapshot.key);
                 });
 
                 store.getters.statsRef.on('value', snapshot => {

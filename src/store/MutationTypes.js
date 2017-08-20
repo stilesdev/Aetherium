@@ -13,5 +13,7 @@ export const RECEIVE_SCRAMBLE = 'RECEIVE_SCRAMBLE';
 
 export const CLEAR_SOLVES = 'CLEAR_SOLVES';
 export const ADD_SOLVE = 'ADD_SOLVE';
+export const UPDATE_SOLVE = 'UPDATE_SOLVE';
+export const DELETE_SOLVE = 'DELETE_SOLVE';
 
 export const RECEIVE_STATS = 'RECEIVE_STATS';
