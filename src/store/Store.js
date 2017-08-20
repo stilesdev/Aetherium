@@ -58,15 +58,9 @@ const mutations = {
     [Mutations.SET_ACTIVE_VIEW] (state, newView) {
         state.activeView = newView;
     },
-    [Mutations.SET_ACTIVE_PUZZLE] (state, puzzleKey) {
-        state.activePuzzle = puzzleKey;
-    },
-    [Mutations.SET_ACTIVE_CATEGORY] (state, categoryKey) {
-        state.activeCategory = categoryKey;
-    },
-    [Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY] (state, puzzle) {
-        state.activePuzzle = puzzle.puzzle;
-        state.activeCategory = puzzle.category;
+    [Mutations.SET_ACTIVE_PUZZLE] (state, payload) {
+        state.activePuzzle = payload.puzzle;
+        state.activeCategory = payload.category;
     },
     [Mutations.RECEIVE_SCRAMBLE] (state, scramble) {
         state.scramble = scramble;
@@ -110,7 +104,7 @@ const actions = {
                         });
 
                         context.getters.userRef.child('currentPuzzle').on('value', snapshot => {
-                            context.commit(Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY, snapshot.val());
+                            context.commit(Mutations.SET_ACTIVE_PUZZLE, snapshot.val());
                         });
                     }
                 });
@@ -192,17 +186,7 @@ const plugins = [
         }
 
         if (mutation.type === Mutations.SET_ACTIVE_PUZZLE) {
-            store.getters.userRef.child('currentPuzzle/puzzle').set(state.activePuzzle);
-            store.commit(Mutations.SET_ACTIVE_CATEGORY, 'default');
-        }
-
-        if (mutation.type === Mutations.SET_ACTIVE_CATEGORY) {
-            store.getters.userRef.child('currentPuzzle/category').set(state.activeCategory);
-            store.dispatch(Actions.REQUEST_SCRAMBLE);
-        }
-
-        if (mutation.type === Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY) {
-            store.dispatch(Actions.REQUEST_SCRAMBLE);
+            store.getters.userRef.child('currentPuzzle').set({ puzzle: state.activePuzzle, category: state.activeCategory });
         }
     }),
     store => {
@@ -210,17 +194,19 @@ const plugins = [
         let prevCategory = store.state.activeCategory;
 
         store.subscribe((mutation, state) => {
-            if (mutation.type === Mutations.SET_ACTIVE_CATEGORY || mutation.type === Mutations.SET_ACTIVE_PUZZLE_AND_CATEGORY) {
+            if (mutation.type === Mutations.SET_ACTIVE_PUZZLE) {
                 store.getters.sessionRef.child(`solves/${prevPuzzle}/${prevCategory}`).off();
                 store.commit(Mutations.CLEAR_SOLVES);
 
                 store.getters.solvesRef.on('child_added', snapshot => {
                     store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
                 });
-            }
 
-            prevPuzzle = state.activePuzzle;
-            prevCategory = state.activeCategory;
+                prevPuzzle = state.activePuzzle;
+                prevCategory = state.activeCategory;
+
+                store.dispatch(Actions.REQUEST_SCRAMBLE);
+            }
         });
     },
     store => store.subscribe((mutation, state) => {
