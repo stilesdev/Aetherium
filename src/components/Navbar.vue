@@ -37,6 +37,9 @@
                                 <option v-for="category in puzzles[activePuzzle].categories" v-bind:value="category.key">{{ category.name }}</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" v-on:click="onCloseSessionClick">Close Session</button>
+                        </div>
                     </form>
 
                     <ul class="nav navbar-nav navbar-right">
@@ -55,6 +58,30 @@
                 </div>
             </div>
         </nav>
+
+        <!-- Close Session Modal -->
+        <div class="modal fade" id="closeSessionModal" tabindex="-1" role="dialog" aria-labelledby="closeSessionModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="closeSessionModalLabel">Close Session</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Are you sure you would like to close the current session?</p>
+                        <!-- TODO: Add datepicker to correct session date if necessary -->
+                        <!-- https://www.npmjs.com/package/vue-bootstrap-datetimepicker -->
+                        <!-- TODO: Add quick summary of session stats for each puzzle -->
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="onCloseSessionConfirm">Close Session</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Options Modal -->
         <div class="modal fade" id="optionsModal" tabindex="-1" role="dialog" aria-labelledby="optionsModalLabel">

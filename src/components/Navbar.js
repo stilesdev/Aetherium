@@ -39,6 +39,12 @@ export default {
         }
     },
     methods: {
+        onCloseSessionClick() {
+            $('#closeSessionModal').modal();
+        },
+        onCloseSessionConfirm() {
+            // TODO: Close session
+        },
         openOptionsModal() {
             $('#optionsModal').modal();
         },
