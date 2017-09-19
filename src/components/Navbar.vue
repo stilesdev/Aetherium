@@ -38,7 +38,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-primary" v-on:click="onCloseSessionClick">Close Session</button>
+                            <button type="button" class="btn btn-primary" v-on:click="onCloseSessionClick">Close Session</button>
                         </div>
                     </form>
 
