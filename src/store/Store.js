@@ -83,7 +83,7 @@ const mutations = {
         state.solves = [];
     },
     [Mutations.ADD_SOLVE] (state, solve) {
-        state.solves.push(solve);
+        state.solves.unshift(solve);
     },
     [Mutations.UPDATE_SOLVE] (state, payload) {
         Vue.set(state.solves, state.solves.findIndex(solve => solve.uid === payload.uid), payload.solve);
