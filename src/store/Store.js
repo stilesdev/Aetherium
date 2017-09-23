@@ -208,6 +208,7 @@ const plugins = [
 
                     store.getters.userRef.child('currentSessionId').on('value', snapshot => {
                         store.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
+                        store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, { puzzle: state.activePuzzle, category: state.activeCategory });
                     });
 
                     store.getters.userRef.child('currentPuzzle').on('value', snapshot => {

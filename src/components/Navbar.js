@@ -43,7 +43,7 @@ export default {
             $('#closeSessionModal').modal();
         },
         onCloseSessionConfirm() {
-            // TODO: Close session
+            this.$store.dispatch(Actions.CLOSE_SESSION);
         },
         openOptionsModal() {
             $('#optionsModal').modal();
