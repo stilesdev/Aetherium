@@ -9,47 +9,61 @@ import * as Mutations from './MutationTypes';
 import * as Actions from './ActionTypes';
 let ScramblerWorker = require('worker-loader?name=GenerateScramblerWorker.js!../workers/GenerateScramblerWorker.js');
 
+let prevRefs = {};
+
+function connectRef(refName, ref, eventType, callback) {
+    prevRefs[refName] = ref;
+    ref.on(eventType, callback);
+}
+
+function disconnectRef(refName) {
+    if (prevRefs[refName]) {
+        prevRefs[refName].off();
+        delete prevRefs[refName];
+    }
+}
+
 const state = {
-    userId: null,
-    sessionId: null,
-    puzzles: null,
     activeView: 'timer',
-    activePuzzle: 333,
-    activeCategory: 'default',
-    solves: [],
-    stats: null,
     scramblerWorker: new ScramblerWorker(),
     scramble: {
         text: 'Generating scramble...',
         svg: null
     },
+    puzzles: null,
+    userId: null,
     options: {
         showTimer: true,
         timerTrigger: 'spacebar'
-    }
+    },
+    sessionId: null,
+    activePuzzle: 333,
+    activeCategory: 'default',
+    solves: [],
+    stats: null
 };
 
 const getters = {
     puzzlesRef() {
         return firebase.database().ref('/puzzles');
     },
-    userRef(state) {
-        return firebase.database().ref(`/users/${state.userId}`);
+    optionsRef() {
+        return firebase.database().ref(`/users/${state.userId}/options`);
     },
-    solvesRootRef(state) {
-        return firebase.database().ref(`/solves/${state.userId}`)
+    currentSessionIdRef() {
+        return firebase.database().ref(`/users/${state.userId}/currentSessionId`);
     },
-    sessionRef(state, getters) {
-        return getters.solvesRootRef.child(`${state.sessionId}`);
+    currentPuzzleRef() {
+        return firebase.database().ref(`/users/${state.userId}/currentPuzzle`);
     },
-    solvesRef(state, getters) {
-        return getters.sessionRef.child(`solves/${state.activePuzzle}/${state.activeCategory}`);
+    sessionRef() {
+        return firebase.database().ref(`/solves/${state.userId}/${state.sessionId}/solves`);
     },
-    statsRootRef(state) {
-        return firebase.database().ref(`/stats/${state.userId}`);
+    solvesRef() {
+        return firebase.database().ref(`/solves/${state.userId}/${state.sessionId}/solves/${state.activePuzzle}/${state.activeCategory}`);
     },
-    statsRef(state, getters) {
-        return getters.statsRootRef.child(`${state.activePuzzle}/${state.activeCategory}/${state.sessionId}`);
+    statsRef () {
+        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.activeCategory}/${state.sessionId}`);
     }
 };
 
@@ -98,10 +112,10 @@ const mutations = {
 
 const actions = {
     [Actions.SET_OPTIONS] (context, payload) {
-        context.getters.userRef.child('options').set(payload);
+        context.getters.optionsRef.set(payload);
     },
     [Actions.SET_ACTIVE_PUZZLE] (context, payload) {
-        context.getters.userRef.child('currentPuzzle').set({ puzzle: payload.puzzle, category: payload.category });
+        context.getters.currentPuzzleRef.set({ puzzle: payload.puzzle, category: payload.category });
     },
     [Actions.REQUEST_SCRAMBLE] (context) {
         context.commit(Mutations.RECEIVE_SCRAMBLE, { text: null, svg: null });
@@ -113,9 +127,9 @@ const actions = {
         return new Promise((resolve, reject) => {
             if (!context.state.sessionId) {
                 const date = moment().utc().dayOfYear(moment().dayOfYear()).startOf('day');
-                const newSessionRef = context.getters.solvesRootRef.push();
+                const newSessionRef = firebase.database().ref(`/solves/${state.userId}`).push();
 
-                context.getters.userRef.child('currentSessionId').set(newSessionRef.key).then(() => {
+                context.getters.currentSessionIdRef.set(newSessionRef.key).then(() => {
                     newSessionRef.set({
                         date: date.format('M/D/YYYY'),
                         timestamp: date.valueOf()
@@ -134,7 +148,7 @@ const actions = {
         });
     },
     [Actions.CLOSE_SESSION] (context) {
-        context.getters.userRef.child('currentSessionId').set(null);
+        context.getters.currentSessionIdRef.set(null);
     },
     [Actions.STORE_SOLVE] (context, delta) {
         context.dispatch(Actions.CHECK_SESSION).then(() => {
@@ -190,67 +204,54 @@ const plugins = [
     store => store.getters.puzzlesRef.on('value', snapshot => {
         store.commit(Mutations.RECEIVE_PUZZLES, snapshot.val());
     }),
-    store => {
-        let prevUserId = store.state.userId;
+    store => store.subscribe((mutation, state) => {
+        if (mutation.type === Mutations.RECEIVE_USER_ID) {
+            disconnectRef('optionsRef');
+            disconnectRef('currentSessionIdRef');
+            disconnectRef('currentPuzzleRef');
 
-        store.subscribe((mutation, state) => {
-            if (mutation.type === Mutations.RECEIVE_USER_ID) {
-                firebase.database().ref(`/users/${prevUserId}/options`).off();
-                firebase.database().ref(`/users/${prevUserId}/currentSessionId`).off();
-                firebase.database().ref(`/users/${prevUserId}/currentPuzzle`).off();
-                prevUserId = state.userId;
+            if (state.userId) {
+                connectRef('optionsRef', store.getters.optionsRef, 'value', snapshot => {
+                    store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer);
+                    store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger);
+                });
 
-                if (state.userId) {
-                    store.getters.userRef.child('options').on('value', snapshot => {
-                        store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer);
-                        store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger);
-                    });
+                connectRef('currentSessionIdRef', store.getters.currentSessionIdRef, 'value', snapshot => {
+                    store.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
+                    store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, { puzzle: state.activePuzzle, category: state.activeCategory });
+                });
 
-                    store.getters.userRef.child('currentSessionId').on('value', snapshot => {
-                        store.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
-                        store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, { puzzle: state.activePuzzle, category: state.activeCategory });
-                    });
-
-                    store.getters.userRef.child('currentPuzzle').on('value', snapshot => {
-                        store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, snapshot.val());
-                    });
-                }
+                connectRef('currentPuzzleRef', store.getters.currentPuzzleRef, 'value', snapshot => {
+                    store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, snapshot.val());
+                });
             }
-        });
-    },
-    store => {
-        let prevPuzzle = store.state.activePuzzle;
-        let prevCategory = store.state.activeCategory;
+        }
+    }),
+    store => store.subscribe((mutation, state) => {
+        if (mutation.type === Mutations.RECEIVE_ACTIVE_PUZZLE) {
+            disconnectRef('solvesRef');
+            disconnectRef('statsRef');
+            store.commit(Mutations.CLEAR_SOLVES);
 
-        store.subscribe((mutation, state) => {
-            if (mutation.type === Mutations.RECEIVE_ACTIVE_PUZZLE) {
-                store.getters.sessionRef.child(`solves/${prevPuzzle}/${prevCategory}`).off();
-                store.getters.solvesRootRef.child(`${prevPuzzle}/${prevCategory}/${store.state.userId}`).off();
-                prevPuzzle = state.activePuzzle;
-                prevCategory = state.activeCategory;
+            connectRef('solvesRef', store.getters.solvesRef, 'child_added', snapshot => {
+                store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
+            });
 
-                store.commit(Mutations.CLEAR_SOLVES);
+            connectRef('solvesRef', store.getters.solvesRef, 'child_changed', snapshot => {
+                store.commit(Mutations.UPDATE_SOLVE, { uid: snapshot.key, solve: Solve.fromSnapshot(snapshot) });
+            });
 
-                store.getters.solvesRef.on('child_added', snapshot => {
-                    store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
-                });
+            connectRef('solvesRef', store.getters.solvesRef, 'child_removed', snapshot => {
+                store.commit(Mutations.DELETE_SOLVE, snapshot.key);
+            });
 
-                store.getters.solvesRef.on('child_changed', snapshot => {
-                    store.commit(Mutations.UPDATE_SOLVE, { uid: snapshot.key, solve: Solve.fromSnapshot(snapshot) });
-                });
+            connectRef('statsRef', store.getters.statsRef, 'value', snapshot => {
+                store.commit(Mutations.RECEIVE_STATS, snapshot.val());
+            });
 
-                store.getters.solvesRef.on('child_removed', snapshot => {
-                    store.commit(Mutations.DELETE_SOLVE, snapshot.key);
-                });
-
-                store.getters.statsRef.on('value', snapshot => {
-                    store.commit(Mutations.RECEIVE_STATS, snapshot.val());
-                });
-
-                store.dispatch(Actions.REQUEST_SCRAMBLE);
-            }
-        });
-    },
+            store.dispatch(Actions.REQUEST_SCRAMBLE);
+        }
+    }),
     store => store.subscribe((mutation, state) => {
         console.log(mutation.type);
         console.log(mutation.payload);
