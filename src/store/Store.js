@@ -23,6 +23,11 @@ function disconnectRef(refName) {
     }
 }
 
+function disconnectAllRefs() {
+    Object.keys(prevRefs).forEach(key => prevRefs[key].off());
+    prevRefs = {};
+}
+
 const state = {
     activeView: 'timer',
     scramblerWorker: new ScramblerWorker(),
@@ -206,9 +211,7 @@ const plugins = [
     }),
     store => store.subscribe((mutation, state) => {
         if (mutation.type === Mutations.RECEIVE_USER_ID) {
-            disconnectRef('optionsRef');
-            disconnectRef('currentSessionIdRef');
-            disconnectRef('currentPuzzleRef');
+            disconnectAllRefs();
 
             if (state.userId) {
                 connectRef('optionsRef', store.getters.optionsRef, 'value', snapshot => {
