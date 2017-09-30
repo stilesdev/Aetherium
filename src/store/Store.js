@@ -175,23 +175,28 @@ const actions = {
         context.getters.solvesRef.child(solveId).remove().then(() => context.dispatch(Actions.UPDATE_STATS));
     },
     [Actions.UPDATE_STATS] (context) {
-        context.getters.statsRef.update({
-            mean: Stats.mean(context.state.solves),
-            count: Stats.count(context.state.solves),
-            best: Stats.best(context.state.solves),
-            worst: Stats.worst(context.state.solves),
-            stdDev: Stats.stdDev(context.state.solves),
-            mo3: Stats.mo3(context.state.solves),
-            ao5: Stats.ao5(context.state.solves),
-            ao12: Stats.ao12(context.state.solves),
-            ao50: Stats.ao50(context.state.solves),
-            ao100: Stats.ao100(context.state.solves),
-            bestMo3: Stats.bestMo3(context.state.solves),
-            bestAo5: Stats.bestAo5(context.state.solves),
-            bestAo12: Stats.bestAo12(context.state.solves),
-            bestAo50: Stats.bestAo50(context.state.solves),
-            bestAo100: Stats.bestAo100(context.state.solves)
-        });
+        if (context.state.solves.length === 0) {
+            context.getters.statsRef.remove();
+            context.commit(Mutations.RECEIVE_STATS, null);
+        } else {
+            context.getters.statsRef.update({
+                mean: Stats.mean(context.state.solves),
+                count: Stats.count(context.state.solves),
+                best: Stats.best(context.state.solves),
+                worst: Stats.worst(context.state.solves),
+                stdDev: Stats.stdDev(context.state.solves),
+                mo3: Stats.mo3(context.state.solves),
+                ao5: Stats.ao5(context.state.solves),
+                ao12: Stats.ao12(context.state.solves),
+                ao50: Stats.ao50(context.state.solves),
+                ao100: Stats.ao100(context.state.solves),
+                bestMo3: Stats.bestMo3(context.state.solves),
+                bestAo5: Stats.bestAo5(context.state.solves),
+                bestAo12: Stats.bestAo12(context.state.solves),
+                bestAo50: Stats.bestAo50(context.state.solves),
+                bestAo100: Stats.bestAo100(context.state.solves)
+            });
+        }
     }
 };
 

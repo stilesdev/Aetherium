@@ -42,7 +42,7 @@
                     </tbody>
                 </table>
                 <div v-else>
-                    <h4>Loading...</h4>
+                    <h4>No Solves Yet!</h4>
                 </div>
             </div>
         </div>
