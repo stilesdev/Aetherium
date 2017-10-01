@@ -69,9 +69,16 @@
                     </div>
 
                     <div class="modal-body">
-                        <p>Are you sure you would like to close the current session?</p>
-                        <!-- TODO: Add datepicker to correct session date if necessary -->
-                        <!-- https://www.npmjs.com/package/vue-bootstrap-datetimepicker -->
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <p>Are you sure you would like to close the current session?</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="sessionDatePicker">Session Date:</label>
+                                <date-picker id="sessionDatePicker" v-model="sessionDate" :config="datePickerConfig"></date-picker>
+                            </div>
+                        </form>
+
                         <!-- TODO: Add quick summary of session stats for each puzzle -->
                     </div>
 

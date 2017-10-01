@@ -1,4 +1,5 @@
 import * as firebase from 'firebase';
+import * as moment from 'moment';
 import * as $ from 'jquery';
 import * as Mutations from '../store/MutationTypes';
 import * as Actions from '../store/ActionTypes';
@@ -7,7 +8,10 @@ export default {
     data: function() {
         return {
             showTimer: true,
-            timerTrigger: 'spacebar'
+            timerTrigger: 'spacebar',
+            datePickerConfig: {
+                format: 'MM/DD/YYYY'
+            }
         }
     },
     computed: {
@@ -44,6 +48,14 @@ export default {
             },
             set(value) {
                 this.$store.dispatch(Actions.SET_OPTIONS, value);
+            }
+        },
+        sessionDate: {
+            get() {
+                return this.$store.state.sessionDate;
+            },
+            set(value) {
+                this.$store.dispatch(Actions.UPDATE_SESSION_DATE, { moment: moment().utc().dayOfYear(value.dayOfYear()).startOf('day') });
             }
         }
     },

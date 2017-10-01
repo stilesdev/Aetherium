@@ -3,6 +3,7 @@ import * as firebaseConfig from '../../firebase.config';
 import * as moment from 'moment';
 import Vue from 'vue';
 import Vuex from 'vuex';
+import datePicker from 'vue-bootstrap-datetimepicker';
 import { Solve } from '../modules/Models';
 import * as Stats from '../modules/Statistics';
 import * as Mutations from './MutationTypes';
@@ -42,6 +43,7 @@ const state = {
         timerTrigger: 'spacebar'
     },
     sessionId: null,
+    sessionDate: null,
     activePuzzle: 333,
     activeCategory: 'default',
     solves: [],
@@ -90,6 +92,9 @@ const mutations = {
     [Mutations.RECEIVE_PUZZLES] (state, puzzles) {
         state.puzzles = puzzles;
     },
+    [Mutations.RECEIVE_SESSION_DATE] (state, payload) {
+        state.sessionDate = payload.moment;
+    },
     [Mutations.SET_ACTIVE_VIEW] (state, newView) {
         state.activeView = newView;
     },
@@ -135,6 +140,12 @@ const actions = {
     },
     [Actions.SET_ACTIVE_PUZZLE] (context, payload) {
         context.getters.currentPuzzleRef.set({ puzzle: payload.puzzle, category: payload.category });
+    },
+    [Actions.UPDATE_SESSION_DATE] (context, payload) {
+        context.getters.currentSessionRef.update({
+            date: payload.moment.format('M/D/YYYY'),
+            timestamp: payload.moment.valueOf()
+        })
     },
     [Actions.REQUEST_SCRAMBLE] (context) {
         context.commit(Mutations.RECEIVE_SCRAMBLE, { text: null, svg: null });
@@ -246,6 +257,17 @@ const plugins = [
         }
     }),
     store => store.subscribe((mutation, state) => {
+        if (mutation.type === Mutations.RECEIVE_SESSION_ID) {
+            disconnectRef('sessionRef');
+
+            if (state.sessionId) {
+                connectRef('sessionRef', store.getters.currentSessionRef, 'value', snapshot => {
+                    store.commit(Mutations.RECEIVE_SESSION_DATE, { moment: moment(snapshot.val().timestamp).utc() });
+                })
+            }
+        }
+    }),
+    store => store.subscribe((mutation, state) => {
         if (mutation.type === Mutations.RECEIVE_ACTIVE_PUZZLE) {
             disconnectRef('solvesRef');
             disconnectRef('sessionStatsRef');
@@ -293,6 +315,7 @@ try {
 }
 
 Vue.use(Vuex);
+Vue.use(datePicker);
 
 export default new Vuex.Store({
     state,
