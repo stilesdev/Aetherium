@@ -93,7 +93,27 @@
                     </div>
 
                     <div class="modal-body">
-                        <!-- TODO: Add fields for user options -->
+                        <label for="showTimerOptionsGroup">Timer Display</label>
+                        <div class="btn-group" id="showTimerOptionsGroup" data-toggle="buttons">
+                            <label class="btn btn-default" v-bind:class="{ 'active': showTimer }" v-on:click="showTimer = true">
+                                <input type="radio" name="timerDisplayOptions" id="showTimer" autocomplete="off"/>Show
+                            </label>
+                            <label class="btn btn-default" v-bind:class="{ 'active': !showTimer }" v-on:click="showTimer = false">
+                                <input type="radio" name="timerDisplayOptions" id="hideTimer" autocomplete="off"/>Hide
+                            </label>
+                        </div>
+
+                        <hr/>
+
+                        <label for="timerTriggerOptionsGroup">Timer Trigger</label>
+                        <div class="btn-group" id="timerTriggerOptionsGroup" data-toggle="buttons">
+                            <label class="btn btn-default" v-bind:class="{ 'active': timerTrigger === 'spacebar' }" v-on:click="timerTrigger = 'spacebar'">
+                                <input type="radio" name="timerTriggerOptions" id="spacebarTimerTrigger" autocomplete="off"/>Spacebar
+                            </label>
+                            <label class="btn btn-default" v-bind:class="{ 'active': timerTrigger === 'stackmat' }" v-on:click="timerTrigger = 'stackmat'">
+                                <input type="radio" name="timerTriggerOptions" id="stackmatTimerTrigger" autocomplete="off"/>Stackmat
+                            </label>
+                        </div>
                     </div>
 
                     <div class="modal-footer">

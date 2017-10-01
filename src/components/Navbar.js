@@ -6,7 +6,8 @@ import * as Actions from '../store/ActionTypes';
 export default {
     data: function() {
         return {
-
+            showTimer: true,
+            timerTrigger: 'spacebar'
         }
     },
     computed: {
@@ -36,6 +37,14 @@ export default {
             set(value) {
                 this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: this.activePuzzle, category: value });
             }
+        },
+        storeOptions: {
+            get() {
+                return this.$store.state.options;
+            },
+            set(value) {
+                this.$store.dispatch(Actions.SET_OPTIONS, value);
+            }
         }
     },
     methods: {
@@ -46,10 +55,15 @@ export default {
             this.$store.dispatch(Actions.CLOSE_SESSION);
         },
         openOptionsModal() {
+            this.showTimer = this.storeOptions.showTimer;
+            this.timerTrigger = this.storeOptions.timerTrigger;
             $('#optionsModal').modal();
         },
         onOptionsModalSave() {
-            // TODO: Save user account options
+            this.storeOptions = {
+                showTimer: this.showTimer,
+                timerTrigger: this.timerTrigger
+            };
         },
         logout() {
             firebase.auth().signOut().catch(error => alert(error.message));
