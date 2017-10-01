@@ -287,7 +287,7 @@ const plugins = [
 ];
 
 try {
-    firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig.development);
 } catch (e) {
     console.error(e);
 }
