@@ -6,6 +6,9 @@
             <div v-if="activeView === 'timer'">
                 <timer></timer>
             </div>
+            <div v-if="activeView === 'stats'">
+                <stats></stats>
+            </div>
         </div>
     </div>
 </template>

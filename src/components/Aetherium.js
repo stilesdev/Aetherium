@@ -1,6 +1,7 @@
 import Login from './Login.vue';
 import Navbar from './Navbar.vue';
 import Timer from './views/Timer.vue';
+import Stats from './views/Stats.vue';
 
 export default {
     data: function() {
@@ -16,5 +17,5 @@ export default {
             return this.$store.state.activeView;
         }
     },
-    components: { Login, Navbar, Timer }
+    components: { Login, Navbar, Timer, Stats }
 }

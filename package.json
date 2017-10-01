@@ -35,7 +35,7 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "firebase": "^4.1.3",
-    "highcharts": "^5.0.12",
+    "highcharts": "^5.0.14",
     "jquery": "^3.2.1",
     "moment": "^2.18.1",
     "vue": "^2.3.4",
