@@ -62,10 +62,10 @@ const getters = {
         return firebase.database().ref(`/users/${state.userId}/currentPuzzle`);
     },
     sessionRef() {
-        return firebase.database().ref(`/solves/${state.userId}/${state.sessionId}/solves`);
+        return firebase.database().ref(`/users/${state.userId}/sessions/${state.sessionId}`);
     },
     solvesRef() {
-        return firebase.database().ref(`/solves/${state.userId}/${state.sessionId}/solves/${state.activePuzzle}/${state.activeCategory}`);
+        return firebase.database().ref(`/solves/${state.userId}/${state.activePuzzle}/${state.activeCategory}`);
     },
     statsRef () {
         return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.activeCategory}/${state.sessionId}`);
@@ -132,15 +132,10 @@ const actions = {
         return new Promise((resolve, reject) => {
             if (!context.state.sessionId) {
                 const date = moment().utc().dayOfYear(moment().dayOfYear()).startOf('day');
-                const newSessionRef = firebase.database().ref(`/solves/${state.userId}`).push();
+                const newSessionRef = firebase.database().ref(`/users/${state.userId}/sessions`).push();
 
                 context.getters.currentSessionIdRef.set(newSessionRef.key).then(() => {
                     newSessionRef.set({
-                        date: date.format('M/D/YYYY'),
-                        timestamp: date.valueOf()
-                    });
-
-                    context.getters.statsRef.set({
                         date: date.format('M/D/YYYY'),
                         timestamp: date.valueOf()
                     });
@@ -158,6 +153,7 @@ const actions = {
     [Actions.STORE_SOLVE] (context, delta) {
         context.dispatch(Actions.CHECK_SESSION).then(() => {
             context.getters.solvesRef.push().set({
+                sessionId: context.state.sessionId,
                 time: delta,
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
                 scramble: context.state.scramble.text,
@@ -241,15 +237,15 @@ const plugins = [
             disconnectRef('statsRef');
             store.commit(Mutations.CLEAR_SOLVES);
 
-            connectRef('solvesRef', store.getters.solvesRef, 'child_added', snapshot => {
+            connectRef('solvesRef', store.getters.solvesRef.orderByChild('sessionId').equalTo(state.sessionId), 'child_added', snapshot => {
                 store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
             });
 
-            connectRef('solvesRef', store.getters.solvesRef, 'child_changed', snapshot => {
+            connectRef('solvesRef', store.getters.solvesRef.orderByChild('sessionId').equalTo(state.sessionId), 'child_changed', snapshot => {
                 store.commit(Mutations.UPDATE_SOLVE, { uid: snapshot.key, solve: Solve.fromSnapshot(snapshot) });
             });
 
-            connectRef('solvesRef', store.getters.solvesRef, 'child_removed', snapshot => {
+            connectRef('solvesRef', store.getters.solvesRef.orderByChild('sessionId').equalTo(state.sessionId), 'child_removed', snapshot => {
                 store.commit(Mutations.DELETE_SOLVE, snapshot.key);
             });
 
