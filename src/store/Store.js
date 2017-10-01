@@ -45,7 +45,9 @@ const state = {
     activePuzzle: 333,
     activeCategory: 'default',
     solves: [],
-    stats: null
+    sessionStats: null,
+    allSessions: null,
+    allStats: null
 };
 
 const getters = {
@@ -61,13 +63,19 @@ const getters = {
     currentPuzzleRef() {
         return firebase.database().ref(`/users/${state.userId}/currentPuzzle`);
     },
-    sessionRef() {
+    sessionsRef() {
+        return firebase.database().ref(`/users/${state.userId}/sessions`);
+    },
+    currentSessionRef() {
         return firebase.database().ref(`/users/${state.userId}/sessions/${state.sessionId}`);
     },
     solvesRef() {
         return firebase.database().ref(`/solves/${state.userId}/${state.activePuzzle}/${state.activeCategory}`);
     },
-    statsRef () {
+    statsRef() {
+        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.activeCategory}`);
+    },
+    sessionStatsRef () {
         return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.activeCategory}/${state.sessionId}`);
     }
 };
@@ -110,8 +118,14 @@ const mutations = {
     [Mutations.DELETE_SOLVE] (state, solveId) {
         state.solves.splice(state.solves.findIndex(solve => solve.uid = solveId), 1);
     },
-    [Mutations.RECEIVE_STATS] (state, stats) {
-        state.stats = stats;
+    [Mutations.RECEIVE_SESSION_STATS] (state, stats) {
+        state.sessionStats = stats;
+    },
+    [Mutations.RECEIVE_ALL_SESSIONS] (state, sessions) {
+        state.allSessions = sessions;
+    },
+    [Mutations.RECEIVE_ALL_STATS] (state, stats) {
+        state.allStats = stats;
     }
 };
 
@@ -132,7 +146,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             if (!context.state.sessionId) {
                 const date = moment().utc().dayOfYear(moment().dayOfYear()).startOf('day');
-                const newSessionRef = firebase.database().ref(`/users/${state.userId}/sessions`).push();
+                const newSessionRef = context.getters.sessionsRef.push();
 
                 context.getters.currentSessionIdRef.set(newSessionRef.key).then(() => {
                     newSessionRef.set({
@@ -172,10 +186,10 @@ const actions = {
     },
     [Actions.UPDATE_STATS] (context) {
         if (context.state.solves.length === 0) {
-            context.getters.statsRef.remove();
-            context.commit(Mutations.RECEIVE_STATS, null);
+            context.getters.sessionStatsRef.remove();
+            context.commit(Mutations.RECEIVE_SESSION_STATS, null);
         } else {
-            context.getters.statsRef.update({
+            context.getters.sessionStatsRef.update({
                 mean: Stats.mean(context.state.solves),
                 count: Stats.count(context.state.solves),
                 best: Stats.best(context.state.solves),
@@ -234,7 +248,9 @@ const plugins = [
     store => store.subscribe((mutation, state) => {
         if (mutation.type === Mutations.RECEIVE_ACTIVE_PUZZLE) {
             disconnectRef('solvesRef');
-            disconnectRef('statsRef');
+            disconnectRef('sessionStatsRef');
+            disconnectRef('allSessionsRef');
+            disconnectRef('allStatsRef');
             store.commit(Mutations.CLEAR_SOLVES);
 
             connectRef('solvesRef', store.getters.solvesRef.orderByChild('sessionId').equalTo(state.sessionId), 'child_added', snapshot => {
@@ -249,8 +265,16 @@ const plugins = [
                 store.commit(Mutations.DELETE_SOLVE, snapshot.key);
             });
 
-            connectRef('statsRef', store.getters.statsRef, 'value', snapshot => {
-                store.commit(Mutations.RECEIVE_STATS, snapshot.val());
+            connectRef('sessionStatsRef', store.getters.sessionStatsRef, 'value', snapshot => {
+                store.commit(Mutations.RECEIVE_SESSION_STATS, snapshot.val());
+            });
+
+            connectRef('allSessionsRef', store.getters.sessionsRef, 'value', snapshot => {
+                store.commit(Mutations.RECEIVE_ALL_SESSIONS, snapshot.val());
+            });
+
+            connectRef('allStatsRef', store.getters.statsRef, 'value', snapshot => {
+                store.commit(Mutations.RECEIVE_ALL_STATS, snapshot.val());
             });
 
             store.dispatch(Actions.REQUEST_SCRAMBLE);

@@ -58,7 +58,7 @@
         },
         computed: {
             stats() {
-                return this.$store.state.stats;
+                return this.$store.state.sessionStats;
             }
         },
         methods: {

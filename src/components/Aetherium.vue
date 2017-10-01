@@ -9,6 +9,9 @@
             <div v-if="activeView === 'stats'">
                 <stats></stats>
             </div>
+            <div v-if="activeView === 'history'">
+                <history></history>
+            </div>
         </div>
     </div>
 </template>
