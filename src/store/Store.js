@@ -12,9 +12,79 @@ let ScramblerWorker = require('worker-loader?name=GenerateScramblerWorker.js!../
 
 let prevRefs = {};
 
-function connectRef(refName, ref, eventType, callback) {
-    prevRefs[refName] = ref;
-    ref.on(eventType, callback);
+function connectRef(refName, store) {
+    switch (refName) {
+        case 'optionsRef':
+            prevRefs[refName] = store.getters.optionsRef;
+            store.getters.optionsRef.on('value', snapshot => {
+                store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer);
+                store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger);
+            });
+            break;
+        case 'currentSessionIdRef':
+            prevRefs[refName] = store.getters.currentSessionIdRef;
+            store.getters.currentSessionIdRef.on('value', snapshot => {
+                store.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
+
+                disconnectRef('solvesRef');
+                disconnectRef('sessionStatsRef');
+                disconnectRef('allSessionsRef');
+                disconnectRef('allStatsRef');
+                store.commit(Mutations.CLEAR_SOLVES);
+
+                connectRef('solvesRef', store);
+                connectRef('sessionStatsRef', store);
+                connectRef('allSessionsRef', store);
+                connectRef('allStatsRef', store);
+            });
+            break;
+        case 'currentPuzzleRef':
+            prevRefs[refName] = store.getters.currentPuzzleRef;
+            store.getters.currentPuzzleRef.on('value', snapshot => {
+                store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, snapshot.val());
+            });
+            break;
+        case 'sessionRef':
+            prevRefs[refName] = store.getters.currentPuzzleRef;
+            store.getters.currentPuzzleRef.on('value', snapshot => {
+                if (snapshot.exists()) {
+                    store.commit(Mutations.RECEIVE_SESSION_DATE, { moment: moment(snapshot.val().timestamp).utc() });
+                }
+            });
+            break;
+        case 'solvesRef':
+            prevRefs[refName] = store.getters.solvesRef;
+            store.getters.solvesRef.orderByChild('sessionId').equalTo(store.state.sessionId).on('child_added', snapshot => {
+                store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
+            });
+            store.getters.solvesRef.orderByChild('sessionId').equalTo(store.state.sessionId).on('child_changed', snapshot => {
+                store.commit(Mutations.UPDATE_SOLVE, { uid: snapshot.key, solve: Solve.fromSnapshot(snapshot) });
+            });
+            store.getters.solvesRef.orderByChild('sessionId').equalTo(store.state.sessionId).on('child_removed', snapshot => {
+                store.commit(Mutations.DELETE_SOLVE, snapshot.key);
+            });
+            break;
+        case 'sessionStatsRef':
+            prevRefs[refName] = store.getters.sessionStatsRef;
+            store.getters.sessionStatsRef.on('value', snapshot => {
+                store.commit(Mutations.RECEIVE_SESSION_STATS, snapshot.val());
+            });
+            break;
+        case 'allSessionsRef':
+            prevRefs[refName] = store.getters.sessionsRef;
+            store.getters.sessionsRef.on('value', snapshot => {
+                store.commit(Mutations.RECEIVE_ALL_SESSIONS, snapshot.val());
+            });
+            break;
+        case 'allStatsRef':
+            prevRefs[refName] = store.getters.statsRef;
+            store.getters.statsRef.on('value', snapshot => {
+                store.commit(Mutations.RECEIVE_ALL_STATS, snapshot.val());
+            });
+            break;
+        default:
+            console.error('Unknown ref name');
+    }
 }
 
 function disconnectRef(refName) {
@@ -148,7 +218,6 @@ const actions = {
         })
     },
     [Actions.REQUEST_SCRAMBLE] (context) {
-        context.commit(Mutations.RECEIVE_SCRAMBLE, { text: null, svg: null });
         context.state.scramblerWorker.postMessage({
             scrambler: context.state.puzzles[context.state.activePuzzle].categories[context.state.activeCategory].scrambler
         })
@@ -240,19 +309,9 @@ const plugins = [
             disconnectAllRefs();
 
             if (state.userId) {
-                connectRef('optionsRef', store.getters.optionsRef, 'value', snapshot => {
-                    store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer);
-                    store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger);
-                });
-
-                connectRef('currentSessionIdRef', store.getters.currentSessionIdRef, 'value', snapshot => {
-                    store.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val());
-                    store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, { puzzle: state.activePuzzle, category: state.activeCategory });
-                });
-
-                connectRef('currentPuzzleRef', store.getters.currentPuzzleRef, 'value', snapshot => {
-                    store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, snapshot.val());
-                });
+                connectRef('optionsRef', store);
+                connectRef('currentSessionIdRef', store);
+                connectRef('currentPuzzleRef', store);
             }
         }
     }),
@@ -261,9 +320,7 @@ const plugins = [
             disconnectRef('sessionRef');
 
             if (state.sessionId) {
-                connectRef('sessionRef', store.getters.currentSessionRef, 'value', snapshot => {
-                    store.commit(Mutations.RECEIVE_SESSION_DATE, { moment: moment(snapshot.val().timestamp).utc() });
-                })
+                connectRef('sessionRef', store);
             }
         }
     }),
@@ -275,30 +332,10 @@ const plugins = [
             disconnectRef('allStatsRef');
             store.commit(Mutations.CLEAR_SOLVES);
 
-            connectRef('solvesRef', store.getters.solvesRef.orderByChild('sessionId').equalTo(state.sessionId), 'child_added', snapshot => {
-                store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot));
-            });
-
-            connectRef('solvesRef', store.getters.solvesRef.orderByChild('sessionId').equalTo(state.sessionId), 'child_changed', snapshot => {
-                store.commit(Mutations.UPDATE_SOLVE, { uid: snapshot.key, solve: Solve.fromSnapshot(snapshot) });
-            });
-
-            connectRef('solvesRef', store.getters.solvesRef.orderByChild('sessionId').equalTo(state.sessionId), 'child_removed', snapshot => {
-                store.commit(Mutations.DELETE_SOLVE, snapshot.key);
-            });
-
-            connectRef('sessionStatsRef', store.getters.sessionStatsRef, 'value', snapshot => {
-                store.commit(Mutations.RECEIVE_SESSION_STATS, snapshot.val());
-            });
-
-            connectRef('allSessionsRef', store.getters.sessionsRef, 'value', snapshot => {
-                store.commit(Mutations.RECEIVE_ALL_SESSIONS, snapshot.val());
-            });
-
-            connectRef('allStatsRef', store.getters.statsRef, 'value', snapshot => {
-                store.commit(Mutations.RECEIVE_ALL_STATS, snapshot.val());
-            });
-
+            connectRef('solvesRef', store);
+            connectRef('sessionStatsRef', store);
+            connectRef('allSessionsRef', store);
+            connectRef('allStatsRef', store);
             store.dispatch(Actions.REQUEST_SCRAMBLE);
         }
     }),

@@ -11,7 +11,7 @@ export default {
         return {
             timerStart: 0,
             timerLabel: '00:00.00',
-            showScramble: true,
+            showScramble: false,
             stackmatStarted: false
         }
     },
@@ -24,6 +24,9 @@ export default {
         },
         showTimer() {
             return this.$store.state.options.showTimer;
+        },
+        currentCategory() {
+            return { puzzle: this.$store.state.activePuzzle, category: this.$store.state.activeCategory };
         }
     },
     created: function() {
@@ -91,10 +94,12 @@ export default {
             this.timerLabel = Solve.formatTime(delta);
 
             this.$store.dispatch(Actions.STORE_SOLVE, delta);
-            this.showScramble = true;
         }
     },
     watch: {
+        scramble: function(val) {
+            this.showScramble = true;
+        },
         timerTrigger: function(val) {
             this.timerStart = 0;
             this.timerLabel = '00:00.00';
@@ -112,6 +117,9 @@ export default {
                 default:
                     break;
             }
+        },
+        currentCategory: function(val) {
+            this.showScramble = false;
         }
     },
     components: {
