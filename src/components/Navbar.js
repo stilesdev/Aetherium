@@ -11,7 +11,8 @@ export default {
             timerTrigger: 'spacebar',
             datePickerConfig: {
                 format: 'MM/DD/YYYY'
-            }
+            },
+            importText: ''
         }
     },
     computed: {
@@ -76,6 +77,12 @@ export default {
                 showTimer: this.showTimer,
                 timerTrigger: this.timerTrigger
             };
+        },
+        openImportModal() {
+            $('#importModal').modal();
+        },
+        runImport() {
+            //TODO: implement
         },
         logout() {
             firebase.auth().signOut().catch(error => alert(error.message));

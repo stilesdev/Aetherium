@@ -50,6 +50,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="#" v-on:click="openOptionsModal">Options</a></li>
+                                <li><a href="#" v-on:click="openImportModal">Import</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#" v-on:click="logout">Logout</a></li>
                             </ul>
@@ -130,7 +131,53 @@
                 </div>
             </div>
         </div>
+
+        <!-- Import Modal -->
+        <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="importModalLabel">Import</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Example Input:</p>
+                        <pre><code>{{ JSON.stringify({
+                            "1/1/2017": {
+                                "222": {
+                                    "default": [
+                                        {
+                                            "penalty": "",
+                                            "scramble": "U R U2 R2 F' U' F2 U' F U2 R2",
+                                            "time": 1234,
+                                            "timestamp": 1507432513964
+                                        }
+                                    ]
+                                }
+                            }
+                        }, undefined, 2) }}
+                        </code></pre>
+                        <textarea v-model="importText"></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="runImport">Import</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script src="./Navbar.js"></script>
+<style>
+    pre {
+        text-align: left;
+    }
+    .modal-body textarea {
+        width: 100%;
+        height: 25vh;
+    }
+</style>
