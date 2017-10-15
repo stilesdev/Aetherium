@@ -144,21 +144,23 @@
                     <div class="modal-body">
                         <p>Example Input:</p>
                         <pre><code>{{ JSON.stringify({
-                            "1/1/2017": {
-                                "222": {
-                                    "default": [
+                            "M/D/YYYY": {
+                                "puzzle": {
+                                    "category": [
                                         {
                                             "penalty": "",
-                                            "scramble": "U R U2 R2 F' U' F2 U' F U2 R2",
-                                            "time": 1234,
-                                            "timestamp": 1507432513964
+                                            "scramble": "",
+                                            "time": 0,
+                                            "timestamp": 1234567890000
                                         }
                                     ]
                                 }
                             }
                         }, undefined, 2) }}
                         </code></pre>
-                        <textarea v-model="importText"></textarea>
+                        <div class="form-group" v-bind:class="{ 'has-error': !importTextValid, 'has-success': importTextValid }">
+                            <textarea class="form-control" v-on:input="validateImportText" v-model="importText"></textarea>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
