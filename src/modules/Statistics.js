@@ -100,7 +100,7 @@ export function bestAo100(solves) {
 }
 
 function meanOfRange(solves, startIdx, endIdx) {
-    if (endIdx <= startIdx) {
+    if (endIdx < startIdx) {
         return 0;
     }
 
