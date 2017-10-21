@@ -11,11 +11,13 @@ export default {
     computed: {
         sessionMeans() {
             let sessions = this.$store.state.allSessions;
-            return Object.entries(this.$store.state.allStats).map(stats => [sessions[stats[0]].timestamp, stats[1].mean]);
+            let stats = this.$store.state.allStats;
+            return stats ? Object.entries(stats).map(stats => [sessions[stats[0]].timestamp, stats[1].mean]) : [];
         },
         sessionBests() {
             let sessions = this.$store.state.allSessions;
-            return Object.entries(this.$store.state.allStats).map(stats => [sessions[stats[0]].timestamp, stats[1].best]);
+            let stats = this.$store.state.allStats;
+            return stats ? Object.entries(stats).map(stats => [sessions[stats[0]].timestamp, stats[1].best]) : [];
         },
         personalBests() {
             let personalBests = [];
