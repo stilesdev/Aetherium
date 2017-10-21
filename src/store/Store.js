@@ -292,7 +292,28 @@ const actions = {
 
 const plugins = [
     store => firebase.auth().onAuthStateChanged(user => {
-        store.commit(Mutations.RECEIVE_USER_ID, user ? user.uid : null);
+        if (user) {
+            let userRef = firebase.database().ref(`/users/${user.uid}`);
+            userRef.once('value').then(snapshot => {
+                if (!snapshot.exists()) {
+                    userRef.set({
+                        currentPuzzle: {
+                            category: 'default',
+                            puzzle: '333'
+                        },
+                        email: user.email,
+                        options: {
+                            showTimer: true,
+                            timerTrigger: 'spacebar'
+                        }
+                    });
+                }
+
+                store.commit(Mutations.RECEIVE_USER_ID, user.uid);
+            });
+        } else {
+            store.commit(Mutations.RECEIVE_USER_ID, null);
+        }
     }),
     store => store.state.scramblerWorker.addEventListener('message', event => {
         if (event.data === null) {
