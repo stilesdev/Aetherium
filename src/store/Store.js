@@ -45,8 +45,8 @@ function connectRef(refName, store) {
             });
             break;
         case 'sessionRef':
-            prevRefs[refName] = store.getters.currentPuzzleRef;
-            store.getters.currentPuzzleRef.on('value', snapshot => {
+            prevRefs[refName] = store.getters.currentSessionRef;
+            store.getters.currentSessionRef.on('value', snapshot => {
                 if (snapshot.exists()) {
                     store.commit(Mutations.RECEIVE_SESSION_DATE, { moment: moment(snapshot.val().timestamp).utc() });
                 }
