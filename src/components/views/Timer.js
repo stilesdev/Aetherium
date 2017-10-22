@@ -11,7 +11,7 @@ export default {
         return {
             timerStart: 0,
             timerLabel: '00:00.00',
-            showScramble: false,
+            showScramble: true,
             stackmatStarted: false
         }
     },
