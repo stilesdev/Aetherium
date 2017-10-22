@@ -367,7 +367,7 @@ const plugins = [
 ];
 
 try {
-    firebase.initializeApp(firebaseConfig.development);
+    firebase.initializeApp(firebaseConfig.production);
 } catch (e) {
     console.error(e);
 }
@@ -380,6 +380,5 @@ export default new Vuex.Store({
     getters,
     mutations,
     actions,
-    plugins,
-    strict: true //TODO: disable this before deploying to production
+    plugins
 })
