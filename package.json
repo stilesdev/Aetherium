@@ -1,6 +1,6 @@
 {
   "name": "aetherium",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A web-based twisty puzzle timer with real-time syncing of times across devices.",
   "main": "src/index.js",
   "scripts": {

@@ -49,7 +49,8 @@ module.exports = {
             template: 'src/index.html'
         }),
         new CopyWebpackPlugin([
-            { from: 'src/lib'}
+            { from: 'src/lib'},
+            { from: 'icons', to: 'icons' }
         ])
     ],
     resolve: {
