@@ -1,8 +1,8 @@
 import * as moment from 'moment';
 import * as $ from 'jquery';
-import * as StatsPanel from '../StatsPanel.vue';
-import * as SolvesPanel from '../SolvesPanel.vue';
-import * as ScramblePanel from '../ScramblePanel.vue';
+import * as PanelSessionStatistics from '../panels/PanelSessionStatistics.vue';
+import * as PanelSolvesList from '../panels/PanelSolvesList.vue';
+import * as PanelScrambleImage from '../panels/PanelScrambleImage.vue';
 import {Solve} from '../../modules/Models';
 import * as Actions from '../../store/ActionTypes';
 
@@ -123,8 +123,8 @@ export default {
         }
     },
     components: {
-        'stats-panel': StatsPanel,
-        'solves-panel': SolvesPanel,
-        'scramble-panel': ScramblePanel
+        'stats-panel': PanelSessionStatistics,
+        'solves-panel': PanelSolvesList,
+        'scramble-panel': PanelScrambleImage
     }
 }
