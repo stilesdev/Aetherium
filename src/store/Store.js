@@ -191,7 +191,7 @@ const mutations = {
         Vue.set(state.solves, state.solves.findIndex(solve => solve.uid === payload.uid), payload.solve);
     },
     [Mutations.DELETE_SOLVE] (state, solveId) {
-        state.solves.splice(state.solves.findIndex(solve => solve.uid = solveId), 1);
+        state.solves.splice(state.solves.findIndex(solve => solve.uid === solveId), 1);
     },
     [Mutations.RECEIVE_SESSION_STATS] (state, stats) {
         state.sessionStats = stats;
