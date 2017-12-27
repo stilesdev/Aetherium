@@ -20,15 +20,10 @@
 
 <style>
     #panel-root {
-
-    }
-
-    #panel-heading {
         text-align: center;
     }
 
     #panel-body {
         overflow-y: auto;
-        text-align: center;
     }
 </style>

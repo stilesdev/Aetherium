@@ -21,13 +21,13 @@
 }
 
 @media (min-width: 992px) {
-    #timerInfoArea {
+    #timerInfoArea #panel-body {
         height: 30vh;
     }
 }
 
 @media (max-width: 992px) {
-    #timerInfoArea {
+    #timerInfoArea #panel-body {
         height: 26vh;
     }
 }
