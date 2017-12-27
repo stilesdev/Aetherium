@@ -12,11 +12,31 @@ export default {
         return {
             showTimer: true,
             timerTrigger: 'spacebar',
+            themeUrl: '/themes/default.min.css',
             datePickerConfig: {
                 format: 'MM/DD/YYYY'
             },
             importTextValid: true,
-            importText: ''
+            importText: '',
+            themes: [
+                { name: 'Default', url: '/themes/default.min.css' },
+                { name: "Cerulean", url: "/themes/cerulean.min.css" },
+                { name: "Cosmo", url: "/themes/cosmo.min.css" },
+                { name: "Cyborg", url: "/themes/cyborg.min.css" },
+                { name: "Darkly", url: "/themes/darkly.min.css" },
+                { name: "Flatly", url: "/themes/flatly.min.css" },
+                { name: "Journal", url: "/themes/journal.min.css" },
+                { name: "Lumen", url: "/themes/lumen.min.css" },
+                { name: "Paper", url: "/themes/paper.min.css" },
+                { name: "Readable", url: "/themes/readable.min.css" },
+                { name: "Sandstone", url: "/themes/sandstone.min.css" },
+                { name: "Simplex", url: "/themes/simplex.min.css" },
+                { name: "Slate", url: "/themes/slate.min.css" },
+                { name: "Spacelab", url: "/themes/spacelab.min.css" },
+                { name: "Superhero", url: "/themes/superhero.min.css" },
+                { name: "United", url: "/themes/united.min.css" },
+                { name: "Yeti", url: "/themes/yeti.min.css" }
+            ]
         }
     },
     computed: {
@@ -74,12 +94,14 @@ export default {
         openOptionsModal() {
             this.showTimer = this.storeOptions.showTimer;
             this.timerTrigger = this.storeOptions.timerTrigger;
+            this.themeUrl = this.storeOptions.themeUrl;
             $('#optionsModal').modal();
         },
         onOptionsModalSave() {
             this.storeOptions = {
                 showTimer: this.showTimer,
-                timerTrigger: this.timerTrigger
+                timerTrigger: this.timerTrigger,
+                themeUrl: this.themeUrl
             };
         },
         openImportModal() {

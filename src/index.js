@@ -3,7 +3,6 @@ import * as $ from 'jquery';
 import Vue from 'vue';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/css/bootstrap-theme.css';
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'
 import './style.css';
 
