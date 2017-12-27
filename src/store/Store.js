@@ -19,6 +19,7 @@ function connectRef(refName, store) {
             store.getters.optionsRef.on('value', snapshot => {
                 store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer);
                 store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger);
+                store.commit(Mutations.SET_OPTION_THEME_URL, snapshot.val().themeUrl);
             });
             break;
         case 'currentSessionIdRef':
@@ -110,7 +111,8 @@ const state = {
     userId: null,
     options: {
         showTimer: true,
-        timerTrigger: 'spacebar'
+        timerTrigger: 'spacebar',
+        themeUrl: '/themes/default.min.css'
     },
     sessionId: null,
     sessionDate: null,
@@ -181,6 +183,9 @@ const mutations = {
     [Mutations.SET_OPTION_TIMERTRIGGER] (state, timerTrigger) {
         state.options.timerTrigger = timerTrigger;
     },
+    [Mutations.SET_OPTION_THEME_URL] (state, themeUrl) {
+        state.options.themeUrl = themeUrl;
+    },
     [Mutations.CLEAR_SOLVES] (state) {
         state.solves = [];
     },
@@ -191,7 +196,7 @@ const mutations = {
         Vue.set(state.solves, state.solves.findIndex(solve => solve.uid === payload.uid), payload.solve);
     },
     [Mutations.DELETE_SOLVE] (state, solveId) {
-        state.solves.splice(state.solves.findIndex(solve => solve.uid = solveId), 1);
+        state.solves.splice(state.solves.findIndex(solve => solve.uid === solveId), 1);
     },
     [Mutations.RECEIVE_SESSION_STATS] (state, stats) {
         state.sessionStats = stats;

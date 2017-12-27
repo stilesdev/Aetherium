@@ -122,6 +122,15 @@
                                 <input type="radio" name="timerTriggerOptions" id="stackmatTimerTrigger" autocomplete="off"/>Stackmat
                             </label>
                         </div>
+
+                        <hr/>
+
+                        <div class="form-group form-inline">
+                            <label for="themeSelector">Theme</label>
+                            <select class="form-control" id="themeSelector" v-model="themeUrl">
+                                <option v-for="theme in themes" v-bind:value="theme.url">{{ theme.name }}</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="modal-footer">

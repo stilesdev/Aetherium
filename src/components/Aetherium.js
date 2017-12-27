@@ -14,6 +14,9 @@ export default {
         loggedIn() {
             return this.$store.state.userId !== null;
         },
+        themeUrl() {
+            return this.$store.state.options.themeUrl;
+        },
         activeView() {
             return this.$store.state.activeView;
         }

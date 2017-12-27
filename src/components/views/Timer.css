@@ -1,22 +1,3 @@
-html {
-    height: 100%
-}
-
-body {
-    background: #ECEFF1;
-    color: rgba(0, 0, 0, 0.87);
-    font-family: Roboto, Helvetica, Arial, sans-serif;
-    padding: 0;
-    height: 100%;
-    margin: 0;
-}
-
-#app {
-    color: rgba(0, 0, 0, 0.4);
-    text-align: center;
-    font-size: 13px;
-}
-
 #timerTouchArea {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -25,6 +6,7 @@ body {
     -ms-user-select: none;
     user-select: none;
     height: 50vh;
+    text-align: center;
 }
 
 #timeList {
@@ -38,18 +20,14 @@ body {
     -o-flex-direction: column-reverse;
 }
 
-.infoPanel {
-    overflow-y: auto;
-}
-
 @media (min-width: 992px) {
-    .infoPanel {
+    #timerInfoArea #panel-body {
         height: 30vh;
     }
 }
 
 @media (max-width: 992px) {
-    .infoPanel {
+    #timerInfoArea #panel-body {
         height: 26vh;
     }
 }
