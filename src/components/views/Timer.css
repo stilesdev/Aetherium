@@ -6,7 +6,6 @@
     -ms-user-select: none;
     user-select: none;
     height: 50vh;
-    text-align: center;
 }
 
 #timeList {
@@ -34,14 +33,17 @@
 
 #scrambleArea {
     font-size: 2em;
+    text-align: justify;
+    text-align-last: center;
 }
 
 #timerLabel {
     font-size: 5em;
+    text-align: center;
 }
 
 .penalty-link {
-    padding-left: 1em;
+    padding-left: 0.5em;
     cursor: pointer;
     color: #337ab7;
 }
