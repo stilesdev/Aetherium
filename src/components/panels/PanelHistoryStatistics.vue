@@ -19,8 +19,14 @@
     import { Solve } from '../../modules/Models';
 
     function findBestSession(sessions, statistic) {
-        let session = sessions.filter(session => session[statistic] > 0).reduce((previous, current) => previous[statistic] < current[statistic] ? previous : current);
-        return { time: Solve.formatTime(session[statistic]), date: session.date };
+        let filteredSessions = sessions.filter(session => session[statistic] > 0);
+
+        if (filteredSessions.length > 0) {
+            let session = filteredSessions.reduce((previous, current) => previous[statistic] < current[statistic] ? previous : current);
+            return {time: Solve.formatTime(session[statistic]), date: session.date};
+        } else {
+            return {time: Solve.formatTime(0), date: null}
+        }
     }
 
     export default {
