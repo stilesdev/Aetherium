@@ -2,8 +2,8 @@
     <panel panelTitle="Statistics">
         <table class="table table-condensed">
             <tbody>
-                <tr><td>Best Single</td><td>{{ bestSingle.time }}</td><td>{{ bestSingle.date }}</td></tr>
                 <tr><td>Best Daily Mean</td><td>{{ bestDailyMean.time }}</td><td>{{ bestDailyMean.date }}</td></tr>
+                <tr><td>Best Single</td><td>{{ bestSingle.time }}</td><td>{{ bestSingle.date }}</td></tr>
                 <tr><td>Best Mean of 3</td><td>{{ bestMo3.time }}</td><td>{{ bestMo3.date }}</td></tr>
                 <tr><td>Best Average of 5</td><td>{{ bestAo5.time }}</td><td>{{ bestAo5.date }}</td></tr>
                 <tr><td>Best Average of 12</td><td>{{ bestAo12.time }}</td><td>{{ bestAo12.date }}</td></tr>
@@ -48,11 +48,11 @@
                 }
                 return sessions;
             },
-            bestSingle() {
-                return findBestSession(this.sessionsArray, 'best');
-            },
             bestDailyMean() {
                 return findBestSession(this.sessionsArray, 'mean');
+            },
+            bestSingle() {
+                return findBestSession(this.sessionsArray, 'best');
             },
             bestMo3() {
                 return findBestSession(this.sessionsArray, 'bestMo3')
