@@ -33,11 +33,6 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <select class="form-control" v-model="activeCategory">
-                                <option v-for="category in puzzles[activePuzzle].categories" v-bind:value="category.key">{{ category.name }}</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <button type="button" class="btn btn-primary" v-on:click="onCloseSessionClick">Close Session</button>
                         </div>
                     </form>
@@ -154,16 +149,14 @@
                         <p>Example Input:</p>
                         <pre><code>{{ JSON.stringify({
                             "M/D/YYYY": {
-                                "puzzle": {
-                                    "category": [
-                                        {
-                                            "penalty": "",
-                                            "scramble": "",
-                                            "time": 0,
-                                            "timestamp": 1234567890000
-                                        }
-                                    ]
-                                }
+                                "puzzle": [
+                                    {
+                                        "penalty": "",
+                                        "scramble": "",
+                                        "time": 0,
+                                        "timestamp": 1234567890000
+                                    }
+                                ]
                             }
                         }, undefined, 2) }}
                         </code></pre>

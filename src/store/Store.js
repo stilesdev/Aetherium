@@ -117,7 +117,6 @@ const state = {
     sessionId: null,
     sessionDate: null,
     activePuzzle: 333,
-    activeCategory: 'default',
     solves: [],
     sessionStats: null,
     allSessions: null,
@@ -144,13 +143,13 @@ const getters = {
         return firebase.database().ref(`/users/${state.userId}/sessions/${state.sessionId}`);
     },
     solvesRef() {
-        return firebase.database().ref(`/solves/${state.userId}/${state.activePuzzle}/${state.activeCategory}`);
+        return firebase.database().ref(`/solves/${state.userId}/${state.activePuzzle}`);
     },
     statsRef() {
-        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.activeCategory}`);
+        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}`);
     },
     sessionStatsRef () {
-        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.activeCategory}/${state.sessionId}`);
+        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.sessionId}`);
     }
 };
 
@@ -171,8 +170,7 @@ const mutations = {
         state.activeView = newView;
     },
     [Mutations.RECEIVE_ACTIVE_PUZZLE] (state, payload) {
-        state.activePuzzle = payload.puzzle;
-        state.activeCategory = payload.category;
+        state.activePuzzle = payload;
     },
     [Mutations.RECEIVE_SCRAMBLE] (state, scramble) {
         state.scramble = scramble;
@@ -214,7 +212,7 @@ const actions = {
         context.getters.optionsRef.set(payload);
     },
     [Actions.SET_ACTIVE_PUZZLE] (context, payload) {
-        context.getters.currentPuzzleRef.set({ puzzle: payload.puzzle, category: payload.category });
+        context.getters.currentPuzzleRef.set(payload.puzzle);
     },
     [Actions.UPDATE_SESSION_DATE] (context, payload) {
         context.getters.currentSessionRef.update({
@@ -224,7 +222,7 @@ const actions = {
     },
     [Actions.REQUEST_SCRAMBLE] (context) {
         context.state.scramblerWorker.postMessage({
-            scrambler: context.state.puzzles[context.state.activePuzzle].categories[context.state.activeCategory].scrambler
+            scrambler: context.state.puzzles[context.state.activePuzzle].scrambler
         })
     },
     [Actions.CHECK_SESSION] (context) {
@@ -302,10 +300,7 @@ const plugins = [
             userRef.once('value').then(snapshot => {
                 if (!snapshot.exists()) {
                     userRef.set({
-                        currentPuzzle: {
-                            category: 'default',
-                            puzzle: '333'
-                        },
+                        currentPuzzle: '333',
                         email: user.email,
                         options: {
                             showTimer: true,

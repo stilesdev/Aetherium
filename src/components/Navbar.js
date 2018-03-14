@@ -56,15 +56,7 @@ export default {
                 return this.$store.state.activePuzzle;
             },
             set(value) {
-                this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value, category: 'default' });
-            }
-        },
-        activeCategory: {
-            get() {
-                return this.$store.state.activeCategory;
-            },
-            set(value) {
-                this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: this.activePuzzle, category: value });
+                this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value });
             }
         },
         storeOptions: {
@@ -140,36 +132,34 @@ export default {
                 });
 
                 Object.keys(input[date]).forEach(puzzle => {
-                    Object.keys(input[date][puzzle]).forEach(category => {
-                        let solves = [];
-                        input[date][puzzle][category].forEach(solve => {
-                            let newSolveRef = firebase.database().ref(`/solves/${userId}/${puzzle}/${category}`).push();
-                            newSolveRef.set({
-                                sessionId: newSessionId,
-                                time: solve.time,
-                                timestamp: solve.timestamp,
-                                scramble: solve.scramble,
-                                penalty: solve.penalty
-                            });
-                            solves.push(new Solve(newSolveRef.key, solve.time, solve.timestamp, solve.scramble, solve.penalty));
+                    let solves = [];
+                    input[date][puzzle].forEach(solve => {
+                        let newSolveRef = firebase.database().ref(`/solves/${userId}/${puzzle}`).push();
+                        newSolveRef.set({
+                            sessionId: newSessionId,
+                            time: solve.time,
+                            timestamp: solve.timestamp,
+                            scramble: solve.scramble,
+                            penalty: solve.penalty
                         });
-                        firebase.database().ref(`/stats/${userId}/${puzzle}/${category}/${newSessionId}`).set({
-                            mean: Stats.mean(solves),
-                            count: Stats.count(solves),
-                            best: Stats.best(solves),
-                            worst: Stats.worst(solves),
-                            stdDev: Stats.stdDev(solves),
-                            mo3: Stats.mo3(solves),
-                            ao5: Stats.ao5(solves),
-                            ao12: Stats.ao12(solves),
-                            ao50: Stats.ao50(solves),
-                            ao100: Stats.ao100(solves),
-                            bestMo3: Stats.bestMo3(solves),
-                            bestAo5: Stats.bestAo5(solves),
-                            bestAo12: Stats.bestAo12(solves),
-                            bestAo50: Stats.bestAo50(solves),
-                            bestAo100: Stats.bestAo100(solves)
-                        })
+                        solves.push(new Solve(newSolveRef.key, solve.time, solve.timestamp, solve.scramble, solve.penalty));
+                    });
+                    firebase.database().ref(`/stats/${userId}/${puzzle}/${newSessionId}`).set({
+                        mean: Stats.mean(solves),
+                        count: Stats.count(solves),
+                        best: Stats.best(solves),
+                        worst: Stats.worst(solves),
+                        stdDev: Stats.stdDev(solves),
+                        mo3: Stats.mo3(solves),
+                        ao5: Stats.ao5(solves),
+                        ao12: Stats.ao12(solves),
+                        ao50: Stats.ao50(solves),
+                        ao100: Stats.ao100(solves),
+                        bestMo3: Stats.bestMo3(solves),
+                        bestAo5: Stats.bestAo5(solves),
+                        bestAo12: Stats.bestAo12(solves),
+                        bestAo50: Stats.bestAo50(solves),
+                        bestAo100: Stats.bestAo100(solves)
                     });
                 });
             });

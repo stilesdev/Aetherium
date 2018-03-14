@@ -25,8 +25,8 @@ export default {
         showTimer() {
             return this.$store.state.options.showTimer;
         },
-        currentCategory() {
-            return { puzzle: this.$store.state.activePuzzle, category: this.$store.state.activeCategory };
+        currentPuzzle() {
+            return { puzzle: this.$store.state.activePuzzle };
         }
     },
     created: function() {
@@ -118,7 +118,7 @@ export default {
                     break;
             }
         },
-        currentCategory: function(val) {
+        currentPuzzle: function(val) {
             this.showScramble = false;
         }
     },
