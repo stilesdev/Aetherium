@@ -48,8 +48,8 @@ export default {
                 this.$store.commit(Mutations.SET_ACTIVE_VIEW, value);
             }
         },
-        puzzles() {
-            return this.$store.state.puzzles;
+        puzzles: function () {
+            return Object.values(this.$store.state.puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
         },
         activePuzzle: {
             get() {
