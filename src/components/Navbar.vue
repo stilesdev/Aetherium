@@ -24,6 +24,9 @@
                         <li id="history" v-bind:class="{ active: activeTab === 'history' }" v-on:click="activeTab = 'history'">
                             <a href="#">History</a>
                         </li>
+                        <li id="pb" v-bind:class="{ active: activeTab === 'pb' }" v-on:click="activeTab = 'pb'">
+                            <a href="#">Personal Bests</a>
+                        </li>
                     </ul>
 
                     <form class="navbar-form navbar-left" v-if="puzzles">

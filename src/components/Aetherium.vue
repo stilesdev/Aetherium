@@ -13,6 +13,9 @@
             <div v-if="activeView === 'history'">
                 <history></history>
             </div>
+            <div v-if="activeView === 'pb'">
+                <personal-bests></personal-bests>
+            </div>
         </div>
     </div>
 </template>
@@ -23,6 +26,7 @@
     import Timer from './views/Timer.vue';
     import Stats from './views/Stats.vue';
     import History from './views/History.vue';
+    import PersonalBests from './views/PersonalBests.vue';
 
     export default {
         data: function() {
@@ -39,6 +43,6 @@
                 return this.$store.state.activeView;
             }
         },
-        components: { Login, Navbar, Timer, Stats, History }
+        components: { Login, Navbar, Timer, Stats, History, PersonalBests }
     }
 </script>
