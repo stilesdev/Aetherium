@@ -99,18 +99,6 @@
                     </div>
 
                     <div class="modal-body">
-                        <label for="showTimerOptionsGroup">Timer Display</label>
-                        <div class="btn-group" id="showTimerOptionsGroup" data-toggle="buttons">
-                            <label class="btn btn-default" v-bind:class="{ 'active': showTimer }" v-on:click="showTimer = true">
-                                <input type="radio" name="timerDisplayOptions" id="showTimer" autocomplete="off"/>Show
-                            </label>
-                            <label class="btn btn-default" v-bind:class="{ 'active': !showTimer }" v-on:click="showTimer = false">
-                                <input type="radio" name="timerDisplayOptions" id="hideTimer" autocomplete="off"/>Hide
-                            </label>
-                        </div>
-
-                        <hr/>
-
                         <label for="timerTriggerOptionsGroup">Timer Trigger</label>
                         <div class="btn-group" id="timerTriggerOptionsGroup" data-toggle="buttons">
                             <label class="btn btn-default" v-bind:class="{ 'active': timerTrigger === 'spacebar' }" v-on:click="timerTrigger = 'spacebar'">
@@ -120,6 +108,21 @@
                                 <input type="radio" name="timerTriggerOptions" id="stackmatTimerTrigger" autocomplete="off"/>Stackmat
                             </label>
                         </div>
+
+                        <hr/>
+
+                        <input type="checkbox" id="showTimerCheckbox" v-model="showTimer">
+                        <label for="showTimerCheckbox">Show timer while solving</label>
+
+                        <hr/>
+
+                        <input type="checkbox" id="holdToStartCheckbox" v-model="holdToStart">
+                        <label for="holdToStartCheckbox">Hold spacebar/touchscreen to start timer</label>
+
+                        <hr/>
+
+                        <input type="checkbox" id="useInspectionCheckbox" v-model="useInspection">
+                        <label for="useInspectionCheckbox">Use inspection</label>
 
                         <hr/>
 

@@ -20,6 +20,8 @@ function connectRef(refName, store) {
                 store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer);
                 store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger);
                 store.commit(Mutations.SET_OPTION_THEME_URL, snapshot.val().themeUrl);
+                store.commit(Mutations.SET_OPTION_HOLD_TO_START, snapshot.val().holdToStart);
+                store.commit(Mutations.SET_OPTION_USE_INSPECTION, snapshot.val().useInspection);
             });
             break;
         case 'currentSessionIdRef':
@@ -112,7 +114,9 @@ const state = {
     options: {
         showTimer: true,
         timerTrigger: 'spacebar',
-        themeUrl: '/themes/default.min.css'
+        themeUrl: '/themes/default.min.css',
+        holdToStart: true,
+        useInspection: true
     },
     sessionId: null,
     sessionDate: null,
@@ -183,6 +187,12 @@ const mutations = {
     },
     [Mutations.SET_OPTION_THEME_URL] (state, themeUrl) {
         state.options.themeUrl = themeUrl;
+    },
+    [Mutations.SET_OPTION_HOLD_TO_START] (state, holdToStart) {
+        state.options.holdToStart = holdToStart;
+    },
+    [Mutations.SET_OPTION_USE_INSPECTION] (state, useInspection) {
+        state.options.useInspection = useInspection;
     },
     [Mutations.CLEAR_SOLVES] (state) {
         state.solves = [];
@@ -304,7 +314,9 @@ const plugins = [
                         email: user.email,
                         options: {
                             showTimer: true,
-                            timerTrigger: 'spacebar'
+                            timerTrigger: 'spacebar',
+                            holdToStart: true,
+                            useInspection: true
                         }
                     });
                 }

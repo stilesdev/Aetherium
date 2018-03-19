@@ -12,6 +12,8 @@ export default {
         return {
             showTimer: true,
             timerTrigger: 'spacebar',
+            holdToStart: true,
+            useInspection: true,
             themeUrl: '/themes/default.min.css',
             datePickerConfig: {
                 format: 'MM/DD/YYYY'
@@ -86,6 +88,8 @@ export default {
         openOptionsModal() {
             this.showTimer = this.storeOptions.showTimer;
             this.timerTrigger = this.storeOptions.timerTrigger;
+            this.holdToStart = this.storeOptions.holdToStart;
+            this.useInspection = this.storeOptions.useInspection;
             this.themeUrl = this.storeOptions.themeUrl;
             $('#optionsModal').modal();
         },
@@ -93,6 +97,8 @@ export default {
             this.storeOptions = {
                 showTimer: this.showTimer,
                 timerTrigger: this.timerTrigger,
+                holdToStart: this.holdToStart,
+                useInspection: this.useInspection,
                 themeUrl: this.themeUrl
             };
         },

@@ -5,14 +5,18 @@ import * as PanelSolvesList from '../panels/PanelSolvesList.vue';
 import * as PanelScrambleImage from '../panels/PanelScrambleImage.vue';
 import {Solve} from '../../modules/Models';
 import * as Actions from '../../store/ActionTypes';
+import TimerStateMachine from '../../modules/TimerStateMachine';
 
 export default {
     data: function() {
         return {
             timerStart: 0,
             timerLabel: '00:00.00',
-            showScramble: true,
-            stackmatStarted: false
+            generatingScramble: true,
+            stackmatStarted: false,
+            timerState: null,
+            inspectionCountdown: 0,
+            inspectionTimer: null
         }
     },
     computed: {
@@ -25,42 +29,82 @@ export default {
         showTimer() {
             return this.$store.state.options.showTimer;
         },
+        holdToStart() {
+            return this.$store.state.options.holdToStart;
+        },
+        useInspection() {
+            return this.$store.state.options.useInspection;
+        },
         currentPuzzle() {
             return { puzzle: this.$store.state.activePuzzle };
+        },
+        timerClass() {
+            switch (this.timerState.state) {
+                case 'inspection':
+                    return 'timer-inspection';
+
+                case 'starting':
+                    return 'timer-starting';
+
+                case 'ready':
+                case 'running':
+                    return 'timer-ready';
+
+                default: return 'inherit';
+            }
         }
     },
     created: function() {
-        let view = this;
-
-        $(document).on('keydown.aetherium', function(event) {
-            if (event.which === 32) {
-                event.preventDefault();
-            }
-        });
-
-        $(document).on('keyup.aetherium', function(event) {
-            if (event.which === 32) {
-                view.onSpacebarPress();
-            }
-        })
+        this.createTimerState();
+        this.initTimers();
     },
     destroyed: function() {
-        $(document).off('.aetherium');
+        this.disconnectTimers();
     },
     methods: {
-        onSpacebarPress() {
+        initTimers() {
             if (this.timerTrigger === 'spacebar') {
-                if (this.timerStart === 0) {
-                    this.startTimer();
-                } else {
-                    let stop = moment().valueOf();
-                    let start = this.timerStart;
-                    this.timerStart = 0;
-                    this.completeSolve(stop - start);
-                }
+                stackmat.stop();
+                let view = this;
+
+                $(document).on('keydown.aetherium', function(event) {
+                    if (event.which === 32) {
+                        event.preventDefault();
+                        view.timerState.triggerDown();
+                    }
+                });
+
+                $(document).on('keyup.aetherium', function(event) {
+                    if (event.which === 32) {
+                        event.preventDefault();
+                        view.timerState.triggerUp();
+                    }
+                });
+            } else if (this.timerTrigger === 'stackmat') {
+                $(document).off('.aetherium');
+
+                stackmat.setCallBack(this.onStackmatSignalReceived);
+                stackmat.init();
             }
         },
+        disconnectTimers() {
+            $(document).off('.aetherium');
+            stackmat.stop();
+
+        },
+        createTimerState() {
+            let view = this;
+
+            view.timerState = new TimerStateMachine({
+                holdToStart: view.holdToStart,
+                useInspection: view.useInspection,
+                onSolveStart: view.startTimer,
+                onSolveComplete: view.stopSolve,
+                onInspectionStart: view.startInspection
+            });
+        },
         onStackmatSignalReceived(state) {
+            /*
             if (this.stackmatStarted && !state.running) {
                 // Timer just stopped
                 this.stackmatStarted = false;
@@ -73,10 +117,29 @@ export default {
             } else if (!this.stackmatStarted && state.time_milli === 0) {
                 this.timerLabel = '00:00.00';
             }
+            */
+        },
+        startInspection() {
+            this.inspectionCountdown = 15;
+            this.timerLabel = this.inspectionCountdown;
+
+            this.inspectionTimer = setInterval(this.updateInspection, 1000);
+        },
+        updateInspection() {
+            this.inspectionCountdown -= 1;
+
+            if (this.inspectionCountdown === 0) {
+                this.timerState.inspectionExceeded();
+                this.timerLabel = 'DNS';
+                clearInterval(this.inspectionTimer);
+            } else {
+                this.timerLabel = this.inspectionCountdown;
+            }
         },
         startTimer() {
             this.timerStart = moment().valueOf();
-            this.showScramble = false;
+            clearInterval(this.inspectionTimer);
+            this.generatingScramble = true;
 
             if (this.showTimer) {
                 setTimeout(this.updateTimer, 10);
@@ -90,6 +153,12 @@ export default {
                 setTimeout(this.updateTimer, 30);
             }
         },
+        stopSolve() {
+            let stop = moment().valueOf();
+            let start = this.timerStart;
+            this.timerStart = 0;
+            this.completeSolve(stop - start);
+        },
         completeSolve(delta) {
             this.timerLabel = Solve.formatTime(delta);
 
@@ -97,29 +166,25 @@ export default {
         }
     },
     watch: {
-        scramble: function(val) {
-            this.showScramble = true;
-        },
-        timerTrigger: function(val) {
-            this.timerStart = 0;
-            this.timerLabel = '00:00.00';
-
-            switch (val) {
-                case 'spacebar':
-                    stackmat.stop();
-                    break;
-
-                case 'stackmat':
-                    stackmat.setCallBack(this.onStackmatSignalReceived);
-                    stackmat.init();
-                    break;
-
-                default:
-                    break;
+        timerTrigger: function(oldTrigger, newTrigger) {
+            if (oldTrigger !== newTrigger) {
+                this.timerStart = 0;
+                this.timerLabel = '00:00.00';
+                this.disconnectTimers();
+                this.initTimers();
             }
         },
-        currentPuzzle: function(val) {
-            this.showScramble = false;
+        holdToStart: function() {
+            this.createTimerState();
+        },
+        useInspection: function() {
+            this.createTimerState();
+        },
+        scramble: function() {
+            this.generatingScramble = false;
+        },
+        currentPuzzle: function() {
+            this.generatingScramble = true;
         }
     },
     components: {

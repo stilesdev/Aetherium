@@ -42,6 +42,18 @@
     text-align: center;
 }
 
+.timer-inspection {
+    color: red;
+}
+
+.timer-starting {
+    color: orange;
+}
+
+.timer-ready {
+    color: green;
+}
+
 .penalty-link {
     padding-left: 0.5em;
     cursor: pointer;

@@ -1,16 +1,16 @@
 <template>
     <div id="app">
         <div class="container-fluid">
-            <div id="timerTouchArea" v-on:touchend="onSpacebarPress">
+            <div id="timerTouchArea" v-on:touchstart="timerState.triggerDown()" v-on:touchend="timerState.triggerUp()">
                 <div class="row">
-                    <div id="scrambleArea" class="col-md-10 col-md-offset-1" v-if="timerStart === 0">
-                        <h3 v-if="showScramble">{{ scramble.text }}</h3>
-                        <h3 v-else>Generating scramble...</h3>
+                    <div id="scrambleArea" class="col-md-10 col-md-offset-1" v-if="timerState.state === 'idle' || timerState.state === 'complete'">
+                        <h3 v-if="generatingScramble">Generating scramble...</h3>
+                        <h3 v-else>{{ scramble.text }}</h3>
                     </div>
                 </div>
                 <div class="row">
                     <div id="timerArea">
-                        <h1 id="timerLabel">{{ timerLabel }}</h1>
+                        <h1 id="timerLabel" v-bind:class="timerClass">{{ timerLabel }}</h1>
                     </div>
                 </div>
             </div>
