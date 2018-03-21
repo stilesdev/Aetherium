@@ -104,6 +104,7 @@ function disconnectAllRefs() {
 
 const state = {
     activeView: 'timer',
+    hideUI: false,
     scramblerWorker: new ScramblerWorker(),
     scramble: {
         text: 'Generating scramble...',
@@ -172,6 +173,9 @@ const mutations = {
     },
     [Mutations.SET_ACTIVE_VIEW] (state, newView) {
         state.activeView = newView;
+    },
+    [Mutations.SET_HIDE_UI] (state, hide) {
+        state.hideUI = hide;
     },
     [Mutations.RECEIVE_ACTIVE_PUZZLE] (state, payload) {
         state.activePuzzle = payload;

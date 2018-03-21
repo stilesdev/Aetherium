@@ -4,6 +4,7 @@ import * as PanelSessionStatistics from '../panels/PanelSessionStatistics.vue';
 import * as PanelSolvesList from '../panels/PanelSolvesList.vue';
 import * as PanelScrambleImage from '../panels/PanelScrambleImage.vue';
 import {Solve} from '../../modules/Models';
+import * as Mutations from '../../store/MutationTypes';
 import * as Actions from '../../store/ActionTypes';
 import TimerStateMachine from '../../modules/TimerStateMachine';
 
@@ -22,6 +23,9 @@ export default {
     computed: {
         scramble() {
             return this.$store.state.scramble;
+        },
+        hideUI () {
+            return this.timerState ? !(this.timerState.state === 'idle' || this.timerState.state === 'complete') : false;
         },
         timerTrigger() {
             return this.$store.state.options.timerTrigger;
@@ -50,7 +54,7 @@ export default {
                 case 'running':
                     return 'timer-ready';
 
-                default: return 'inherit';
+                default: return 'timer-idle';
             }
         }
     },
@@ -180,7 +184,10 @@ export default {
         }
     },
     watch: {
-        timerTrigger: function(oldTrigger, newTrigger) {
+        hideUI: function(newValue) {
+            this.$store.commit(Mutations.SET_HIDE_UI, newValue);
+        },
+        timerTrigger: function(newTrigger, oldTrigger) {
             if (oldTrigger !== newTrigger) {
                 this.timerStart = 0;
                 this.timerLabel = '00:00.00';

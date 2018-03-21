@@ -38,20 +38,27 @@
 }
 
 #timerLabel {
-    font-size: 5em;
     text-align: center;
+}
+
+.timer-idle {
+    color: inherit;
+    font-size: 5em;
 }
 
 .timer-inspection {
     color: red;
+    font-size: 15em;
 }
 
 .timer-starting {
     color: orange;
+    font-size: 15em;
 }
 
 .timer-ready {
     color: green;
+    font-size: 15em;
 }
 
 .penalty-link {
@@ -62,4 +69,11 @@
 
 .penalty-active {
     color: red;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
 }

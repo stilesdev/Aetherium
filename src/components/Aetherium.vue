@@ -3,7 +3,10 @@
         <login v-if="!loggedIn"></login>
         <div v-else>
             <link rel="stylesheet" v-bind:href="themeUrl">
-            <navbar></navbar>
+            <transition name="fade">
+                <navbar v-if="showNavbar || activeView !== 'timer'"></navbar>
+            </transition>
+
             <div v-if="activeView === 'timer'">
                 <timer></timer>
             </div>
@@ -33,6 +36,9 @@
             return {}
         },
         computed: {
+            showNavbar() {
+                return !this.$store.state.hideUI;
+            },
             loggedIn() {
                 return this.$store.state.userId !== null;
             },
@@ -46,3 +52,12 @@
         components: { Login, Navbar, Timer, Stats, History, PersonalBests }
     }
 </script>
+
+<style>
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s;
+    }
+    .fade-enter, .fade-leave-to {
+        opacity: 0;
+    }
+</style>
