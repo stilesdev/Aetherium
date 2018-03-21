@@ -24,6 +24,11 @@ export default class TimerStateMachine {
                     to: () => this._onTriggerUp()
                 },
                 {
+                    name: 'stackmatTrigger',
+                    from: '*',
+                    to: (s) => this._onStackmatTrigger(s)
+                },
+                {
                     name: 'inspectionExceeded',
                     from: 'inspection',
                     to: 'idle'
@@ -37,6 +42,11 @@ export default class TimerStateMachine {
                     name: 'timerReset',
                     from: 'complete',
                     to: 'idle'
+                },
+                {
+                    name: 'goto',
+                    from: '*',
+                    to: (state) => state
                 },
                 {
                     name: 'reset',
@@ -67,6 +77,10 @@ export default class TimerStateMachine {
 
     triggerUp() {
         this.stateMachine.triggerUp();
+    }
+
+    stackmatTrigger(newState) {
+        this.stateMachine.stackmatTrigger(newState);
     }
 
     inspectionExceeded() {
@@ -141,6 +155,47 @@ export default class TimerStateMachine {
 
             case 'complete':
                 return 'complete';
+        }
+    }
+
+    _onStackmatTrigger(newState) {
+        switch (this.stateMachine.state) {
+            case 'idle':
+                if (this.useInspection && newState === 'inspection') {
+                    this.onInspectionStart();
+                    return 'inspection';
+                } else if (newState === 'starting') {
+                    return 'starting';
+                } else {
+                    return 'idle';
+                }
+            case 'inspection':
+                return newState === 'starting' ? 'starting' : 'inspection';
+            case 'starting':
+                if (newState === 'ready') {
+                    return 'ready';
+                } else if (newState === 'idle' || newState === 'inspection') {
+                    return this.useInspection ? 'inspection' : 'idle';
+                } else {
+                    return 'starting';
+                }
+            case 'ready':
+                if (newState === 'running') {
+                    this.onSolveStart();
+                    return 'running';
+                } else {
+                    return 'ready';
+                }
+            case 'running':
+                if (newState === 'complete') {
+                    this.onSolveComplete();
+                    setTimeout(() => this.stateMachine.timerReset(), 2000);
+                    return 'complete';
+                } else {
+                    return 'running';
+                }
+            case 'complete':
+                return newState === 'idle' ? 'idle' : 'complete';
         }
     }
 }

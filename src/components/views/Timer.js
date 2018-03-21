@@ -99,25 +99,34 @@ export default {
                 holdToStart: view.holdToStart,
                 useInspection: view.useInspection,
                 onSolveStart: view.startTimer,
-                onSolveComplete: view.stopSolve,
+                onSolveComplete: view.stopTimer,
                 onInspectionStart: view.startInspection
             });
         },
-        onStackmatSignalReceived(state) {
-            /*
-            if (this.stackmatStarted && !state.running) {
-                // Timer just stopped
+        onStackmatSignalReceived(stackmat) {
+            if (!this.stackmatStarted && !stackmat.running) {
+                // Stackmat idle
+                if (!(stackmat.leftHand || stackmat.rightHand) && stackmat.time_milli === 0) {
+                    // No hands down and timer reset to 0
+                    this.timerLabel = '00:00.00';
+                    this.timerState.stackmatTrigger('idle');
+                } else if (stackmat.leftHand !== stackmat.rightHand) {
+                    // Only one hand down to start inspection
+                    this.timerState.stackmatTrigger('inspection');
+                } else if (stackmat.leftHand && stackmat.rightHand) {
+                    // Both hands down to start solve
+                    this.timerState.stackmatTrigger(stackmat.greenLight ? 'ready' : 'starting');
+                }
+            } else if (!this.stackmatStarted && stackmat.running) {
+                // Stackmat just started
+                this.stackmatStarted = true;
+                this.timerState.stackmatTrigger('running');
+            } else if (this.stackmatStarted && !stackmat.running) {
+                // Stackmat just stopped
                 this.stackmatStarted = false;
                 this.timerStart = 0;
-                this.completeSolve(state.time_milli);
-            } else if (!this.stackmatStarted && state.running) {
-                // Timer just started
-                this.stackmatStarted = true;
-                this.startTimer();
-            } else if (!this.stackmatStarted && state.time_milli === 0) {
-                this.timerLabel = '00:00.00';
+                this.timerState.stackmatTrigger('complete');
             }
-            */
         },
         startInspection() {
             this.inspectionCountdown = 15;
@@ -153,11 +162,16 @@ export default {
                 setTimeout(this.updateTimer, 30);
             }
         },
-        stopSolve() {
-            let stop = moment().valueOf();
-            let start = this.timerStart;
-            this.timerStart = 0;
-            this.completeSolve(stop - start);
+        stopTimer() {
+            if (this.timerTrigger === 'spacebar') {
+                let stop = moment().valueOf();
+                let start = this.timerStart;
+                this.timerStart = 0;
+                this.completeSolve(stop - start);
+            } else if (this.timerTrigger === 'stackmat') {
+                this.timerStart = 0;
+                this.completeSolve(stackmat.time_milli);
+            }
         },
         completeSolve(delta) {
             this.timerLabel = Solve.formatTime(delta);
