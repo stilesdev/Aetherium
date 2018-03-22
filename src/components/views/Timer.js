@@ -15,6 +15,7 @@ export default {
             timerLabel: '00:00.00',
             generatingScramble: true,
             stackmatStarted: false,
+            stackmatLastTime: 0,
             timerState: null,
             inspectionCountdown: 0,
             inspectionTimer: null
@@ -110,10 +111,9 @@ export default {
         onStackmatSignalReceived(stackmat) {
             if (!this.stackmatStarted && !stackmat.running) {
                 // Stackmat idle
-                if (!(stackmat.leftHand || stackmat.rightHand) && stackmat.time_milli === 0) {
-                    // No hands down and timer reset to 0
+                if (!(stackmat.leftHand || stackmat.rightHand) && stackmat.time_milli === 0 && !this.inspectionTimer) {
+                    // No hands down and timer reset to 0, reset timer label if inspection is not running
                     this.timerLabel = '00:00.00';
-                    this.timerState.stackmatTrigger('idle');
                 } else if (stackmat.leftHand !== stackmat.rightHand) {
                     // Only one hand down to start inspection
                     this.timerState.stackmatTrigger('inspection');
@@ -129,6 +129,7 @@ export default {
                 // Stackmat just stopped
                 this.stackmatStarted = false;
                 this.timerStart = 0;
+                this.stackmatLastTime = stackmat.time_milli;
                 this.timerState.stackmatTrigger('complete');
             }
         },
@@ -145,6 +146,7 @@ export default {
                 this.timerState.inspectionExceeded();
                 this.timerLabel = 'DNS';
                 clearInterval(this.inspectionTimer);
+                this.inspectionTimer = null;
             } else {
                 this.timerLabel = this.inspectionCountdown;
             }
@@ -152,6 +154,7 @@ export default {
         startTimer() {
             this.timerStart = moment().valueOf();
             clearInterval(this.inspectionTimer);
+            this.inspectionTimer = null;
             this.generatingScramble = true;
 
             if (this.showTimer) {
@@ -174,12 +177,12 @@ export default {
                 this.completeSolve(stop - start);
             } else if (this.timerTrigger === 'stackmat') {
                 this.timerStart = 0;
-                this.completeSolve(stackmat.time_milli);
+                this.completeSolve(this.stackmatLastTime);
             }
         },
         completeSolve(delta) {
             this.timerLabel = Solve.formatTime(delta);
-
+            this.stackmatLastTime = 0;
             this.$store.dispatch(Actions.STORE_SOLVE, delta);
         }
     },
