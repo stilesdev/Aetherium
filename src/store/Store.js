@@ -235,6 +235,11 @@ const actions = {
         })
     },
     [Actions.REQUEST_SCRAMBLE] (context) {
+        context.commit(Mutations.RECEIVE_SCRAMBLE, {
+            text: 'Generating scramble...',
+            svg: null
+        });
+
         context.state.scramblerWorker.postMessage({
             scrambler: context.state.puzzles[context.state.activePuzzle].scrambler
         })

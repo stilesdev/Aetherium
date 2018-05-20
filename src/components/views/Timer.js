@@ -13,7 +13,6 @@ export default {
         return {
             timerStart: 0,
             timerLabel: '00:00.00',
-            generatingScramble: true,
             stackmatStarted: false,
             stackmatLastTime: 0,
             timerState: null,
@@ -155,7 +154,6 @@ export default {
             this.timerStart = moment().valueOf();
             clearInterval(this.inspectionTimer);
             this.inspectionTimer = null;
-            this.generatingScramble = true;
 
             if (this.showTimer) {
                 setTimeout(this.updateTimer, 10);
@@ -203,12 +201,6 @@ export default {
         },
         useInspection: function() {
             this.createTimerState();
-        },
-        scramble: function() {
-            this.generatingScramble = false;
-        },
-        currentPuzzle: function() {
-            this.generatingScramble = true;
         }
     },
     components: {

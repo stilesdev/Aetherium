@@ -5,8 +5,7 @@
                 <div class="row">
                     <transition name="fade">
                         <div id="scrambleArea" class="col-md-10 col-md-offset-1" v-if="!hideUI">
-                            <h3 v-if="generatingScramble">Generating scramble...</h3>
-                            <h3 v-else>{{ scramble.text }}</h3>
+                            <h3>{{ scramble.text }}</h3>
                         </div>
                     </transition>
                 </div>
