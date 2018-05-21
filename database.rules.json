@@ -15,7 +15,7 @@
         ".read": "$user_id === auth.uid",
         ".write": "$user_id === auth.uid",
         "$puzzle": {
-          ".indexOn": "sessionId"
+          ".indexOn": ["sessionId", "timestamp"]
         }
       }
     },
