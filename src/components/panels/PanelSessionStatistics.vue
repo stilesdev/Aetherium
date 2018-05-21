@@ -35,6 +35,10 @@
                     <td>Ao100</td><td>{{ formatSolve(stats.ao100) }}</td>
                     <td>Best Ao100</td><td>{{ formatSolve(stats.bestAo100) }}</td>
                 </tr>
+                <tr>
+                    <td colspan="2"><button class="btn btn-sm" v-on:click="calculateAo1000">Calculate Global Ao1000</button></td>
+                    <td>Global Ao1000</td><td>{{ formatSolve(ao1000) }}</td>
+                </tr>
                 </tbody>
             </table>
             <div v-else>
@@ -47,10 +51,13 @@
 <script>
     import * as PanelRoot from './PanelRoot.vue'
     import { Solve } from '../../modules/Models';
+    import { average } from '../../modules/Statistics'
 
     export default {
         data: function() {
-            return {}
+            return {
+                ao1000: 0
+            }
         },
         computed: {
             stats() {
@@ -58,7 +65,22 @@
             }
         },
         methods: {
-            formatSolve: Solve.formatTime
+            formatSolve: Solve.formatTime,
+            calculateAo1000() {
+                this.$store.getters.solvesRef.orderByChild('timestamp').limitToLast(1000).once('value').then(snapshot => {
+                    let solves = [];
+                    snapshot.forEach(childSnapshot => {
+                        solves.push(Solve.fromSnapshot(childSnapshot));
+                    });
+
+                    this.ao1000 = average(solves);
+                });
+            }
+        },
+        watch: {
+            stats() {
+                this.ao1000 = 0;
+            }
         },
         components: {
             'panel': PanelRoot

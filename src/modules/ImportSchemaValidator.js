@@ -17,22 +17,14 @@ export class ImportValidator {
             'additionalProperties': false
         };
 
-        const categorySchema = {
-            'id': '/Category',
+        const puzzleSchema = {
+            'id': '/Puzzle',
             'type': 'object',
             'patternProperties': {
                 '.*': {
                     'type': 'array',
                     'items': { '$ref': '/Solve' }
                 }
-            }
-        };
-
-        const puzzleSchema = {
-            'id': '/Puzzle',
-            'type': 'object',
-            'patternProperties': {
-                '.*': { '$ref': '/Category' }
             }
         };
 
@@ -46,7 +38,6 @@ export class ImportValidator {
         };
 
         this.validator.addSchema(solveSchema, '/Solve');
-        this.validator.addSchema(categorySchema, '/Category');
         this.validator.addSchema(puzzleSchema, '/Puzzle');
         this.schema = sessionSchema;
     }

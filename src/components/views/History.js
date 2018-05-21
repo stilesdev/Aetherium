@@ -1,6 +1,7 @@
 import * as Highcharts from 'highcharts';
 import * as moment from 'moment';
 import { Solve } from '../../modules/Models.js';
+import * as PanelHistoryStatistics from '../panels/PanelHistoryStatistics.vue';
 
 export default {
     data: function() {
@@ -109,5 +110,8 @@ export default {
                 formatter: function() { return `<b>${moment(this.x).utc().format('M/D/YYYY')}</b><br/>${Solve.formatTime(this.y)}` }
             }
         });
+    },
+    components: {
+        'panel-history-statistics': PanelHistoryStatistics
     }
 }

@@ -12,10 +12,10 @@
             </thead>
             <tbody>
             <tr v-for="solve in solves">
-                <td>{{ solve.getFormattedTimestamp() }}</td>
-                <td v-bind:class="{ 'penalty-active': solve.penalty !== '' }">{{ solve.getFormattedTime() }}</td>
-                <td class="visible-md visible-lg">{{ solve.scramble }}</td>
-                <td>
+                <td class="timestamp-column">{{ solve.getFormattedTimestamp() }}</td>
+                <td class="time-column" v-bind:class="{ 'penalty-active': solve.penalty !== '' }">{{ solve.getFormattedTime() }}</td>
+                <td class="scramble-column visible-md visible-lg">{{ solve.scramble }}</td>
+                <td class="actions-column">
                     <span class="penalty-link" v-bind:class="{ 'penalty-active': solve.penalty === '+2' }" v-on:click="setPenalty(solve, '+2')">+2</span>
                     <span class="penalty-link" v-bind:class="{ 'penalty-active': solve.penalty === 'dnf' }" v-on:click="setPenalty(solve, 'dnf')">DNF</span>
                     <span class="penalty-link" v-on:click="deleteSolve(solve.uid)"><span class="glyphicon glyphicon-remove"></span></span>
@@ -52,3 +52,22 @@
         }
     }
 </script>
+
+<style>
+    .timestamp-column {
+        width: 8em;
+    }
+
+    .time-column {
+        width: 4em;
+    }
+
+    .scramble-column {
+        text-align: justify;
+        text-align-last: center;
+    }
+
+    .actions-column {
+        width: 8em;
+    }
+</style>

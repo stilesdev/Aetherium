@@ -17,6 +17,12 @@
                             <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password">
                         </div>
                     </div>
+                    <div v-if="loginError" class="alert alert-danger alert-dismissible" role="alert">
+                        <button v-on:click="loginError = null" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Error signing in!</strong> {{ loginError }}
+                    </div>
                     <button class="btn btn-default">Login</button>
                 </form>
             </div>
@@ -31,13 +37,16 @@
         data: function() {
             return {
                 email: '',
-                password: ''
+                password: '',
+                loginError: null
             }
         },
         methods: {
             submit: function(event) {
                 event.preventDefault();
-                firebase.auth().signInWithEmailAndPassword(this.email, this.password);
+                firebase.auth().signInWithEmailAndPassword(this.email, this.password).catch(error => {
+                    this.loginError = error.message;
+                });
             }
         }
     }

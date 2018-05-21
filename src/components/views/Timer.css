@@ -6,7 +6,6 @@
     -ms-user-select: none;
     user-select: none;
     height: 50vh;
-    text-align: center;
 }
 
 #timeList {
@@ -34,18 +33,47 @@
 
 #scrambleArea {
     font-size: 2em;
+    text-align: justify;
+    text-align-last: center;
 }
 
 #timerLabel {
+    text-align: center;
+}
+
+.timer-idle {
+    color: inherit;
     font-size: 5em;
 }
 
+.timer-inspection {
+    color: red;
+    font-size: 15em;
+}
+
+.timer-starting {
+    color: orange;
+    font-size: 15em;
+}
+
+.timer-ready {
+    color: green;
+    font-size: 15em;
+}
+
 .penalty-link {
-    padding-left: 1em;
+    padding-left: 0.5em;
     cursor: pointer;
     color: #337ab7;
 }
 
 .penalty-active {
     color: red;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
 }

@@ -20,6 +20,8 @@ function connectRef(refName, store) {
                 store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer);
                 store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger);
                 store.commit(Mutations.SET_OPTION_THEME_URL, snapshot.val().themeUrl);
+                store.commit(Mutations.SET_OPTION_HOLD_TO_START, snapshot.val().holdToStart);
+                store.commit(Mutations.SET_OPTION_USE_INSPECTION, snapshot.val().useInspection);
             });
             break;
         case 'currentSessionIdRef':
@@ -102,6 +104,7 @@ function disconnectAllRefs() {
 
 const state = {
     activeView: 'timer',
+    hideUI: false,
     scramblerWorker: new ScramblerWorker(),
     scramble: {
         text: 'Generating scramble...',
@@ -112,12 +115,13 @@ const state = {
     options: {
         showTimer: true,
         timerTrigger: 'spacebar',
-        themeUrl: '/themes/default.min.css'
+        themeUrl: '/themes/default.min.css',
+        holdToStart: true,
+        useInspection: true
     },
     sessionId: null,
     sessionDate: null,
     activePuzzle: 333,
-    activeCategory: 'default',
     solves: [],
     sessionStats: null,
     allSessions: null,
@@ -144,13 +148,13 @@ const getters = {
         return firebase.database().ref(`/users/${state.userId}/sessions/${state.sessionId}`);
     },
     solvesRef() {
-        return firebase.database().ref(`/solves/${state.userId}/${state.activePuzzle}/${state.activeCategory}`);
+        return firebase.database().ref(`/solves/${state.userId}/${state.activePuzzle}`);
     },
     statsRef() {
-        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.activeCategory}`);
+        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}`);
     },
     sessionStatsRef () {
-        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.activeCategory}/${state.sessionId}`);
+        return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.sessionId}`);
     }
 };
 
@@ -170,9 +174,11 @@ const mutations = {
     [Mutations.SET_ACTIVE_VIEW] (state, newView) {
         state.activeView = newView;
     },
+    [Mutations.SET_HIDE_UI] (state, hide) {
+        state.hideUI = hide;
+    },
     [Mutations.RECEIVE_ACTIVE_PUZZLE] (state, payload) {
-        state.activePuzzle = payload.puzzle;
-        state.activeCategory = payload.category;
+        state.activePuzzle = payload;
     },
     [Mutations.RECEIVE_SCRAMBLE] (state, scramble) {
         state.scramble = scramble;
@@ -185,6 +191,12 @@ const mutations = {
     },
     [Mutations.SET_OPTION_THEME_URL] (state, themeUrl) {
         state.options.themeUrl = themeUrl;
+    },
+    [Mutations.SET_OPTION_HOLD_TO_START] (state, holdToStart) {
+        state.options.holdToStart = holdToStart;
+    },
+    [Mutations.SET_OPTION_USE_INSPECTION] (state, useInspection) {
+        state.options.useInspection = useInspection;
     },
     [Mutations.CLEAR_SOLVES] (state) {
         state.solves = [];
@@ -214,7 +226,7 @@ const actions = {
         context.getters.optionsRef.set(payload);
     },
     [Actions.SET_ACTIVE_PUZZLE] (context, payload) {
-        context.getters.currentPuzzleRef.set({ puzzle: payload.puzzle, category: payload.category });
+        context.getters.currentPuzzleRef.set(payload.puzzle);
     },
     [Actions.UPDATE_SESSION_DATE] (context, payload) {
         context.getters.currentSessionRef.update({
@@ -223,8 +235,13 @@ const actions = {
         })
     },
     [Actions.REQUEST_SCRAMBLE] (context) {
+        context.commit(Mutations.RECEIVE_SCRAMBLE, {
+            text: 'Generating scramble...',
+            svg: null
+        });
+
         context.state.scramblerWorker.postMessage({
-            scrambler: context.state.puzzles[context.state.activePuzzle].categories[context.state.activeCategory].scrambler
+            scrambler: context.state.puzzles[context.state.activePuzzle].scrambler
         })
     },
     [Actions.CHECK_SESSION] (context) {
@@ -302,14 +319,13 @@ const plugins = [
             userRef.once('value').then(snapshot => {
                 if (!snapshot.exists()) {
                     userRef.set({
-                        currentPuzzle: {
-                            category: 'default',
-                            puzzle: '333'
-                        },
+                        currentPuzzle: '333',
                         email: user.email,
                         options: {
                             showTimer: true,
-                            timerTrigger: 'spacebar'
+                            timerTrigger: 'spacebar',
+                            holdToStart: true,
+                            useInspection: true
                         }
                     });
                 }

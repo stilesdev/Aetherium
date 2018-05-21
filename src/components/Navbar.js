@@ -12,6 +12,8 @@ export default {
         return {
             showTimer: true,
             timerTrigger: 'spacebar',
+            holdToStart: true,
+            useInspection: true,
             themeUrl: '/themes/default.min.css',
             datePickerConfig: {
                 format: 'MM/DD/YYYY'
@@ -48,23 +50,15 @@ export default {
                 this.$store.commit(Mutations.SET_ACTIVE_VIEW, value);
             }
         },
-        puzzles() {
-            return this.$store.state.puzzles;
+        puzzles: function () {
+            return Object.values(this.$store.state.puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
         },
         activePuzzle: {
             get() {
                 return this.$store.state.activePuzzle;
             },
             set(value) {
-                this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value, category: 'default' });
-            }
-        },
-        activeCategory: {
-            get() {
-                return this.$store.state.activeCategory;
-            },
-            set(value) {
-                this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: this.activePuzzle, category: value });
+                this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value });
             }
         },
         storeOptions: {
@@ -94,6 +88,8 @@ export default {
         openOptionsModal() {
             this.showTimer = this.storeOptions.showTimer;
             this.timerTrigger = this.storeOptions.timerTrigger;
+            this.holdToStart = this.storeOptions.holdToStart;
+            this.useInspection = this.storeOptions.useInspection;
             this.themeUrl = this.storeOptions.themeUrl;
             $('#optionsModal').modal();
         },
@@ -101,6 +97,8 @@ export default {
             this.storeOptions = {
                 showTimer: this.showTimer,
                 timerTrigger: this.timerTrigger,
+                holdToStart: this.holdToStart,
+                useInspection: this.useInspection,
                 themeUrl: this.themeUrl
             };
         },
@@ -140,36 +138,34 @@ export default {
                 });
 
                 Object.keys(input[date]).forEach(puzzle => {
-                    Object.keys(input[date][puzzle]).forEach(category => {
-                        let solves = [];
-                        input[date][puzzle][category].forEach(solve => {
-                            let newSolveRef = firebase.database().ref(`/solves/${userId}/${puzzle}/${category}`).push();
-                            newSolveRef.set({
-                                sessionId: newSessionId,
-                                time: solve.time,
-                                timestamp: solve.timestamp,
-                                scramble: solve.scramble,
-                                penalty: solve.penalty
-                            });
-                            solves.push(new Solve(newSolveRef.key, solve.time, solve.timestamp, solve.scramble, solve.penalty));
+                    let solves = [];
+                    input[date][puzzle].forEach(solve => {
+                        let newSolveRef = firebase.database().ref(`/solves/${userId}/${puzzle}`).push();
+                        newSolveRef.set({
+                            sessionId: newSessionId,
+                            time: solve.time,
+                            timestamp: solve.timestamp,
+                            scramble: solve.scramble,
+                            penalty: solve.penalty
                         });
-                        firebase.database().ref(`/stats/${userId}/${puzzle}/${category}/${newSessionId}`).set({
-                            mean: Stats.mean(solves),
-                            count: Stats.count(solves),
-                            best: Stats.best(solves),
-                            worst: Stats.worst(solves),
-                            stdDev: Stats.stdDev(solves),
-                            mo3: Stats.mo3(solves),
-                            ao5: Stats.ao5(solves),
-                            ao12: Stats.ao12(solves),
-                            ao50: Stats.ao50(solves),
-                            ao100: Stats.ao100(solves),
-                            bestMo3: Stats.bestMo3(solves),
-                            bestAo5: Stats.bestAo5(solves),
-                            bestAo12: Stats.bestAo12(solves),
-                            bestAo50: Stats.bestAo50(solves),
-                            bestAo100: Stats.bestAo100(solves)
-                        })
+                        solves.push(new Solve(newSolveRef.key, solve.time, solve.timestamp, solve.scramble, solve.penalty));
+                    });
+                    firebase.database().ref(`/stats/${userId}/${puzzle}/${newSessionId}`).set({
+                        mean: Stats.mean(solves),
+                        count: Stats.count(solves),
+                        best: Stats.best(solves),
+                        worst: Stats.worst(solves),
+                        stdDev: Stats.stdDev(solves),
+                        mo3: Stats.mo3(solves),
+                        ao5: Stats.ao5(solves),
+                        ao12: Stats.ao12(solves),
+                        ao50: Stats.ao50(solves),
+                        ao100: Stats.ao100(solves),
+                        bestMo3: Stats.bestMo3(solves),
+                        bestAo5: Stats.bestAo5(solves),
+                        bestAo12: Stats.bestAo12(solves),
+                        bestAo50: Stats.bestAo50(solves),
+                        bestAo100: Stats.bestAo100(solves)
                     });
                 });
             });
