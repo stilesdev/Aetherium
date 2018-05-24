@@ -176,6 +176,9 @@ export default class TimerStateMachine {
                     return 'ready';
                 } else if (newState === 'idle' || newState === 'inspection') {
                     return this.useInspection ? 'inspection' : 'idle';
+                } else if (newState === 'running') {
+                    this.onSolveStart();
+                    return 'running';
                 } else {
                     return 'starting';
                 }
