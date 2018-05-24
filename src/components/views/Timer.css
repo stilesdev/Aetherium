@@ -43,22 +43,27 @@
 
 .timer-idle {
     color: inherit;
-    font-size: 5em;
+    font-size: calc(2vw + 4em);
 }
 
 .timer-inspection {
     color: red;
-    font-size: 15em;
+    font-size: calc(5vw + 10em);
 }
 
 .timer-starting {
     color: orange;
-    font-size: 15em;
+    font-size: calc(5vw + 10em);
 }
 
 .timer-ready {
     color: green;
-    font-size: 15em;
+    font-size: calc(5vw + 10em);
+}
+
+.timer-running {
+    color: green;
+    font-size: calc(2vw + 8em);
 }
 
 .penalty-link {

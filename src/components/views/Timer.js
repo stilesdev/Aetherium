@@ -51,8 +51,10 @@ export default {
                     return 'timer-starting';
 
                 case 'ready':
+                    return 'timer-ready'
+
                 case 'running':
-                    return 'timer-ready';
+                    return 'timer-running';
 
                 default: return 'timer-idle';
             }
