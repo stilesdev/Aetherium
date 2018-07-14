@@ -45,16 +45,16 @@ export default {
         timerClass() {
             switch (this.timerState.state) {
                 case 'inspection':
-                    return 'timer-inspection';
+                    return 'timer-color-inspection timer-size-inspection';
 
                 case 'starting':
-                    return 'timer-starting';
+                    return 'timer-color-starting ' + (this.useInspection ? 'timer-size-inspection' : 'timer-size-active');
 
                 case 'ready':
-                    return 'timer-ready'
+                    return 'timer-color-ready ' + (this.useInspection ? 'timer-size-inspection' : 'timer-size-active');
 
                 case 'running':
-                    return 'timer-running';
+                    return 'timer-color-running timer-size-active';
 
                 default: return 'timer-idle';
             }
