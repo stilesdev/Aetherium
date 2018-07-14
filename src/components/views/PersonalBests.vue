@@ -9,19 +9,19 @@
                     <tr class="h4">
                         <td rowspan="2"><h3>{{puzzle.name}}</h3></td>
                         <td>{{personalBests[puzzle.key].best.time}}</td>
-                        <td>{{personalBests[puzzle.key].mo3.time}}</td>
-                        <td>{{personalBests[puzzle.key].ao5.time}}</td>
-                        <td>{{personalBests[puzzle.key].ao12.time}}</td>
-                        <td>{{personalBests[puzzle.key].ao50.time}}</td>
-                        <td>{{personalBests[puzzle.key].ao100.time}}</td>
+                        <td>{{personalBests[puzzle.key].bestMo3.time}}</td>
+                        <td>{{personalBests[puzzle.key].bestAo5.time}}</td>
+                        <td>{{personalBests[puzzle.key].bestAo12.time}}</td>
+                        <td>{{personalBests[puzzle.key].bestAo50.time}}</td>
+                        <td>{{personalBests[puzzle.key].bestAo100.time}}</td>
                     </tr>
                     <tr>
                         <td>{{personalBests[puzzle.key].best.date}}</td>
-                        <td>{{personalBests[puzzle.key].mo3.date}}</td>
-                        <td>{{personalBests[puzzle.key].ao5.date}}</td>
-                        <td>{{personalBests[puzzle.key].ao12.date}}</td>
-                        <td>{{personalBests[puzzle.key].ao50.date}}</td>
-                        <td>{{personalBests[puzzle.key].ao100.date}}</td>
+                        <td>{{personalBests[puzzle.key].bestMo3.date}}</td>
+                        <td>{{personalBests[puzzle.key].bestAo5.date}}</td>
+                        <td>{{personalBests[puzzle.key].bestAo12.date}}</td>
+                        <td>{{personalBests[puzzle.key].bestAo50.date}}</td>
+                        <td>{{personalBests[puzzle.key].bestAo100.date}}</td>
                     </tr>
                 </template>
             </tbody>
@@ -76,11 +76,11 @@
             findBestStatistics(allSessions) {
                 let bests = {
                     best: null,
-                    mo3: null,
-                    ao5: null,
-                    ao12: null,
-                    ao50: null,
-                    ao100: null
+                    bestMo3: null,
+                    bestAo5: null,
+                    bestAo12: null,
+                    bestAo50: null,
+                    bestAo100: null
                 };
 
                 Object.keys(bests).forEach(key => bests[key] = this.findBestStatistic(allSessions, key));
