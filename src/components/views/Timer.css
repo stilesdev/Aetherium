@@ -46,24 +46,28 @@
     font-size: calc(2vw + 4em);
 }
 
-.timer-inspection {
+.timer-color-inspection {
     color: red;
-    font-size: calc(5vw + 10em);
 }
 
-.timer-starting {
+.timer-color-starting {
     color: orange;
-    font-size: calc(5vw + 10em);
 }
 
-.timer-ready {
+.timer-color-ready {
     color: green;
-    font-size: calc(5vw + 10em);
 }
 
-.timer-running {
+.timer-color-running {
     color: green;
-    font-size: calc(2vw + 8em);
+}
+
+.timer-size-inspection {
+    font-size: calc(10vw + 10em);
+}
+
+.timer-size-active {
+    font-size: calc(5vw + 6em);
 }
 
 .penalty-link {
