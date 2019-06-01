@@ -49,7 +49,7 @@
 </template>
 
 <script>
-    import * as PanelRoot from './PanelRoot.vue'
+    import PanelRoot from './PanelRoot.vue'
     import { Solve } from '../../modules/Models';
     import { average } from '../../modules/Statistics'
 

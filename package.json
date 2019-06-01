@@ -5,9 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "watch": "webpack --progress --watch",
-    "serve": "firebase serve"
+    "build": "vue-cli-service build src/index.js",
+    "watch": "vue-cli-service build --mode development --watch src/index.js",
+    "serve": "firebase serve",
+    "serve:vue": "vue-cli-service serve src/index.js",
+    "lint": "vue-cli-service lint src/index.js"
   },
   "repository": {
     "type": "git",
@@ -20,29 +22,29 @@
     "url": "https://github.com/mstiles92/Aetherium/issues"
   },
   "homepage": "https://github.com/mstiles92/Aetherium#readme",
-  "devDependencies": {
-    "copy-webpack-plugin": "^4.0.1",
-    "css-loader": "^0.28.4",
-    "file-loader": "^0.11.2",
-    "html-loader": "^0.4.5",
-    "html-webpack-plugin": "^2.29.0",
-    "style-loader": "^0.18.2",
-    "vue-loader": "^12.2.1",
-    "vue-template-compiler": "^2.3.4",
-    "webpack": "^3.0.0",
-    "worker-loader": "^0.8.0"
-  },
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "core-js": "^2.6.5",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "firebase": "^6.1.0",
-    "highcharts": "^5.0.14",
-    "javascript-state-machine": "^3.0.1",
-    "jquery": "^3.2.1",
-    "jsonschema": "^1.2.0",
-    "moment": "^2.18.1",
-    "vue": "^2.3.4",
-    "vue-bootstrap-datetimepicker": "^3.1.0",
-    "vuex": "^2.3.1"
+    "highcharts": "^7.1.1",
+    "javascript-state-machine": "^3.1.0",
+    "jquery": "^3.4.1",
+    "jsonschema": "^1.2.4",
+    "moment": "^2.24.0",
+    "vue": "^2.6.10",
+    "vue-bootstrap-datetimepicker": "^5.0.1",
+    "vue-class-component": "^7.0.2",
+    "vue-property-decorator": "^8.1.0",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.3.29",
+    "@vue/cli-plugin-babel": "^3.8.0",
+    "@vue/cli-plugin-typescript": "^3.8.0",
+    "@vue/cli-service": "^3.8.0",
+    "typescript": "^3.4.3",
+    "vue-template-compiler": "^2.6.10",
+    "worker-loader": "^2.0.0"
   }
 }

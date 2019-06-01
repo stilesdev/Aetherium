@@ -5,7 +5,7 @@
 </template>
 
 <script>
-    import * as PanelRoot from './PanelRoot.vue'
+    import PanelRoot from './PanelRoot.vue'
 
     export default {
         data: function() {

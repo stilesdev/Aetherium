@@ -27,7 +27,7 @@
 </template>
 
 <script>
-    import * as PanelRoot from './PanelRoot.vue'
+    import PanelRoot from './PanelRoot.vue'
     import * as Actions from '../../store/ActionTypes';
 
     export default {

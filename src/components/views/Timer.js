@@ -1,8 +1,8 @@
 import * as moment from 'moment';
 import * as $ from 'jquery';
-import * as PanelSessionStatistics from '../panels/PanelSessionStatistics.vue';
-import * as PanelSolvesList from '../panels/PanelSolvesList.vue';
-import * as PanelScrambleImage from '../panels/PanelScrambleImage.vue';
+import PanelSessionStatistics from '../panels/PanelSessionStatistics.vue';
+import PanelSolvesList from '../panels/PanelSolvesList.vue';
+import PanelScrambleImage from '../panels/PanelScrambleImage.vue';
 import {Solve} from '../../modules/Models';
 import * as Mutations from '../../store/MutationTypes';
 import * as Actions from '../../store/ActionTypes';

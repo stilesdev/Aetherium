@@ -74,7 +74,7 @@ export default {
                 return this.$store.state.sessionDate;
             },
             set(value) {
-                this.$store.dispatch(Actions.UPDATE_SESSION_DATE, { moment: moment().utc().dayOfYear(value.dayOfYear()).startOf('day') });
+                this.$store.dispatch(Actions.UPDATE_SESSION_DATE, { moment: moment().utc().dayOfYear(moment(value, 'MM/DD/YYYY').dayOfYear()).startOf('day') });
             }
         }
     },
