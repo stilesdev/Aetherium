@@ -11,7 +11,7 @@ Clone the GitHub repository, then perform the following steps to get a developme
 - `npm install -g firebase-tools`
 - `firebase login`, and follow the directions to get signed in
 - `firebase use --add`, then select the project you created in the Firebase console
-- Copy the `firebase.config.example.js` file to `firebase.config.js` and fill it with your details provided by Firebase
+- Copy the `firebase.config.example.ts` file to `firebase.config.ts` and fill it with your details provided by Firebase
 
 Now you should be all set for future development. Run `npm run watch` for Webpack to automatically build the bundle when
 it detects changes to the source files. Run `npm run serve` to host a local development server, which is available at

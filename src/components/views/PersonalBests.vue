@@ -29,77 +29,72 @@
     </div>
 </template>
 
-<script>
-    import * as firebase from 'firebase';
-    import Vue from 'vue';
-    import { Solve } from '../../modules/Models';
+<script lang="ts">
+    import { database } from 'firebase'
+    import Vue from 'vue'
+    import { Component } from 'vue-property-decorator'
+    import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
+    import { ISession, Session, Statistics } from '@/types'
 
-    export default {
-        data: function() {
+    @Component
+    export default class PersonalBests extends Vue {
+        public personalBests: {} = {}
+
+        get userId(): string {
+            return this.$store.state.userId
+        }
+
+        get puzzles(): any[] {
+            return Object.values(this.$store.state.puzzles).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        }
+
+        get allSessions(): { [id: string]: Session } {
+            return this.$store.state.allSessions
+        }
+
+        get puzzleStatsRef(): (puzzle: string) => database.Reference {
+            return (puzzle) => database().ref(`/stats/${this.userId}/${puzzle}`)
+        }
+
+        public findBestStatistics(allSessions: any[]): {} {
             return {
-                personalBests: {}
+                best: this.findBestStatistic(allSessions, 'best'),
+                bestMo3: this.findBestStatistic(allSessions, 'bestMo3'),
+                bestAo5: this.findBestStatistic(allSessions, 'bestAo5'),
+                bestAo12: this.findBestStatistic(allSessions, 'bestAo12'),
+                bestAo50: this.findBestStatistic(allSessions, 'bestAo50'),
+                bestAo100: this.findBestStatistic(allSessions, 'bestAo100')
             }
-        },
-        computed: {
-            userId() {
-                return this.$store.state.userId;
-            },
-            puzzles() {
-                return Object.values(this.$store.state.puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-            },
-            allSessions() {
-                return this.$store.state.allSessions;
-            },
-            puzzleStatsRef() {
-                return (puzzle) => firebase.database().ref(`/stats/${this.userId}/${puzzle}`);
+        }
+
+        public findBestStatistic(sessions: any[], statistic: string): {time: string, date?: any} {
+            const filteredSessions = sessions.filter(session => session[statistic] > 0)
+
+            if (filteredSessions.length > 0) {
+                const session = filteredSessions.reduce((previous, current) => previous[statistic] < current[statistic] ? previous : current)
+                return {time: formatTimeDeltaShort(session[statistic]), date: session.date}
+            } else {
+                return {time: formatTimeDelta(0), date: null}
             }
-        },
-        mounted: function() {
+        }
+
+        public mounted(): void {
             this.puzzles.forEach(puzzle => {
                 this.puzzleStatsRef(puzzle.key).once('value').then(snapshot => {
-                    let allStats = snapshot.val();
-                    let sessions = [];
+                    const allStats: { [id: string]: Statistics } = snapshot.val()
+                    const sessions: Statistics[] = []
                     if (allStats && this.allSessions) {
                         Object.entries(allStats).forEach(entry => {
-                            let sessionId = entry[0];
-                            let stat = entry[1];
-                            stat.date = this.allSessions[sessionId].date;
-                            sessions.push(stat);
-                        });
+                            const sessionId = entry[0]
+                            const stat = entry[1]
+                            stat.date = this.allSessions[sessionId].date
+                            sessions.push(stat)
+                        })
                     }
 
-                    Vue.set(this.personalBests, puzzle.key, this.findBestStatistics(sessions));
-                });
-            });
-        },
-        methods: {
-            findBestStatistics(allSessions) {
-                let bests = {
-                    best: null,
-                    bestMo3: null,
-                    bestAo5: null,
-                    bestAo12: null,
-                    bestAo50: null,
-                    bestAo100: null
-                };
-
-                Object.keys(bests).forEach(key => bests[key] = this.findBestStatistic(allSessions, key));
-                return bests;
-            },
-            findBestStatistic(sessions, statistic) {
-                let filteredSessions = sessions.filter(session => session[statistic] > 0);
-
-                if (filteredSessions.length > 0) {
-                    let session = filteredSessions.reduce((previous, current) => previous[statistic] < current[statistic] ? previous : current);
-                    return {time: Solve.formatTimeShort(session[statistic]), date: session.date};
-                } else {
-                    return {time: Solve.formatTime(0), date: null}
-                }
-            }
+                    Vue.set(this.personalBests, puzzle.key, this.findBestStatistics(sessions))
+                })
+            })
         }
     }
 </script>
-
-<style scoped>
-
-</style>

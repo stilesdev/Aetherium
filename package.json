@@ -5,11 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "vue-cli-service build src/index.js",
-    "watch": "vue-cli-service build --mode development --watch src/index.js",
+    "build": "vue-cli-service build",
+    "watch": "vue-cli-service build --mode development --watch",
     "serve": "firebase serve",
-    "serve:vue": "vue-cli-service serve src/index.js",
-    "lint": "vue-cli-service lint src/index.js"
+    "serve:vue": "vue-cli-service serve",
+    "lint": "vue-cli-service lint"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,7 @@
     "jquery": "^3.4.1",
     "jsonschema": "^1.2.4",
     "moment": "^2.24.0",
+    "stackmat": "^1.0.0",
     "vue": "^2.6.10",
     "vue-bootstrap-datetimepicker": "^5.0.1",
     "vue-class-component": "^7.0.2",
@@ -39,11 +40,13 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@types/bootstrap": "^3.3.42",
     "@types/jquery": "^3.3.29",
     "@vue/cli-plugin-babel": "^3.8.0",
     "@vue/cli-plugin-typescript": "^3.8.0",
     "@vue/cli-service": "^3.8.0",
     "typescript": "^3.4.3",
+    "typescript-tslint-plugin": "^0.4.0",
     "vue-template-compiler": "^2.6.10",
     "worker-loader": "^2.0.0"
   }

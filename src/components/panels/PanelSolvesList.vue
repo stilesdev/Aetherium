@@ -12,13 +12,13 @@
             </thead>
             <tbody>
             <tr v-for="solve in solves">
-                <td class="timestamp-column">{{ solve.getFormattedTimestamp() }}</td>
-                <td class="time-column" v-bind:class="{ 'penalty-active': solve.penalty !== '' }">{{ solve.getFormattedTime() }}</td>
+                <td class="timestamp-column">{{ solve.formattedTimestamp }}</td>
+                <td class="time-column" :class="{ 'penalty-active': solve.penalty !== '' }">{{ solve.formattedTime }}</td>
                 <td class="scramble-column visible-md visible-lg">{{ solve.scramble }}</td>
                 <td class="actions-column">
-                    <span class="penalty-link" v-bind:class="{ 'penalty-active': solve.penalty === '+2' }" v-on:click="setPenalty(solve, '+2')">+2</span>
-                    <span class="penalty-link" v-bind:class="{ 'penalty-active': solve.penalty === 'dnf' }" v-on:click="setPenalty(solve, 'dnf')">DNF</span>
-                    <span class="penalty-link" v-on:click="deleteSolve(solve.uid)"><span class="glyphicon glyphicon-remove"></span></span>
+                    <span class="penalty-link" :class="{ 'penalty-active': solve.penalty === '+2' }" @click="setPenalty(solve, '+2')">+2</span>
+                    <span class="penalty-link" :class="{ 'penalty-active': solve.penalty === 'dnf' }" @click="setPenalty(solve, 'dnf')">DNF</span>
+                    <span class="penalty-link" @click="deleteSolve(solve.uid)"><span class="glyphicon glyphicon-remove"></span></span>
                 </td>
             </tr>
             </tbody>
@@ -26,29 +26,27 @@
     </panel>
 </template>
 
-<script>
+<script lang="ts">
+    import Vue from 'vue'
+    import { Component } from 'vue-property-decorator'
     import PanelRoot from './PanelRoot.vue'
-    import * as Actions from '../../store/ActionTypes';
+    import { ISolve } from '@/types'
+    import { Actions } from '@/types/store'
 
-    export default {
-        data: function() {
-            return {}
-        },
-        computed: {
-            solves() {
-                return this.$store.state.solves;
-            }
-        },
-        methods: {
-            setPenalty(solve, newPenalty) {
-                this.$store.dispatch(Actions.SET_PENALTY, {solve: solve, penalty: newPenalty});
-            },
-            deleteSolve(solveId) {
-                this.$store.dispatch(Actions.DELETE_SOLVE, solveId);
-            }
-        },
-        components: {
-            'panel': PanelRoot
+    @Component({
+        components: { panel: PanelRoot }
+    })
+    export default class PanelSolvesList extends Vue {
+        get solves(): ISolve[] {
+            return this.$store.state.solves
+        }
+
+        public setPenalty(solve: ISolve, penalty: string): void {
+            this.$store.dispatch(Actions.SET_PENALTY, {solve, penalty})
+        }
+
+        public deleteSolve(solveId: string): void {
+            this.$store.dispatch(Actions.DELETE_SOLVE, solveId)
         }
     }
 </script>

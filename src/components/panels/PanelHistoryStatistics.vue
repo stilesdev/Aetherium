@@ -14,68 +14,68 @@
     </panel>
 </template>
 
-<script>
-    import PanelRoot from './PanelRoot.vue';
-    import { Solve } from '../../modules/Models';
+<script lang="ts">
+import Vue from 'vue'
+import { Component } from 'vue-property-decorator'
+import PanelRoot from './PanelRoot.vue'
+import { formatTimeDelta } from '@/util/format'
 
-    function findBestSession(sessions, statistic) {
-        let filteredSessions = sessions.filter(session => session[statistic] > 0);
-
-        if (filteredSessions.length > 0) {
-            let session = filteredSessions.reduce((previous, current) => previous[statistic] < current[statistic] ? previous : current);
-            return {time: Solve.formatTime(session[statistic]), date: session.date};
-        } else {
-            return {time: Solve.formatTime(0), date: null}
+@Component({
+    components: { panel: PanelRoot }
+})
+export default class PanelHistoryStatistics extends Vue {
+    get sessionsArray(): any {
+        const allSessions = this.$store.state.allSessions
+        const allStats = this.$store.state.allStats
+        const sessions: any[] = []
+        if (allSessions && allStats) {
+            Object.entries(allStats).forEach((entry: any) => {
+                const sessionId = entry[0]
+                const stat = entry[1]
+                stat.date = allSessions[sessionId].date
+                sessions.push(stat)
+            })
         }
+        return sessions
     }
 
-    export default {
-        data: function() {
-            return {}
-        },
-        computed: {
-            sessionsArray() {
-                let allSessions = this.$store.state.allSessions;
-                let allStats = this.$store.state.allStats;
-                let sessions = [];
-                if (allSessions && allStats) {
-                    Object.entries(allStats).forEach(entry => {
-                        let sessionId = entry[0];
-                        let stat = entry[1];
-                        stat.date = allSessions[sessionId].date;
-                        sessions.push(stat);
-                    })
-                }
-                return sessions;
-            },
-            bestDailyMean() {
-                return findBestSession(this.sessionsArray, 'mean');
-            },
-            bestSingle() {
-                return findBestSession(this.sessionsArray, 'best');
-            },
-            bestMo3() {
-                return findBestSession(this.sessionsArray, 'bestMo3')
-            },
-            bestAo5() {
-                return findBestSession(this.sessionsArray, 'bestAo5');
-            },
-            bestAo12() {
-                return findBestSession(this.sessionsArray, 'bestAo12');
-            },
-            bestAo50() {
-                return findBestSession(this.sessionsArray, 'bestAo50');
-            },
-            bestAo100() {
-                return findBestSession(this.sessionsArray, 'bestAo100');
-            }
-        },
-        components: {
-            'panel': PanelRoot
-        }
+    get bestDailyMean(): {time: string, date?: number } {
+        return findBestSession(this.sessionsArray, 'mean')
     }
+
+    get bestSingle(): {time: string, date?: number } {
+        return findBestSession(this.sessionsArray, 'best')
+    }
+
+    get bestMo3(): {time: string, date?: number } {
+        return findBestSession(this.sessionsArray, 'bestMo3')
+    }
+
+    get bestAo5(): {time: string, date?: number } {
+        return findBestSession(this.sessionsArray, 'bestAo5')
+    }
+
+    get bestAo12(): {time: string, date?: number } {
+        return findBestSession(this.sessionsArray, 'bestAo12')
+    }
+
+    get bestAo50(): {time: string, date?: number } {
+        return findBestSession(this.sessionsArray, 'bestAo50')
+    }
+
+    get bestAo100(): {time: string, date?: number } {
+        return findBestSession(this.sessionsArray, 'bestAo100')
+    }
+}
+
+function findBestSession(sessions: any, statistic: string): {time: string, date?: number} {
+    const filteredSessions = sessions.filter((session: any) => session[statistic] > 0)
+
+    if (filteredSessions.length > 0) {
+        const session = filteredSessions.reduce((previous: any, current: any) => previous[statistic] < current[statistic] ? previous : current)
+        return {time: formatTimeDelta(session[statistic]), date: session.date}
+    } else {
+        return {time: formatTimeDelta(0), date: undefined}
+    }
+}
 </script>
-
-<style>
-
-</style>

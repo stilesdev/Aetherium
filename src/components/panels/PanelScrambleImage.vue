@@ -4,20 +4,17 @@
     </panel>
 </template>
 
-<script>
+<script lang="ts">
+    import Vue from 'vue'
+    import { Component } from 'vue-property-decorator'
     import PanelRoot from './PanelRoot.vue'
 
-    export default {
-        data: function() {
-            return {}
-        },
-        computed: {
-            scrambleImage() {
-                return this.$store.state.scramble.svg
-            }
-        },
-        components: {
-            'panel': PanelRoot
+    @Component({
+        components: { panel: PanelRoot }
+    })
+    export default class PanelScrambleImage extends Vue {
+        get scrambleImage(): string {
+            return this.$store.state.scramble.svg
         }
     }
 </script>

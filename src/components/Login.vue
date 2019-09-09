@@ -2,7 +2,7 @@
     <div id="app">
         <div class="container">
             <div class="login">
-                <form v-on:submit="submit">
+                <form @submit.prevent="submit">
                     <div class="form-group">
                         <label for="emailInput">Email Address</label>
                         <div class="input-group">
@@ -18,7 +18,7 @@
                         </div>
                     </div>
                     <div v-if="loginError" class="alert alert-danger alert-dismissible" role="alert">
-                        <button v-on:click="loginError = null" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <button @click="loginError = undefined" type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                         <strong>Error signing in!</strong> {{ loginError }}
@@ -30,24 +30,21 @@
     </div>
 </template>
 
-<script>
-    import * as firebase from 'firebase';
+<script lang="ts">
+    import Vue from 'vue'
+    import { Component } from 'vue-property-decorator'
+    import { auth } from 'firebase'
 
-    export default {
-        data: function() {
-            return {
-                email: '',
-                password: '',
-                loginError: null
-            }
-        },
-        methods: {
-            submit: function(event) {
-                event.preventDefault();
-                firebase.auth().signInWithEmailAndPassword(this.email, this.password).catch(error => {
-                    this.loginError = error.message;
-                });
-            }
+    @Component
+    export default class Login extends Vue {
+        public email: string = ''
+        public password: string = ''
+        public loginError?: string
+
+        public submit(): void {
+            auth().signInWithEmailAndPassword(this.email, this.password).catch((error: auth.Error) => {
+                this.loginError = error.message
+            })
         }
     }
 </script>

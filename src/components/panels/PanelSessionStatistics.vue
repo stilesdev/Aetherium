@@ -36,7 +36,7 @@
                     <td>Best Ao100</td><td>{{ formatSolve(stats.bestAo100) }}</td>
                 </tr>
                 <tr>
-                    <td colspan="2"><button class="btn btn-sm" v-on:click="calculateAo1000">Calculate Global Ao1000</button></td>
+                    <td colspan="2"><button class="btn btn-sm" @click="calculateAo1000">Calculate Global Ao1000</button></td>
                     <td>Global Ao1000</td><td>{{ formatSolve(ao1000) }}</td>
                 </tr>
                 </tbody>
@@ -48,42 +48,41 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import Vue from 'vue'
+    import { Component, Watch } from 'vue-property-decorator'
     import PanelRoot from './PanelRoot.vue'
-    import { Solve } from '../../modules/Models';
-    import { average } from '../../modules/Statistics'
+    import { formatTimeDelta } from '@/util/format'
+    import { database } from 'firebase'
+    import { Solve } from '@/classes/solve'
+    import { Stats } from '@/util/stats'
 
-    export default {
-        data: function() {
-            return {
-                ao1000: 0
-            }
-        },
-        computed: {
-            stats() {
-                return this.$store.state.sessionStats;
-            }
-        },
-        methods: {
-            formatSolve: Solve.formatTime,
-            calculateAo1000() {
-                this.$store.getters.solvesRef.orderByChild('timestamp').limitToLast(1000).once('value').then(snapshot => {
-                    let solves = [];
-                    snapshot.forEach(childSnapshot => {
-                        solves.push(Solve.fromSnapshot(childSnapshot));
-                    });
+    @Component({
+        components: { panel: PanelRoot }
+    })
+    export default class PanelSessionStatistics extends Vue {
+        public ao1000: number = 0
 
-                    this.ao1000 = average(solves);
-                });
-            }
-        },
-        watch: {
-            stats() {
-                this.ao1000 = 0;
-            }
-        },
-        components: {
-            'panel': PanelRoot
+        get stats(): any {
+            return this.$store.state.sessionStats
+        }
+
+        public formatSolve = formatTimeDelta
+
+        public calculateAo1000(): void {
+            this.$store.getters.solvesRef.orderByChild('timestamp').limitToLast(1000).once('value').then((snapshot: database.DataSnapshot) => {
+                const solves: Solve[] = []
+                snapshot.forEach(childSnapshot => {
+                    solves.push(Solve.fromSnapshot(childSnapshot))
+                })
+
+                this.ao1000 = Stats.average(solves)
+            })
+        }
+
+        @Watch('stats')
+        public onStatsChange(): void {
+            this.ao1000 = 0
         }
     }
 </script>
