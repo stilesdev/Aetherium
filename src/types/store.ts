@@ -1,4 +1,5 @@
 import { Session, Statistics } from '@/types/index'
+import { ScramblerWorker } from '@/workers'
 
 export enum References {
     OPTIONS = 'OPTIONS',
@@ -27,7 +28,7 @@ export interface Options {
 export interface RootState {
     activeView: string
     hideUI: boolean
-    scramblerWorker: any
+    scramblerWorker: ScramblerWorker
     scramble: ScramblePayload
     puzzles?: any
     userId?: string

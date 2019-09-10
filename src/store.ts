@@ -7,7 +7,7 @@ import FirebaseManager from '@/util/firebase-manager'
 import { Stats } from '@/util/stats'
 import { ISolve, Statistics } from '@/types'
 import DataSnapshot = firebase.database.DataSnapshot
-import ScramblerWorker from 'worker-loader!./workers/GenerateScramblerWorker.js'
+import { ScramblerWorker } from '@/workers'
 
 import firebase from 'firebase'
 import firebaseConfig from '../firebase.config'
