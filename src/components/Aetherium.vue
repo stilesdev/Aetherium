@@ -4,19 +4,19 @@
         <div v-else>
             <link rel="stylesheet" :href="themeUrl">
             <transition name="fade">
-                <navbar v-if="showNavbar || activeView !== 'timer'"></navbar>
+                <navbar v-if="showNavbar || activeView !== View.TIMER"></navbar>
             </transition>
 
-            <div v-if="activeView === 'timer'">
+            <div v-if="activeView === View.TIMER">
                 <timer></timer>
             </div>
-            <div v-if="activeView === 'stats'">
+            <div v-if="activeView === View.STATS">
                 <stats></stats>
             </div>
-            <div v-if="activeView === 'history'">
+            <div v-if="activeView === View.HISTORY">
                 <history></history>
             </div>
-            <div v-if="activeView === 'pb'">
+            <div v-if="activeView === View.PB">
                 <personal-bests></personal-bests>
             </div>
         </div>
@@ -32,11 +32,14 @@
     import Stats from './views/Stats.vue'
     import History from './views/History.vue'
     import PersonalBests from './views/PersonalBests.vue'
+    import { View } from '@/types/store'
 
     @Component({
         components: {Login, Navbar, Timer, Stats, History, PersonalBests}
     })
     export default class Aetherium extends Vue {
+        public View = View
+
         get showNavbar(): boolean {
             return !this.$store.state.hideUI
         }
@@ -46,7 +49,7 @@
         get themeUrl(): string {
             return this.$store.state.options.themeUrl
         }
-        get activeView(): string {
+        get activeView(): View {
             return this.$store.state.activeView
         }
     }

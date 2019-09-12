@@ -13,7 +13,7 @@
 
     import PanelHistoryStatistics from '@/components/panels/PanelHistoryStatistics.vue'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
-    import { Session, Statistics } from '@/types'
+    import { FirebaseList, SessionPayload, StatisticsPayload } from '@/types/firebase'
 
     @Component({
         components: { 'panel-history-statistics': PanelHistoryStatistics }
@@ -22,14 +22,14 @@
         public sessionHistoryChart?: Chart
 
         get sessionMeans(): Array<[number, number]> {
-            const sessions: { [id: string]: Session } = this.$store.state.allSessions
-            const stats: { [id: string]: Statistics } = this.$store.state.allStats
+            const sessions: FirebaseList<SessionPayload> = this.$store.state.allSessions
+            const stats: FirebaseList<StatisticsPayload> = this.$store.state.allStats
             return stats ? Object.entries(stats).map(stat => [sessions[stat[0]].timestamp, stat[1].mean]) : []
         }
 
         get sessionBests(): any[] {
-            const sessions: { [id: string]: Session } = this.$store.state.allSessions
-            const stats: { [id: string]: Statistics } = this.$store.state.allStats
+            const sessions: FirebaseList<SessionPayload> = this.$store.state.allSessions
+            const stats: FirebaseList<StatisticsPayload> = this.$store.state.allStats
             return stats ? Object.entries(stats).map(stat => [sessions[stat[0]].timestamp, stat[1].best]) : []
         }
 

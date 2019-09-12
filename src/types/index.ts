@@ -1,13 +1,6 @@
-import { StateMachineState } from 'javascript-state-machine'
+import { SolvePayload, StatisticsPayload } from '@/types/firebase'
 
-export interface SolveData {
-    time: number
-    timestamp: number
-    scramble: string
-    penalty: string
-}
-
-export interface ISolve extends SolveData {
+export interface ISolve extends SolvePayload {
     uid: string
 
     readonly finalTime: number
@@ -18,34 +11,14 @@ export interface ISolve extends SolveData {
 
 export interface ISession {
     solves: ISolve[]
-    stats: Statistics
+    stats: IStatistics
 
     addSolve: (solve: ISolve) => void
-    updateSolve: (solveUid: string, data: SolveData) => void
+    updateSolve: (solveUid: string, data: SolvePayload) => void
     deleteSolve: (solveUid: string) => void
 }
 
-export interface Session {
-    timestamp: number,
-    date: string
-}
-
-export interface Statistics {
-    mean: number
-    count: number
-    best: number
-    worst: number
-    stdDev: number
-    mo3: number
-    ao5: number
-    ao12: number
-    ao50: number
-    ao100: number
-    bestMo3: number
-    bestAo5: number
-    bestAo12: number
-    bestAo50: number
-    bestAo100: number,
+export interface IStatistics extends StatisticsPayload {
     date?: string
 }
 
@@ -62,5 +35,11 @@ export interface TimerStateMachineOptions {
     onInspectionStart: () => void
 }
 
-export type TimerState = 'idle' | 'inspection' | 'starting' | 'ready' | 'running' | 'complete'
-
+export enum TimerState {
+    IDLE = 'idle',
+    INSPECTION = 'inspection',
+    STARTING = 'starting',
+    READY = 'ready',
+    RUNNING = 'running',
+    COMPLETE = 'complete'
+}

@@ -1,5 +1,35 @@
-import { Session, Statistics } from '@/types/index'
-import { ScramblerWorker } from '@/workers'
+import { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
+import { ISolve } from '@/types/index'
+import WebWorker from 'worker-loader!*'
+
+export interface RootState {
+    activeView: View
+    hideUI: boolean
+    scramblerWorker: WebWorker
+    scramble: ScramblePayload
+    puzzles?: FirebaseList<Puzzle>
+    userId?: string
+    options: ProfileOptions
+    sessionId?: string
+    sessionDate?: string
+    activePuzzle: string
+    solves: ISolve[]
+    sessionStats?: StatisticsPayload
+    allSessions?: FirebaseList<SessionPayload>
+    allStats?: FirebaseList<StatisticsPayload>
+}
+
+export enum View {
+    TIMER = 'timer',
+    STATS = 'stats',
+    HISTORY = 'history',
+    PB = 'pb'
+}
+
+export interface ScramblePayload {
+    text: string,
+    svg?: string
+}
 
 export enum References {
     OPTIONS = 'OPTIONS',
@@ -10,36 +40,6 @@ export enum References {
     SESSION_STATS = 'SESSION_STATS',
     ALL_SESSIONS = 'ALL_SESSIONS',
     ALL_STATS = 'ALL_STATS'
-}
-
-export interface ScramblePayload {
-    text: string,
-    svg?: string
-}
-
-export interface Options {
-    showTimer: boolean
-    timerTrigger: string
-    themeUrl: string
-    holdToStart: boolean
-    useInspection: boolean
-}
-
-export interface RootState {
-    activeView: string
-    hideUI: boolean
-    scramblerWorker: ScramblerWorker
-    scramble: ScramblePayload
-    puzzles?: any
-    userId?: string
-    options: Options
-    sessionId?: string
-    sessionDate?: any
-    activePuzzle: string
-    solves: any
-    sessionStats?: Statistics
-    allSessions?: { [id: string]: Session }
-    allStats?: { [id: string]: Statistics }
 }
 
 export enum Mutations {

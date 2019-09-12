@@ -1,3 +1,13 @@
+import { TimerState } from '@/types'
+import { TimerState } from '@/types'
+import { TimerState } from '@/types'
+import { TimerState } from '@/types'
+import { TimerState } from '@/types'
+import { TimerState } from '@/types'
+import { TimerState } from '@/types'
+import { TimerState } from '@/types'
+import { TimerState } from '@/types'
+import { TimerState } from '@/types'
 <template>
     <div id="app">
         <div class="container-fluid">
@@ -44,9 +54,10 @@
     import PanelScrambleImage from '@/components/panels/PanelScrambleImage.vue'
     import Stackmat, { Packet } from 'stackmat'
     import TimerStateMachine from '@/util/timer-state-machine'
-    import { TimerStateMachineOptions } from '@/types'
+    import { TimerState, TimerStateMachineOptions } from '@/types'
     import { Actions, Mutations } from '@/types/store'
     import { formatTimeDelta } from '@/util/format'
+    import { TimerTrigger } from '@/types/firebase'
 
     @Component({
         components: {
@@ -70,7 +81,7 @@
         }
 
         get hideUI(): boolean {
-            return this.timerState ? !(this.timerState.state === 'idle' || this.timerState.state === 'complete') : false
+            return this.timerState ? !(this.timerState.state === TimerState.IDLE || this.timerState.state === TimerState.COMPLETE) : false
         }
 
         get timerTrigger(): string {
@@ -96,13 +107,13 @@
         get timerClass(): string {
             if (this.timerState) {
                 switch (this.timerState.state) {
-                    case 'inspection':
+                    case TimerState.INSPECTION:
                         return 'timer-color-inspection timer-size-inspection'
-                    case 'starting':
+                    case TimerState.STARTING:
                         return 'timer-color-starting ' + (this.useInspection ? 'timer-size-inspection' : 'timer-size-active')
-                    case 'ready':
+                    case TimerState.READY:
                         return 'timer-color-ready ' + (this.useInspection ? 'timer-size-inspection' : 'timer-size-active')
-                    case 'running':
+                    case TimerState.RUNNING:
                         return 'timer-color-running timer-size-active'
                 }
             }
@@ -120,7 +131,7 @@
         }
 
         public initTimers(): void {
-            if (this.timerTrigger === 'spacebar') {
+            if (this.timerTrigger === TimerTrigger.SPACEBAR) {
                 this.stackmat.stop()
                 const self = this
 
@@ -141,7 +152,7 @@
                         }
                     }
                 })
-            } else if (this.timerTrigger === 'stackmat') {
+            } else if (this.timerTrigger === TimerTrigger.STACKMAT) {
                 $(document).off('.aetherium')
 
                 this.stackmat.on('reset', () => {
@@ -150,20 +161,20 @@
 
                 this.stackmat.on('ready', () => {
                     if (this.timerState) {
-                        this.timerState.stackmatTrigger('ready')
+                        this.timerState.stackmatTrigger(TimerState.READY)
                     }
                 })
 
                 this.stackmat.on('starting', () => {
                     if (this.timerState) {
-                        this.timerState.stackmatTrigger('starting')
+                        this.timerState.stackmatTrigger(TimerState.STARTING)
                     }
                 })
 
                 this.stackmat.on('started', () => {
                     this.stackmatStarted = true
                     if (this.timerState) {
-                        this.timerState.stackmatTrigger('running')
+                        this.timerState.stackmatTrigger(TimerState.RUNNING)
                     }
                 })
 
@@ -172,19 +183,19 @@
                     this.timerStart = 0
                     this.stackmatLastTime = packet.timeInMilliseconds
                     if (this.timerState) {
-                        this.timerState.stackmatTrigger('complete')
+                        this.timerState.stackmatTrigger(TimerState.COMPLETE)
                     }
                 })
 
                 this.stackmat.on('leftHandDown', () => {
                     if (this.timerState && !this.stackmatStarted) {
-                        this.timerState.stackmatTrigger('inspection')
+                        this.timerState.stackmatTrigger(TimerState.INSPECTION)
                     }
                 })
 
                 this.stackmat.on('rightHandDown', () => {
                     if (this.timerState && !this.stackmatStarted) {
-                        this.timerState.stackmatTrigger('inspection')
+                        this.timerState.stackmatTrigger(TimerState.INSPECTION)
                     }
                 })
 
@@ -252,12 +263,12 @@
         }
 
         public stopTimer(): void {
-            if (this.timerTrigger === 'spacebar') {
+            if (this.timerTrigger === TimerTrigger.SPACEBAR) {
                 const stop = moment().valueOf()
                 const start = this.timerStart
                 this.timerStart = 0
                 this.completeSolve(stop - start)
-            } else if (this.timerTrigger === 'stackmat') {
+            } else if (this.timerTrigger === TimerTrigger.STACKMAT) {
                 this.timerStart = 0
                 this.completeSolve(this.stackmatLastTime)
             }
@@ -275,7 +286,7 @@
         }
 
         @Watch('timerTrigger')
-        public onTimerTriggerChange(newTrigger: string, oldTrigger: string): void {
+        public onTimerTriggerChange(newTrigger: TimerTrigger, oldTrigger: TimerTrigger): void {
             if (oldTrigger !== newTrigger) {
                 this.timerStart = 0
                 this.timerLabel = '00:00:00'

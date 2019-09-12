@@ -1,10 +1,10 @@
-import { Schema, Validator, ValidatorResult } from 'jsonschema'
+import { Schema, Validator } from 'jsonschema'
 import moment from 'moment'
 import { database } from 'firebase'
 import { Solve } from '@/classes/solve'
-import { SolveData } from '@/types'
 import { Stats } from '@/util/stats'
 import Reference = firebase.database.Reference
+import { SolvePayload } from '@/types/firebase'
 
 export class SolveImporter {
     private userId: string
@@ -80,44 +80,46 @@ export class SolveImporter {
             const sessionMoment = moment().utc().year(year).month(month).date(day).startOf('day')
 
             const newSessionRef = database().ref(`/users/${this.userId}/sessions`).push()
-            const newSessionId = newSessionRef.key
-            newSessionRef.set({
-                date: sessionMoment.format('M/D/YYYY'),
-                timestamp: sessionMoment.valueOf()
-            })
+            if (newSessionRef.key) {
+                const newSessionId = newSessionRef.key
+                newSessionRef.set({
+                    date: sessionMoment.format('M/D/YYYY'),
+                    timestamp: sessionMoment.valueOf()
+                })
 
-            Object.keys(input[date]).forEach(puzzle => {
-                const solves: Solve[] = []
-                input[date][puzzle].forEach((solve: SolveData) => {
-                    database().ref(`/solves/${this.userId}/${puzzle}`).push().then((ref: Reference) => {
-                        ref.set({
-                            sessionId: newSessionId,
-                            time: solve.time,
-                            timestamp: solve.timestamp,
-                            scramble: solve.scramble,
-                            penalty: solve.penalty
+                Object.keys(input[date]).forEach(puzzle => {
+                    const solves: Solve[] = []
+                    input[date][puzzle].forEach((solve: SolvePayload) => {
+                        database().ref(`/solves/${this.userId}/${puzzle}`).push().then((ref: Reference) => {
+                            ref.set({
+                                sessionId: newSessionId,
+                                time: solve.time,
+                                timestamp: solve.timestamp,
+                                scramble: solve.scramble,
+                                penalty: solve.penalty
+                            })
+                            solves.push(new Solve(ref.key as string, newSessionId, solve.time, solve.timestamp, solve.scramble, solve.penalty))
                         })
-                        solves.push(new Solve(ref.key as string, solve.time, solve.timestamp, solve.scramble, solve.penalty))
+                    })
+                    database().ref(`/stats/${this.userId}/${puzzle}/${newSessionId}`).set({
+                        mean: Stats.mean(solves),
+                        count: Stats.count(solves),
+                        best: Stats.best(solves),
+                        worst: Stats.worst(solves),
+                        stdDev: Stats.stdDev(solves),
+                        mo3: Stats.mo3(solves),
+                        ao5: Stats.ao5(solves),
+                        ao12: Stats.ao12(solves),
+                        ao50: Stats.ao50(solves),
+                        ao100: Stats.ao100(solves),
+                        bestMo3: Stats.bestMo3(solves),
+                        bestAo5: Stats.bestAo5(solves),
+                        bestAo12: Stats.bestAo12(solves),
+                        bestAo50: Stats.bestAo50(solves),
+                        bestAo100: Stats.bestAo100(solves)
                     })
                 })
-                database().ref(`/stats/${this.userId}/${puzzle}/${newSessionId}`).set({
-                    mean: Stats.mean(solves),
-                    count: Stats.count(solves),
-                    best: Stats.best(solves),
-                    worst: Stats.worst(solves),
-                    stdDev: Stats.stdDev(solves),
-                    mo3: Stats.mo3(solves),
-                    ao5: Stats.ao5(solves),
-                    ao12: Stats.ao12(solves),
-                    ao50: Stats.ao50(solves),
-                    ao100: Stats.ao100(solves),
-                    bestMo3: Stats.bestMo3(solves),
-                    bestAo5: Stats.bestAo5(solves),
-                    bestAo12: Stats.bestAo12(solves),
-                    bestAo50: Stats.bestAo50(solves),
-                    bestAo100: Stats.bestAo100(solves)
-                })
-            })
+            }
         })
     }
 }

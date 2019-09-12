@@ -1,9 +1,10 @@
-import { ISession, ISolve, SolveData, Statistics } from '@/types'
+import { ISession, ISolve } from '@/types'
 import { Stats } from '@/util/stats'
+import { SolvePayload, StatisticsPayload } from '@/types/firebase'
 
 export class Session implements ISession {
     public solves: ISolve[] = []
-    public stats: Statistics = {
+    public stats: StatisticsPayload = {
         mean: 0,
         count: 0,
         best: 0,
@@ -27,13 +28,13 @@ export class Session implements ISession {
         this.updateStats()
     }
 
-    public updateSolve(solveUid: string, data: SolveData): void {
+    public updateSolve(solveUid: string, payload: SolvePayload): void {
         this.solves.forEach(solve => {
             if (solve.uid === solveUid) {
-                solve.time = data.time
-                solve.timestamp = data.timestamp
-                solve.scramble = data.scramble
-                solve.penalty = data.penalty
+                solve.time = payload.time
+                solve.timestamp = payload.timestamp
+                solve.scramble = payload.scramble
+                solve.penalty = payload.penalty
             }
         })
 

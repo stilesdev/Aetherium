@@ -18,7 +18,7 @@ export default class TimerStateMachine {
         this.onInspectionStart = options.onInspectionStart
 
         this.stateMachine = new StateMachine({
-            init: 'idle',
+            init: TimerState.IDLE,
             transitions: [
                 {
                     name: 'triggerDown',
@@ -37,18 +37,18 @@ export default class TimerStateMachine {
                 },
                 {
                     name: 'inspectionExceeded',
-                    from: 'inspection',
-                    to: 'idle'
+                    from: TimerState.INSPECTION,
+                    to: TimerState.IDLE
                 },
                 {
                     name: 'timerReady',
-                    from: 'starting',
-                    to: 'ready'
+                    from: TimerState.STARTING,
+                    to: TimerState.READY
                 },
                 {
                     name: 'timerReset',
-                    from: 'complete',
-                    to: 'idle'
+                    from: TimerState.COMPLETE,
+                    to: TimerState.IDLE
                 },
                 {
                     name: 'goto',
@@ -57,8 +57,8 @@ export default class TimerStateMachine {
                 },
                 {
                     name: 'reset',
-                    from: [ 'inspection', 'starting', 'ready', 'running', 'complete' ],
-                    to: 'idle'
+                    from: [ TimerState.INSPECTION, TimerState.STARTING, TimerState.READY, TimerState.RUNNING, TimerState.COMPLETE ],
+                    to: TimerState.IDLE
                 }
             ],
             methods: {
@@ -78,7 +78,7 @@ export default class TimerStateMachine {
         try {
             return this.stateMachine.state as unknown as TimerState
         } catch (e) {
-            return 'idle'
+            return TimerState.IDLE
         }
     }
 
@@ -104,112 +104,112 @@ export default class TimerStateMachine {
 
     private onTriggerDown(): TimerState {
         switch (this.state) {
-            case 'idle':
+            case TimerState.IDLE:
                 if (!this.useInspection) {
                     if (this.holdToStart) {
                         this.readyTimer = setTimeout(() => this.stateMachine.timerReady(), 500)
-                        return 'starting'
+                        return TimerState.STARTING
                     } else {
-                        return 'ready'
+                        return TimerState.READY
                     }
                 } else {
-                    return 'idle'
+                    return TimerState.IDLE
                 }
 
-            case 'inspection':
+            case TimerState.INSPECTION:
                 if (this.holdToStart) {
                     this.readyTimer = setTimeout(() => this.stateMachine.timerReady(), 500)
-                    return 'starting'
+                    return TimerState.STARTING
                 } else {
-                    return 'ready'
+                    return TimerState.READY
                 }
 
-            case 'starting':
-                return 'starting'
+            case TimerState.STARTING:
+                return TimerState.STARTING
 
-            case 'ready':
-                return 'ready'
+            case TimerState.READY:
+                return TimerState.READY
 
-            case 'running':
+            case TimerState.RUNNING:
                 this.onSolveComplete()
                 setTimeout(() => this.stateMachine.timerReset(), 2000)
-                return 'complete'
+                return TimerState.COMPLETE
 
-            case 'complete':
-                return 'complete'
+            case TimerState.COMPLETE:
+                return TimerState.COMPLETE
         }
     }
 
     private onTriggerUp(): TimerState {
         switch (this.state) {
-            case 'idle':
+            case TimerState.IDLE:
                 if (this.useInspection) {
                     this.onInspectionStart()
-                    return 'inspection'
+                    return TimerState.INSPECTION
                 } else {
-                    return 'idle'
+                    return TimerState.IDLE
                 }
 
-            case 'inspection':
-                return 'inspection'
+            case TimerState.INSPECTION:
+                return TimerState.INSPECTION
 
-            case 'starting':
+            case TimerState.STARTING:
                 clearTimeout(this.readyTimer)
-                return this.useInspection ? 'inspection' : 'idle'
+                return this.useInspection ? TimerState.INSPECTION : TimerState.IDLE
 
-            case 'ready':
+            case TimerState.READY:
                 this.onSolveStart()
-                return 'running'
+                return TimerState.RUNNING
 
-            case 'running':
-                return 'running'
+            case TimerState.RUNNING:
+                return TimerState.RUNNING
 
-            case 'complete':
-                return 'complete'
+            case TimerState.COMPLETE:
+                return TimerState.COMPLETE
         }
     }
 
     private onStackmatTrigger(newState: TimerState): TimerState {
         switch (this.state) {
-            case 'idle':
-                if (this.useInspection && newState === 'inspection') {
+            case TimerState.IDLE:
+                if (this.useInspection && newState === TimerState.INSPECTION) {
                     this.onInspectionStart()
-                    return 'inspection'
-                } else if (newState === 'starting') {
-                    return 'starting'
+                    return TimerState.INSPECTION
+                } else if (newState === TimerState.STARTING) {
+                    return TimerState.STARTING
                 } else {
-                    return 'idle'
+                    return TimerState.IDLE
                 }
-            case 'inspection':
-                return newState === 'starting' ? 'starting' : 'inspection'
-            case 'starting':
-                if (newState === 'ready') {
-                    return 'ready'
-                } else if (newState === 'idle' || newState === 'inspection') {
-                    return this.useInspection ? 'inspection' : 'idle'
-                } else if (newState === 'running') {
+            case TimerState.INSPECTION:
+                return newState === TimerState.STARTING ? TimerState.STARTING : TimerState.INSPECTION
+            case TimerState.STARTING:
+                if (newState === TimerState.READY) {
+                    return TimerState.READY
+                } else if (newState === TimerState.IDLE || newState === TimerState.INSPECTION) {
+                    return this.useInspection ? TimerState.INSPECTION : TimerState.IDLE
+                } else if (newState === TimerState.RUNNING) {
                     this.onSolveStart()
-                    return 'running'
+                    return TimerState.RUNNING
                 } else {
-                    return 'starting'
+                    return TimerState.STARTING
                 }
-            case 'ready':
-                if (newState === 'running') {
+            case TimerState.READY:
+                if (newState === TimerState.RUNNING) {
                     this.onSolveStart()
-                    return 'running'
+                    return TimerState.RUNNING
                 } else {
-                    return 'ready'
+                    return TimerState.READY
                 }
-            case 'running':
-                if (newState === 'complete') {
+            case TimerState.RUNNING:
+                if (newState === TimerState.COMPLETE) {
                     this.onSolveComplete()
                     setTimeout(() => this.stateMachine.timerReset(), 2000)
-                    return 'complete'
+                    return TimerState.COMPLETE
                 } else {
-                    return 'running'
+                    return TimerState.RUNNING
                 }
-            case 'complete':
-                return newState === 'idle' ? 'idle' : 'complete'
+            case TimerState.COMPLETE:
+                return newState === TimerState.IDLE ? TimerState.IDLE : TimerState.COMPLETE
         }
     }
 }

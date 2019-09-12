@@ -1,16 +1,16 @@
-import { auth, database } from 'firebase'
+import firebase, { auth, database } from 'firebase'
 import moment from 'moment'
 import Vue from 'vue'
 import Vuex, { ActionContext, MutationPayload } from 'vuex'
-import { Actions, Mutations, References, RootState, ScramblePayload } from '@/types/store'
+import { Actions, Mutations, References, RootState, ScramblePayload, View } from '@/types/store'
 import FirebaseManager from '@/util/firebase-manager'
 import { Stats } from '@/util/stats'
-import { ISolve, Statistics } from '@/types'
-import DataSnapshot = firebase.database.DataSnapshot
+import { ISolve } from '@/types'
 import { ScramblerWorker } from '@/workers'
-
-import firebase from 'firebase'
 import firebaseConfig from '../firebase.config'
+import { FirebaseList, ProfileOptions, Puzzle, StatisticsPayload, TimerTrigger } from '@/types/firebase'
+import DataSnapshot = firebase.database.DataSnapshot
+
 try {
     firebase.initializeApp(firebaseConfig.development)
 } catch (e) {
@@ -22,7 +22,7 @@ Vue.use(Vuex)
 export default new Vuex.Store<RootState> ({
     strict: true, // TODO: disable this before deploying to production
     state: {
-        activeView: 'timer',
+        activeView: View.TIMER,
         hideUI: false,
         scramblerWorker: new ScramblerWorker(),
         scramble: {
@@ -33,7 +33,7 @@ export default new Vuex.Store<RootState> ({
         userId: undefined,
         options: {
             showTimer: true,
-            timerTrigger: 'spacebar',
+            timerTrigger: TimerTrigger.SPACEBAR,
             themeUrl: '/themes/default.min.css',
             holdToStart: true,
             useInspection: true
@@ -82,13 +82,13 @@ export default new Vuex.Store<RootState> ({
         [Mutations.RECEIVE_SESSION_ID](state: RootState, sessionId: string): void {
             state.sessionId = sessionId
         },
-        [Mutations.RECEIVE_PUZZLES](state: RootState, puzzles: any): void {
+        [Mutations.RECEIVE_PUZZLES](state: RootState, puzzles: FirebaseList<Puzzle>): void {
             state.puzzles = puzzles
         },
         [Mutations.RECEIVE_SESSION_DATE](state: RootState, payload: any): void {
             state.sessionDate = payload.moment
         },
-        [Mutations.SET_ACTIVE_VIEW](state: RootState, newView: string): void {
+        [Mutations.SET_ACTIVE_VIEW](state: RootState, newView: View): void {
             state.activeView = newView
         },
         [Mutations.SET_HIDE_UI](state: RootState, hide: boolean): void {
@@ -103,7 +103,7 @@ export default new Vuex.Store<RootState> ({
         [Mutations.SET_OPTION_SHOWTIMER](state: RootState, showTimer: boolean): void {
             state.options.showTimer = showTimer
         },
-        [Mutations.SET_OPTION_TIMERTRIGGER](state: RootState, timerTrigger: string): void {
+        [Mutations.SET_OPTION_TIMERTRIGGER](state: RootState, timerTrigger: TimerTrigger): void {
             state.options.timerTrigger = timerTrigger
         },
         [Mutations.SET_OPTION_THEME_URL](state: RootState, themeUrl: string): void {
@@ -127,7 +127,7 @@ export default new Vuex.Store<RootState> ({
         [Mutations.DELETE_SOLVE](state: RootState, solveId: string): void {
             state.solves.splice(state.solves.findIndex((solve: ISolve) => solve.uid === solveId), 1)
         },
-        [Mutations.RECEIVE_SESSION_STATS](state: RootState, stats: Statistics): void {
+        [Mutations.RECEIVE_SESSION_STATS](state: RootState, stats: StatisticsPayload): void {
             state.sessionStats = stats
         },
         [Mutations.RECEIVE_ALL_SESSIONS](state: RootState, sessions: any): void {
@@ -138,7 +138,7 @@ export default new Vuex.Store<RootState> ({
         }
     },
     actions: {
-        [Actions.SET_OPTIONS](context: ActionContext<RootState, RootState>, payload: any): void {
+        [Actions.SET_OPTIONS](context: ActionContext<RootState, RootState>, payload: ProfileOptions): void {
             context.getters.optionsRef.set(payload)
         },
         [Actions.SET_ACTIVE_PUZZLE](context: ActionContext<RootState, RootState>, payload: any): void {
@@ -156,12 +156,14 @@ export default new Vuex.Store<RootState> ({
                 svg: null
             })
 
-            context.state.scramblerWorker.postMessage({
-                scrambler: context.state.puzzles[context.state.activePuzzle].scrambler
-            })
+            if (context.state.puzzles) {
+                context.state.scramblerWorker.postMessage({
+                    scrambler: context.state.puzzles[context.state.activePuzzle].scrambler
+                })
+            }
         },
         [Actions.CHECK_SESSION](context: ActionContext<RootState, RootState>): Promise<void> {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 if (!context.state.sessionId) {
                     const date = moment().utc().dayOfYear(moment().dayOfYear()).startOf('day')
                     const newSessionRef = context.getters.sessionsRef.push()

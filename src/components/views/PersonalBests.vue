@@ -34,7 +34,8 @@
     import Vue from 'vue'
     import { Component } from 'vue-property-decorator'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
-    import { ISession, Session, Statistics } from '@/types'
+    import { FirebaseList, Puzzle, SessionPayload } from '@/types/firebase'
+    import { IStatistics } from '@/types'
 
     @Component
     export default class PersonalBests extends Vue {
@@ -44,11 +45,12 @@
             return this.$store.state.userId
         }
 
-        get puzzles(): any[] {
-            return Object.values(this.$store.state.puzzles).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        get puzzles(): Puzzle[] {
+            const puzzles: FirebaseList<Puzzle> = this.$store.state.puzzles
+            return Object.values(puzzles).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
         }
 
-        get allSessions(): { [id: string]: Session } {
+        get allSessions(): FirebaseList<SessionPayload> {
             return this.$store.state.allSessions
         }
 
@@ -81,8 +83,8 @@
         public mounted(): void {
             this.puzzles.forEach(puzzle => {
                 this.puzzleStatsRef(puzzle.key).once('value').then(snapshot => {
-                    const allStats: { [id: string]: Statistics } = snapshot.val()
-                    const sessions: Statistics[] = []
+                    const allStats: FirebaseList<IStatistics> = snapshot.val()
+                    const sessions: IStatistics[] = []
                     if (allStats && this.allSessions) {
                         Object.entries(allStats).forEach(entry => {
                             const sessionId = entry[0]

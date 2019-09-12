@@ -1,3 +1,4 @@
+import { TimerTrigger } from '@/types/firebase'
 <template>
     <div id="app">
         <nav class="navbar navbar-default">
@@ -187,15 +188,16 @@
     import Vue from 'vue'
     import { Component } from 'vue-property-decorator'
     import { ThemeData } from '@/types'
-    import { Actions, Mutations, Options } from '@/types/store'
+    import { Actions, Mutations, View } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
     import { auth } from 'firebase'
+    import { FirebaseList, ProfileOptions, Puzzle, TimerTrigger } from '@/types/firebase'
 
     @Component
     export default class Navbar extends Vue {
-        public options: Options = {
+        public options: ProfileOptions = {
             showTimer: true,
-            timerTrigger: 'spacebar',
+            timerTrigger: TimerTrigger.SPACEBAR,
             holdToStart: true,
             useInspection: true,
             themeUrl: '/themes/default.min.css'
@@ -226,43 +228,44 @@
             { name: 'Yeti', url: '/themes/yeti.min.css' }
         ]
 
-        get activeTab(): string {
+        get activeTab(): View {
             return this.$store.state.activeView
         }
 
-        set activeTab(value: string) {
+        set activeTab(value: View) {
             this.$store.commit(Mutations.SET_ACTIVE_VIEW, value)
         }
 
-        get puzzles(): any[] {
+        get puzzles(): Puzzle[] {
             if (this.$store.state.puzzles) {
-                return Object.values(this.$store.state.puzzles).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
+                const puzzles: FirebaseList<Puzzle> = this.$store.state.puzzles
+                return Object.values(puzzles).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
             } else {
                 return []
             }
         }
 
-        get activePuzzle(): any {
+        get activePuzzle(): string {
             return this.$store.state.activePuzzle
         }
 
-        set activePuzzle(value: any) {
+        set activePuzzle(value: string) {
             this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value })
         }
 
-        get storeOptions(): Options {
+        get storeOptions(): ProfileOptions {
             return this.$store.state.options
         }
 
-        set storeOptions(value: Options) {
+        set storeOptions(value: ProfileOptions) {
             this.$store.dispatch(Actions.SET_OPTIONS, value)
         }
 
-        get sessionDate(): any {
+        get sessionDate(): string {
             return this.$store.state.sessionDate
         }
 
-        set sessionDate(value: any) {
+        set sessionDate(value: string) {
             this.$store.dispatch(Actions.UPDATE_SESSION_DATE, {
                 moment: moment().utc().dayOfYear(moment(value, 'MM/DD/YYYY').dayOfYear()).startOf('day')
             })
