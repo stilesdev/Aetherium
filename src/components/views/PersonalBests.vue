@@ -76,7 +76,7 @@
                 const session = filteredSessions.reduce((previous, current) => previous[statistic] < current[statistic] ? previous : current)
                 return {time: formatTimeDeltaShort(session[statistic]), date: session.date}
             } else {
-                return {time: formatTimeDelta(0), date: null}
+                return {time: formatTimeDelta(0), date: undefined}
             }
         }
 

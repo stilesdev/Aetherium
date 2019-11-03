@@ -153,7 +153,7 @@ export default new Vuex.Store<RootState> ({
         [Actions.REQUEST_SCRAMBLE](context: ActionContext<RootState, RootState>): void {
             context.commit(Mutations.RECEIVE_SCRAMBLE, {
                 text: 'Generating scramble...',
-                svg: null
+                svg: undefined
             })
 
             if (context.state.puzzles) {
@@ -182,7 +182,7 @@ export default new Vuex.Store<RootState> ({
             })
         },
         [Actions.CLOSE_SESSION](context: ActionContext<RootState, RootState>): void {
-            context.getters.currentSessionIdRef.set(null)
+            context.getters.currentSessionIdRef.set(undefined)
         },
         [Actions.STORE_SOLVE](context: ActionContext<RootState, RootState>, delta: number): void {
             context.dispatch(Actions.CHECK_SESSION).then(() => {
@@ -207,7 +207,7 @@ export default new Vuex.Store<RootState> ({
         [Actions.UPDATE_STATS](context: ActionContext<RootState, RootState>): void {
             if (context.state.solves.length === 0) {
                 context.getters.sessionStatsRef.remove()
-                context.commit(Mutations.RECEIVE_SESSION_STATS, null)
+                context.commit(Mutations.RECEIVE_SESSION_STATS, undefined)
             } else {
                 context.getters.sessionStatsRef.update({
                     mean: Stats.mean(context.state.solves),
@@ -254,7 +254,7 @@ export default new Vuex.Store<RootState> ({
             }
         }),
         store => store.state.scramblerWorker.addEventListener('message', (event: any) => {
-            if (event.data === null) {
+            if (event.data === undefined) {
                 store.commit(Mutations.RECEIVE_SCRAMBLE, { text: 'No valid scrambler for this puzzle', svg: undefined })
             } else {
                 store.commit(Mutations.RECEIVE_SCRAMBLE, { text: event.data.scramble, svg: event.data.svg })

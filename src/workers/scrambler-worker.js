@@ -32,7 +32,7 @@ self.generateScramble = function(scrambler) {
             let svg = tnoodlejs.scrambleToSvg(scramble, puzzle, 0, 0);
             self.postMessage({scramble: scramble, svg: svg});
         } else {
-            self.postMessage({scramble: null, svg: null});
+            self.postMessage({scramble: undefined, svg: undefined});
         }
     } else {
         setTimeout(self.generateScramble, 100, scrambler);

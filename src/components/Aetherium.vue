@@ -44,7 +44,7 @@
             return !this.$store.state.hideUI
         }
         get loggedIn(): boolean {
-            return this.$store.state.userId !== null
+            return this.$store.state.userId !== undefined
         }
         get themeUrl(): string {
             return this.$store.state.options.themeUrl
