@@ -9,5 +9,10 @@ module.exports = {
                 jquery: 'jquery'
             })
         ]
+    },
+    devServer: {
+        allowedHosts: [
+            '.stiles.me'
+        ]
     }
 }
