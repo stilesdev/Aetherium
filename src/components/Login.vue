@@ -21,7 +21,7 @@
                         <button @click="loginError = ''" type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <strong>Error signing in!</strong> {{ loginError }}
+                        <strong>Error:</strong> {{ loginError }}
                     </div>
                     <button class="btn btn-default">Login</button>
                 </form>
@@ -43,7 +43,22 @@
 
         public submit(): void {
             auth().signInWithEmailAndPassword(this.email, this.password).catch((error: auth.Error) => {
-                this.loginError = error.message
+                switch (error.code) {
+                    case 'auth/too-many-requests':
+                        this.loginError = 'Too many login attempts. Wait a while and try again.'
+                        break
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                    case 'auth/invalid-email':
+                    case 'auth/user-disabled':
+                        this.loginError = 'Invalid username or password.'
+                        break
+                    default:
+                        this.loginError = 'Unknown error'
+                        // tslint:disable-next-line: no-console
+                        console.error(`${error.code}: ${error.message}`)
+                        break
+                }
             })
         }
     }
