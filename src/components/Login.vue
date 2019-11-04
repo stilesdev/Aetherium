@@ -18,7 +18,7 @@
                         </div>
                     </div>
                     <div v-if="loginError" class="alert alert-danger alert-dismissible" role="alert">
-                        <button @click="loginError = undefined" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <button @click="loginError = ''" type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                         <strong>Error signing in!</strong> {{ loginError }}
@@ -39,7 +39,7 @@
     export default class Login extends Vue {
         public email: string = ''
         public password: string = ''
-        public loginError?: string
+        public loginError: string = ''
 
         public submit(): void {
             auth().signInWithEmailAndPassword(this.email, this.password).catch((error: auth.Error) => {
