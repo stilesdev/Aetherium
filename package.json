@@ -24,7 +24,7 @@
   "homepage": "https://github.com/mstiles92/Aetherium#readme",
   "dependencies": {
     "bootstrap": "^3.4.1",
-    "core-js": "^2.6.11",
+    "core-js": "^3.6.5",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "firebase": "^6.6.2",
     "highcharts": "^7.2.1",
@@ -42,9 +42,9 @@
   "devDependencies": {
     "@types/bootstrap": "^3.4.0",
     "@types/jquery": "^3.3.38",
-    "@vue/cli-plugin-babel": "^3.12.1",
-    "@vue/cli-plugin-typescript": "^3.12.1",
-    "@vue/cli-service": "^3.12.1",
+    "@vue/cli-plugin-babel": "^4.4.1",
+    "@vue/cli-plugin-typescript": "^4.4.1",
+    "@vue/cli-service": "^4.4.1",
     "typescript": "^3.9.5",
     "typescript-tslint-plugin": "^0.5.5",
     "vue-template-compiler": "^2.6.11",
