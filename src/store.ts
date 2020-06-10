@@ -2,7 +2,7 @@ import firebase, { auth, database } from 'firebase'
 import moment from 'moment'
 import Vue from 'vue'
 import Vuex, { ActionContext, MutationPayload } from 'vuex'
-import { Actions, Mutations, References, RootState, ScramblePayload, View } from '@/types/store'
+import { Actions, Mutations, References, RootState, ScramblePayload } from '@/types/store'
 import FirebaseManager from '@/util/firebase-manager'
 import { Stats } from '@/util/stats'
 import { ISolve } from '@/types'
@@ -22,7 +22,6 @@ Vue.use(Vuex)
 export default new Vuex.Store<RootState> ({
     strict: true, // TODO: disable this before deploying to production
     state: {
-        activeView: View.TIMER,
         hideUI: false,
         scramblerWorker: new ScramblerWorker(),
         scramble: {
@@ -47,6 +46,9 @@ export default new Vuex.Store<RootState> ({
         allStats: undefined
     },
     getters: {
+        isLoggedIn(state: RootState): boolean {
+            return state.userId !== undefined
+        },
         puzzlesRef(): database.Reference {
             return database().ref('/puzzles')
         },
@@ -87,9 +89,6 @@ export default new Vuex.Store<RootState> ({
         },
         [Mutations.RECEIVE_SESSION_DATE](state: RootState, payload: any): void {
             state.sessionDate = payload.moment
-        },
-        [Mutations.SET_ACTIVE_VIEW](state: RootState, newView: View): void {
-            state.activeView = newView
         },
         [Mutations.SET_HIDE_UI](state: RootState, hide: boolean): void {
             state.hideUI = hide

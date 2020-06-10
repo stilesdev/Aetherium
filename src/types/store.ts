@@ -3,7 +3,6 @@ import { ISolve } from '@/types/index'
 import WebWorker from 'worker-loader!*'
 
 export interface RootState {
-    activeView: View
     hideUI: boolean
     scramblerWorker: WebWorker
     scramble: ScramblePayload
@@ -17,13 +16,6 @@ export interface RootState {
     sessionStats?: StatisticsPayload
     allSessions?: FirebaseList<SessionPayload>
     allStats?: FirebaseList<StatisticsPayload>
-}
-
-export enum View {
-    TIMER = 'timer',
-    STATS = 'stats',
-    HISTORY = 'history',
-    PB = 'pb'
 }
 
 export interface ScramblePayload {
@@ -52,7 +44,6 @@ export enum Mutations {
     SET_OPTION_THEME_URL = 'SET_OPTION_THEME_URL',
     SET_OPTION_HOLD_TO_START = 'SET_OPTION_HOLD_TO_START',
     SET_OPTION_USE_INSPECTION = 'SET_OPTION_USE_INSPECTION',
-    SET_ACTIVE_VIEW = 'SET_ACTIVE_VIEW',
     SET_HIDE_UI = 'SET_HIDE_UI',
     RECEIVE_ACTIVE_PUZZLE = 'RECEIVE_ACTIVE_PUZZLE',
     RECEIVE_SCRAMBLE = 'RECEIVE_SCRAMBLE',

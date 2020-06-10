@@ -32,7 +32,7 @@
 
 <script lang="ts">
     import Vue from 'vue'
-    import { Component } from 'vue-property-decorator'
+    import { Component, Watch } from 'vue-property-decorator'
     import { auth } from 'firebase'
 
     @Component
@@ -40,6 +40,17 @@
         public email: string = ''
         public password: string = ''
         public loginError: string = ''
+
+        get isLoggedIn(): boolean {
+            return this.$store.getters.isLoggedIn
+        }
+
+        @Watch('isLoggedIn')
+        public watchIsLoggedIn() {
+            if (this.isLoggedIn) {
+                this.$router.push('/')
+            }
+        }
 
         public submit(): void {
             auth().signInWithEmailAndPassword(this.email, this.password).catch((error: auth.Error) => {

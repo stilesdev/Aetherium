@@ -1,4 +1,3 @@
-import { TimerTrigger } from '@/types/firebase'
 <template>
     <div id="app">
         <nav class="navbar navbar-default">
@@ -10,24 +9,32 @@ import { TimerTrigger } from '@/types/firebase'
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">Aetherium</a>
+                    <router-link class="navbar-brand" to="/" exact>Aetherium</router-link>
                 </div>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="header-navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <li id="timer" :class="{ active: activeTab === 'timer' }" @click="activeTab = 'timer'">
-                            <a href="#">Timer</a>
-                        </li>
-                        <li id="stats" :class="{ active: activeTab === 'stats' }" @click="activeTab = 'stats'">
-                            <a href="#">Stats</a>
-                        </li>
-                        <li id="history" :class="{ active: activeTab === 'history' }" @click="activeTab = 'history'">
-                            <a href="#">History</a>
-                        </li>
-                        <li id="pb" :class="{ active: activeTab === 'pb' }" @click="activeTab = 'pb'">
-                            <a href="#">Personal Bests</a>
-                        </li>
+                        <router-link to="/timer" v-slot="{ href, navigate, isActive }">
+                            <li :class="{ active: isActive }">
+                                <a :href="href" @click="navigate">Timer</a>
+                            </li>
+                        </router-link>
+                        <router-link to="/statistics" v-slot="{ href, navigate, isActive }">
+                            <li :class="{ active: isActive }">
+                                <a :href="href" @click="navigate">Session Stats</a>
+                            </li>
+                        </router-link>
+                        <router-link to="/history" v-slot="{ href, navigate, isActive }">
+                            <li :class="{ active: isActive }">
+                                <a :href="href" @click="navigate">History</a>
+                            </li>
+                        </router-link>
+                        <router-link to="/personal-bests" v-slot="{ href, navigate, isActive }">
+                            <li :class="{ active: isActive }">
+                                <a :href="href" @click="navigate">Personal Bests</a>
+                            </li>
+                        </router-link>
                     </ul>
 
                     <form class="navbar-form navbar-left" v-if="puzzles">
@@ -188,7 +195,7 @@ import { TimerTrigger } from '@/types/firebase'
     import Vue from 'vue'
     import { Component } from 'vue-property-decorator'
     import { ThemeData } from '@/types'
-    import { Actions, Mutations, View } from '@/types/store'
+    import { Actions } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
     import { auth } from 'firebase'
     import { FirebaseList, ProfileOptions, Puzzle, TimerTrigger } from '@/types/firebase'
@@ -227,14 +234,6 @@ import { TimerTrigger } from '@/types/firebase'
             { name: 'United', url: '/themes/united.min.css' },
             { name: 'Yeti', url: '/themes/yeti.min.css' }
         ]
-
-        get activeTab(): View {
-            return this.$store.state.activeView
-        }
-
-        set activeTab(value: View) {
-            this.$store.commit(Mutations.SET_ACTIVE_VIEW, value)
-        }
 
         get puzzles(): Puzzle[] {
             if (this.$store.state.puzzles) {
@@ -307,7 +306,9 @@ import { TimerTrigger } from '@/types/firebase'
         }
 
         public logout(): void {
-            auth().signOut().catch((error: Error) => alert(error.message))
+            auth().signOut()
+                .then(() => this.$router.push('/login'))
+                .catch((error: Error) => alert(error.message))
         }
     }
 </script>
