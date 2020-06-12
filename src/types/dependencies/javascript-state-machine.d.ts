@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Typings retrieved from https://github.com/taoqf/javascript-state-machine/blob/master/types/state-machine.d.ts
  *
@@ -28,7 +29,7 @@ declare module 'javascript-state-machine' {
         constructor(options: Partial<StateMachine.Options>)
         static factory(options: Partial<StateMachine.Options>): StateMachine.IFSM
         static factory<T>(instance: T, options: Partial<StateMachine.Options>): StateMachine.IFSM | T
-        [action: string]: ((...args: any[]) => any)
+        [action: string]: (...args: any[]) => any
         state: StateMachine.StateMachineState
         is: StateMachine.StateMachineIs
         can: StateMachine.StateMachineCan
@@ -46,11 +47,11 @@ declare module 'javascript-state-machine' {
     }
 
     namespace StateMachine {
-        const VERSION: string 		        // = "3.x.x"
+        const VERSION: string // = "3.x.x"
         const defaults: {
-            wildcard: '*',
+            wildcard: '*'
             init: {
-                name: 'init',
+                name: 'init'
                 from: 'none'
             }
         }
@@ -79,7 +80,7 @@ declare module 'javascript-state-machine' {
             past: string
             future: string
             init: string
-            max: number	// max history
+            max: number // max history
             state: string
             transitions: {
                 name: string
@@ -88,22 +89,21 @@ declare module 'javascript-state-machine' {
             }[]
             methods: {
                 [method: string]: Callback | undefined
-                onBeforeTransition?(lifecycle: LifeCycle, ...args: any[]): boolean | Promise<boolean>	// 1
-                onLeaveState?(lifecycle: LifeCycle, ...args: any[]): boolean | Promise<boolean>	// 2
-                onTransition?(lifecycle: LifeCycle, ...args: any[]): boolean | Promise<boolean>	// 3
-                onEnterState?(lifecycle: LifeCycle, ...args: any[]): any | Promise<any>	// 4
-                onAfterTransition?(lifecycle: LifeCycle, ...args: any[]): any | Promise<any>	// 5
+                onBeforeTransition?(lifecycle: LifeCycle, ...args: any[]): boolean | Promise<boolean> // 1
+                onLeaveState?(lifecycle: LifeCycle, ...args: any[]): boolean | Promise<boolean> // 2
+                onTransition?(lifecycle: LifeCycle, ...args: any[]): boolean | Promise<boolean> // 3
+                onEnterState?(lifecycle: LifeCycle, ...args: any[]): any | Promise<any> // 4
+                onAfterTransition?(lifecycle: LifeCycle, ...args: any[]): any | Promise<any> // 5
                 onPendingTransition?(transition: string, from: string, to: string): any | Promise<any>
             }
-            data: any	// {} | any[] | ((...args: any[]) => {} | any[])
+            data: any // {} | any[] | ((...args: any[]) => {} | any[])
             plugins: any[]
         }
 
         interface IFSM {
-            new(...data: any[]): StateMachine
+            new (...data: any[]): StateMachine
         }
     }
 
     export = StateMachine
 }
-

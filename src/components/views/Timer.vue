@@ -1,17 +1,8 @@
-import { TimerState } from '@/types'
-import { TimerState } from '@/types'
-import { TimerState } from '@/types'
-import { TimerState } from '@/types'
-import { TimerState } from '@/types'
-import { TimerState } from '@/types'
-import { TimerState } from '@/types'
-import { TimerState } from '@/types'
-import { TimerState } from '@/types'
-import { TimerState } from '@/types'
 <template>
     <div id="app">
         <div class="container-fluid">
-            <div id="timerTouchArea" @touchstart="timerState.triggerDown()" @touchend="timerState.triggerUp()"> <!-- this needs to go to 100vh height when timing -->
+            <div id="timerTouchArea" @touchstart="timerState.triggerDown()" @touchend="timerState.triggerUp()">
+                <!-- this needs to go to 100vh height when timing -->
                 <div class="row">
                     <transition name="fade">
                         <div id="scrambleArea" class="col-md-10 col-md-offset-1" v-if="!hideUI">
@@ -20,9 +11,12 @@ import { TimerState } from '@/types'
                     </transition>
                 </div>
 
-                <div class="row"> <!-- This needs to be verically aligned in the parent div -->
+                <div class="row">
+                    <!-- This needs to be verically aligned in the parent div -->
                     <div id="timerArea">
-                        <h1 id="timerLabel" :class="timerClass">{{ timerLabel }}</h1>
+                        <h1 id="timerLabel" :class="timerClass">
+                            {{ timerLabel }}
+                        </h1>
                     </div>
                 </div>
             </div>
@@ -67,12 +61,12 @@ import { TimerState } from '@/types'
         }
     })
     export default class Timer extends Vue {
-        public timerStart: number = 0
-        public timerLabel: string = '00:00:00'
-        public stackmatStarted: boolean = false
-        public stackmatLastTime: number = 0
+        public timerStart = 0
+        public timerLabel = '00:00:00'
+        public stackmatStarted = false
+        public stackmatLastTime = 0
         public timerState?: TimerStateMachine
-        public inspectionCountdown: number = 0
+        public inspectionCountdown = 0
         public inspectionTimer?: number
         public stackmat: Stackmat = new Stackmat()
 
@@ -100,7 +94,7 @@ import { TimerState } from '@/types'
             return this.$store.state.options.useInspection
         }
 
-        get currentPuzzle(): any {
+        get currentPuzzle(): { puzzle: string } {
             return { puzzle: this.$store.state.activePuzzle }
         }
 
@@ -133,22 +127,21 @@ import { TimerState } from '@/types'
         public initTimers(): void {
             if (this.timerTrigger === TimerTrigger.SPACEBAR) {
                 this.stackmat.stop()
-                const self = this
 
-                $(document).on('keydown.aetherium', event => {
+                $(document).on('keydown.aetherium', this, event => {
                     if (event.which === 32) {
                         event.preventDefault()
-                        if (self.timerState) {
-                            self.timerState.triggerDown()
+                        if (event.data.timerState) {
+                            event.data.timerState.triggerDown()
                         }
                     }
                 })
 
-                $(document).on('keyup.aetherium', event => {
+                $(document).on('keyup.aetherium', this, event => {
                     if (event.which === 32) {
                         event.preventDefault()
-                        if (self.timerState) {
-                            self.timerState.triggerUp()
+                        if (event.data.timerState) {
+                            event.data.timerState.triggerUp()
                         }
                     }
                 })

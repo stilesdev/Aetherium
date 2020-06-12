@@ -42,7 +42,10 @@ export class Session implements ISession {
     }
 
     public deleteSolve(solveUid: string): void {
-        this.solves.splice(this.solves.findIndex(solve => solve.uid === solveUid), 1)
+        this.solves.splice(
+            this.solves.findIndex(solve => solve.uid === solveUid),
+            1
+        )
         this.updateStats()
     }
 

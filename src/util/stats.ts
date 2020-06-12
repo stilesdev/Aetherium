@@ -14,7 +14,9 @@ export abstract class Stats {
     }
 
     public static best(solves: ISolve[]): number {
-        if (solves.length === 0) { return 0 }
+        if (solves.length === 0) {
+            return 0
+        }
 
         let best = Number.MAX_VALUE
         let dnfCount = 0
@@ -29,7 +31,7 @@ export abstract class Stats {
             }
         })
 
-        return (dnfCount === solves.length) ? -1 : best
+        return dnfCount === solves.length ? -1 : best
     }
 
     public static worst(solves: ISolve[]): number {
@@ -67,43 +69,43 @@ export abstract class Stats {
     }
 
     public static mo3(solves: ISolve[]): number {
-        return (solves.length < 3) ? 0 : this.meanOfRange(solves, 0, 2)
+        return solves.length < 3 ? 0 : this.meanOfRange(solves, 0, 2)
     }
 
     public static ao5(solves: ISolve[]): number {
-        return (solves.length < 5) ? 0 : this.averageOfRange(solves, 0, 4)
+        return solves.length < 5 ? 0 : this.averageOfRange(solves, 0, 4)
     }
 
     public static ao12(solves: ISolve[]): number {
-        return (solves.length < 12) ? 0 : this.averageOfRange(solves, 0, 11)
+        return solves.length < 12 ? 0 : this.averageOfRange(solves, 0, 11)
     }
 
     public static ao50(solves: ISolve[]): number {
-        return (solves.length < 50) ? 0 : this.averageOfRange(solves, 0, 49)
+        return solves.length < 50 ? 0 : this.averageOfRange(solves, 0, 49)
     }
 
     public static ao100(solves: ISolve[]): number {
-        return (solves.length < 100) ? 0 : this.averageOfRange(solves, 0, 99)
+        return solves.length < 100 ? 0 : this.averageOfRange(solves, 0, 99)
     }
 
     public static bestMo3(solves: ISolve[]): number {
-        return (solves.length < 3) ? 0 : this.bestMean(solves, 3)
+        return solves.length < 3 ? 0 : this.bestMean(solves, 3)
     }
 
     public static bestAo5(solves: ISolve[]): number {
-        return (solves.length < 5) ? 0 : this.bestAverage(solves, 5)
+        return solves.length < 5 ? 0 : this.bestAverage(solves, 5)
     }
 
     public static bestAo12(solves: ISolve[]): number {
-        return (solves.length < 12) ? 0 : this.bestAverage(solves, 12)
+        return solves.length < 12 ? 0 : this.bestAverage(solves, 12)
     }
 
     public static bestAo50(solves: ISolve[]): number {
-        return (solves.length < 50) ? 0 : this.bestAverage(solves, 50)
+        return solves.length < 50 ? 0 : this.bestAverage(solves, 50)
     }
 
     public static bestAo100(solves: ISolve[]): number {
-        return (solves.length < 100) ? 0 : this.bestAverage(solves, 100)
+        return solves.length < 100 ? 0 : this.bestAverage(solves, 100)
     }
 
     private static meanOfRange(solves: ISolve[], startIdx: number, endIdx: number): number {
@@ -166,7 +168,9 @@ export abstract class Stats {
 
         while (end < solves.length) {
             const mean = this.meanOfRange(solves, start, end)
-            if (mean < best) { best = mean }
+            if (mean < best) {
+                best = mean
+            }
             start++
             end++
         }
@@ -181,7 +185,9 @@ export abstract class Stats {
 
         while (end < solves.length) {
             const average = this.averageOfRange(solves, start, end)
-            if (average < best) { best = average }
+            if (average < best) {
+                best = average
+            }
             start++
             end++
         }

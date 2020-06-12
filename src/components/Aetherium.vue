@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <link rel="stylesheet" :href="themeUrl">
+        <link rel="stylesheet" :href="themeUrl" />
         <transition name="fade">
             <navbar v-if="showNavbar"></navbar>
         </transition>
@@ -14,7 +14,7 @@
     import Navbar from './Navbar.vue'
 
     @Component({
-        components: {Navbar}
+        components: { Navbar }
     })
     export default class Aetherium extends Vue {
         get showNavbar(): boolean {
@@ -27,10 +27,12 @@
 </script>
 
 <style>
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity .5s;
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity 0.5s;
     }
-    .fade-enter, .fade-leave-to {
+    .fade-enter,
+    .fade-leave-to {
         opacity: 0;
     }
 </style>

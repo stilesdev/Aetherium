@@ -7,14 +7,14 @@
                         <label for="emailInput">Email Address</label>
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                            <input type="email" class="form-control" id="emailInput" placeholder="Email Address" v-model="email">
+                            <input type="email" class="form-control" id="emailInput" placeholder="Email Address" v-model="email" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="passwordInput">Password</label>
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                            <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password">
+                            <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password" />
                         </div>
                     </div>
                     <div v-if="loginError" class="alert alert-danger alert-dismissible" role="alert">
@@ -37,9 +37,9 @@
 
     @Component
     export default class Login extends Vue {
-        public email: string = ''
-        public password: string = ''
-        public loginError: string = ''
+        public email = ''
+        public password = ''
+        public loginError = ''
 
         get isLoggedIn(): boolean {
             return this.$store.getters.isLoggedIn
@@ -53,24 +53,25 @@
         }
 
         public submit(): void {
-            auth().signInWithEmailAndPassword(this.email, this.password).catch((error: auth.Error) => {
-                switch (error.code) {
-                    case 'auth/too-many-requests':
-                        this.loginError = 'Too many login attempts. Wait a while and try again.'
-                        break
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                    case 'auth/invalid-email':
-                    case 'auth/user-disabled':
-                        this.loginError = 'Invalid username or password.'
-                        break
-                    default:
-                        this.loginError = 'Unknown error'
-                        // tslint:disable-next-line: no-console
-                        console.error(`${error.code}: ${error.message}`)
-                        break
-                }
-            })
+            auth()
+                .signInWithEmailAndPassword(this.email, this.password)
+                .catch((error: auth.Error) => {
+                    switch (error.code) {
+                        case 'auth/too-many-requests':
+                            this.loginError = 'Too many login attempts. Wait a while and try again.'
+                            break
+                        case 'auth/user-not-found':
+                        case 'auth/wrong-password':
+                        case 'auth/invalid-email':
+                        case 'auth/user-disabled':
+                            this.loginError = 'Invalid username or password.'
+                            break
+                        default:
+                            this.loginError = 'Unknown error'
+                            console.error(`${error.code}: ${error.message}`)
+                            break
+                    }
+                })
         }
     }
 </script>

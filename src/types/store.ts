@@ -19,7 +19,7 @@ export interface RootState {
 }
 
 export interface ScramblePayload {
-    text: string,
+    text: string
     svg?: string
 }
 

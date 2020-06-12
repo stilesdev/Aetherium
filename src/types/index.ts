@@ -1,5 +1,6 @@
 import { SolvePayload, StatisticsPayload } from '@/types/firebase'
 
+// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface ISolve extends SolvePayload {
     uid: string
 
@@ -9,16 +10,17 @@ export interface ISolve extends SolvePayload {
     readonly formattedTimestamp: string
 }
 
+// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface ISession {
     solves: ISolve[]
-    stats: IStatistics
+    stats: Statistics
 
     addSolve: (solve: ISolve) => void
     updateSolve: (solveUid: string, data: SolvePayload) => void
     deleteSolve: (solveUid: string) => void
 }
 
-export interface IStatistics extends StatisticsPayload {
+export interface Statistics extends StatisticsPayload {
     date?: string
 }
 
@@ -43,3 +45,5 @@ export enum TimerState {
     RUNNING = 'running',
     COMPLETE = 'complete'
 }
+
+export type ChartSeries = Array<[number, number]>

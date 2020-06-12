@@ -11,17 +11,18 @@
     import { Component, Watch } from 'vue-property-decorator'
     import { formatTimeDelta, formatTimeDeltaShort, formatTimestamp } from '@/util/format'
     import { Solve } from '@/classes/solve'
+    import { ChartSeries } from '@/types'
 
     @Component
     export default class Stats extends Vue {
         public sessionChart?: Chart
 
-        get allSolves(): any[] {
+        get allSolves(): ChartSeries {
             return this.$store.state.solves.map((solve: Solve) => [solve.timestamp, solve.time]).reverse()
         }
 
-        get bestSolves(): any[] {
-            const bestSolves: any[] = []
+        get bestSolves(): ChartSeries {
+            const bestSolves: ChartSeries = []
             this.allSolves.forEach(solve => {
                 if (bestSolves.length === 0 || solve[1] < bestSolves[bestSolves.length - 1][1]) {
                     bestSolves.push(solve)
@@ -32,13 +33,13 @@
         }
 
         @Watch('allSolves')
-        public onAllSolvesChange(newValue: any): void {
-            this.sessionChart!.series[0].setData(newValue)
+        public onAllSolvesChange(newValue: ChartSeries): void {
+            this.sessionChart?.series[0]?.setData(newValue)
         }
 
         @Watch('bestSolves')
-        public onBestSolvesChange(newValue: any): void {
-            this.sessionChart!.series[1].setData(newValue)
+        public onBestSolvesChange(newValue: ChartSeries): void {
+            this.sessionChart?.series[1]?.setData(newValue)
         }
 
         public mounted(): void {

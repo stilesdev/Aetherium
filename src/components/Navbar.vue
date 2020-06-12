@@ -40,11 +40,13 @@
                     <form class="navbar-form navbar-left" v-if="puzzles">
                         <div class="form-group">
                             <select class="form-control" v-model="activePuzzle">
-                                <option v-for="puzzle in puzzles" :value="puzzle.key">{{ puzzle.name }}</option>
+                                <option v-for="puzzle in puzzles" :key="puzzle.key" :value="puzzle.key">{{ puzzle.name }}</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <button type="button" class="btn btn-primary" @click="onCloseSessionClick">Close Session</button>
+                            <button type="button" class="btn btn-primary" @click="onCloseSessionClick">
+                                Close Session
+                            </button>
                         </div>
                     </form>
 
@@ -55,8 +57,12 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="#" @click="openOptionsModal">Options</a></li>
-                                <li><a href="#" @click="openImportModal">Import</a></li>
+                                <li>
+                                    <a href="#" @click="openOptionsModal">Options</a>
+                                </li>
+                                <li>
+                                    <a href="#" @click="openImportModal">Import</a>
+                                </li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#" @click="logout">Logout</a></li>
                             </ul>
@@ -71,14 +77,20 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="closeSessionModalLabel">Close Session</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="closeSessionModalLabel">
+                            Close Session
+                        </h4>
                     </div>
 
                     <div class="modal-body">
                         <form class="form-inline">
                             <div class="form-group">
-                                <p>Are you sure you would like to close the current session?</p>
+                                <p>
+                                    Are you sure you would like to close the current session?
+                                </p>
                             </div>
                             <div class="form-group">
                                 <label for="sessionDatePicker">Session Date:</label>
@@ -90,8 +102,12 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="onCloseSessionConfirm">Close Session</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="onCloseSessionConfirm">
+                            Close Session
+                        </button>
                     </div>
                 </div>
             </div>
@@ -102,49 +118,69 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="optionsModalLabel">Options</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="optionsModalLabel">
+                            Options
+                        </h4>
                     </div>
 
                     <div class="modal-body">
                         <label for="timerTriggerOptionsGroup">Timer Trigger</label>
                         <div class="btn-group" id="timerTriggerOptionsGroup" data-toggle="buttons">
-                            <label class="btn btn-default" :class="{ 'active': options.timerTrigger === 'spacebar' }" @click="options.timerTrigger = 'spacebar'">
-                                <input type="radio" name="timerTriggerOptions" id="spacebarTimerTrigger" autocomplete="off"/>Spacebar
+                            <label
+                                class="btn btn-default"
+                                :class="{
+                                    active: options.timerTrigger === 'spacebar'
+                                }"
+                                @click="options.timerTrigger = 'spacebar'"
+                            >
+                                <input type="radio" name="timerTriggerOptions" id="spacebarTimerTrigger" autocomplete="off" />Spacebar
                             </label>
-                            <label class="btn btn-default" :class="{ 'active': options.timerTrigger === 'stackmat' }" @click="options.timerTrigger = 'stackmat'">
-                                <input type="radio" name="timerTriggerOptions" id="stackmatTimerTrigger" autocomplete="off"/>Stackmat
+                            <label
+                                class="btn btn-default"
+                                :class="{
+                                    active: options.timerTrigger === 'stackmat'
+                                }"
+                                @click="options.timerTrigger = 'stackmat'"
+                            >
+                                <input type="radio" name="timerTriggerOptions" id="stackmatTimerTrigger" autocomplete="off" />Stackmat
                             </label>
                         </div>
 
-                        <hr/>
+                        <hr />
 
-                        <input type="checkbox" id="showTimerCheckbox" v-model="options.showTimer">
+                        <input type="checkbox" id="showTimerCheckbox" v-model="options.showTimer" />
                         <label for="showTimerCheckbox">Show timer while solving</label>
 
-                        <hr/>
+                        <hr />
 
-                        <input type="checkbox" id="holdToStartCheckbox" v-model="options.holdToStart">
+                        <input type="checkbox" id="holdToStartCheckbox" v-model="options.holdToStart" />
                         <label for="holdToStartCheckbox">Hold spacebar/touchscreen to start timer</label>
 
-                        <hr/>
+                        <hr />
 
-                        <input type="checkbox" id="useInspectionCheckbox" v-model="options.useInspection">
+                        <input type="checkbox" id="useInspectionCheckbox" v-model="options.useInspection" />
                         <label for="useInspectionCheckbox">Use inspection</label>
 
-                        <hr/>
+                        <hr />
 
                         <div class="form-group form-inline">
                             <label for="themeSelector">Theme</label>
                             <select class="form-control" id="themeSelector" v-model="options.themeUrl">
-                                <option v-for="theme in themes" :value="theme.url">{{ theme.name }}</option>
+                                <option v-for="theme in themes" :key="theme.name" :value="theme.url">{{ theme.name }}</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="onOptionsModalSave">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="onOptionsModalSave">
+                            Save
+                        </button>
                     </div>
                 </div>
             </div>
@@ -155,8 +191,12 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="importModalLabel">Import</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="importModalLabel">
+                            Import
+                        </h4>
                     </div>
 
                     <div class="modal-body">
@@ -174,14 +214,24 @@
                             }
                         }, undefined, 2) }}
                         </code></pre>
-                        <div class="form-group" :class="{ 'has-error': !importTextValid, 'has-success': importTextValid }">
+                        <div
+                            class="form-group"
+                            :class="{
+                                'has-error': !importTextValid,
+                                'has-success': importTextValid
+                            }"
+                        >
                             <textarea class="form-control" @input="validateImportText" v-model="importText"></textarea>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="runImport">Import</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="runImport">
+                            Import
+                        </button>
                     </div>
                 </div>
             </div>
@@ -212,8 +262,8 @@
         public datePickerConfig = {
             format: 'MM/DD/YYYY'
         }
-        public importTextValid: boolean = true
-        public importText: string = ''
+        public importTextValid = true
+        public importText = ''
         public solveImporter?: SolveImporter
         public themes: ThemeData[] = [
             { name: 'Default', url: '/themes/default.min.css' },
@@ -238,7 +288,7 @@
         get puzzles(): Puzzle[] {
             if (this.$store.state.puzzles) {
                 const puzzles: FirebaseList<Puzzle> = this.$store.state.puzzles
-                return Object.values(puzzles).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
+                return Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
             } else {
                 return []
             }
@@ -266,7 +316,10 @@
 
         set sessionDate(value: string) {
             this.$store.dispatch(Actions.UPDATE_SESSION_DATE, {
-                moment: moment().utc().dayOfYear(moment(value, 'MM/DD/YYYY').dayOfYear()).startOf('day')
+                moment: moment()
+                    .utc()
+                    .dayOfYear(moment(value, 'MM/DD/YYYY').dayOfYear())
+                    .startOf('day')
             })
         }
 
@@ -293,12 +346,12 @@
         }
 
         public validateImportText(): void {
-            this.importTextValid = this.solveImporter!.validate(this.importText)
+            this.importTextValid = this.solveImporter?.validate(this.importText) || false
         }
 
         public runImport(): void {
             if (this.importTextValid) {
-                this.solveImporter!.import(this.importText)
+                this.solveImporter?.import(this.importText)
             } else {
                 alert('Invalid JSON entered.')
                 return
@@ -306,7 +359,8 @@
         }
 
         public logout(): void {
-            auth().signOut()
+            auth()
+                .signOut()
                 .then(() => this.$router.push('/login'))
                 .catch((error: Error) => alert(error.message))
         }

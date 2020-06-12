@@ -14,6 +14,7 @@
     import PanelHistoryStatistics from '@/components/panels/PanelHistoryStatistics.vue'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
     import { FirebaseList, SessionPayload, StatisticsPayload } from '@/types/firebase'
+    import { ChartSeries } from '@/types'
 
     @Component({
         components: { 'panel-history-statistics': PanelHistoryStatistics }
@@ -21,20 +22,20 @@
     export default class History extends Vue {
         public sessionHistoryChart?: Chart
 
-        get sessionMeans(): Array<[number, number]> {
+        get sessionMeans(): ChartSeries {
             const sessions: FirebaseList<SessionPayload> = this.$store.state.allSessions
             const stats: FirebaseList<StatisticsPayload> = this.$store.state.allStats
             return stats ? Object.entries(stats).map(stat => [sessions[stat[0]].timestamp, stat[1].mean]) : []
         }
 
-        get sessionBests(): any[] {
+        get sessionBests(): ChartSeries {
             const sessions: FirebaseList<SessionPayload> = this.$store.state.allSessions
             const stats: FirebaseList<StatisticsPayload> = this.$store.state.allStats
             return stats ? Object.entries(stats).map(stat => [sessions[stat[0]].timestamp, stat[1].best]) : []
         }
 
-        get personalBests(): any[] {
-            const personalBests: any[] = []
+        get personalBests(): ChartSeries {
+            const personalBests: ChartSeries = []
             this.sessionBests.forEach(bestTime => {
                 if (personalBests.length === 0 || bestTime[1] < personalBests[personalBests.length - 1][1]) {
                     personalBests.push(bestTime)
@@ -45,18 +46,18 @@
         }
 
         @Watch('sessionMeans')
-        public onSessionMeansChange(newValue: any): void {
-            this.sessionHistoryChart!.series[0].setData(newValue)
+        public onSessionMeansChange(newValue: ChartSeries): void {
+            this.sessionHistoryChart?.series[0]?.setData(newValue)
         }
 
         @Watch('sessionBests')
-        public onSessionBestsChange(newValue: any): void {
-            this.sessionHistoryChart!.series[1].setData(newValue)
+        public onSessionBestsChange(newValue: ChartSeries): void {
+            this.sessionHistoryChart?.series[1]?.setData(newValue)
         }
 
         @Watch('personalBests')
-        public onPersonalBestsChange(newValue: any): void {
-            this.sessionHistoryChart!.series[2].setData(newValue)
+        public onPersonalBestsChange(newValue: ChartSeries): void {
+            this.sessionHistoryChart?.series[2]?.setData(newValue)
         }
 
         public mounted(): void {
@@ -100,7 +101,7 @@
                         dataLabels: {
                             enabled: true,
                             formatter(): string {
-                                return formatTimeDeltaShort(this.y!)
+                                return this.y ? formatTimeDeltaShort(this.y) : ''
                             }
                         },
                         marker: {
@@ -132,7 +133,9 @@
                 ],
                 tooltip: {
                     formatter(): string {
-                        return `<b>${moment(this.x).utc().format('M/D/YYYY')}</b><br/>${formatTimeDelta(this.y)}`
+                        return `<b>${moment(this.x)
+                            .utc()
+                            .format('M/D/YYYY')}</b><br/>${formatTimeDelta(this.y)}`
                     }
                 }
             })

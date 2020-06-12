@@ -1,4 +1,6 @@
-export interface FirebaseList<T> { [id: string]: T }
+export interface FirebaseList<T> {
+    [id: string]: T
+}
 
 export interface Puzzle {
     key: string

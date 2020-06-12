@@ -24,7 +24,7 @@ export class SolveImporter {
                 time: { type: 'integer', minimum: 1 },
                 timestamp: { type: 'integer', minimum: 1000000000000 }
             },
-            required: [ 'penalty', 'scramble', 'time', 'timestamp' ],
+            required: ['penalty', 'scramble', 'time', 'timestamp'],
             additionalProperties: false
         }
 
@@ -43,7 +43,9 @@ export class SolveImporter {
             id: '/Session',
             type: 'object',
             patternProperties: {
-                '([2-9]|1[0-2]?)/([1-9]|[1-2][0-9]|3[0-1])/(20\\d{2})': { $ref: '/Puzzle' }
+                '([2-9]|1[0-2]?)/([1-9]|[1-2][0-9]|3[0-1])/(20\\d{2})': {
+                    $ref: '/Puzzle'
+                }
             },
             additionalProperties: false
         }
@@ -59,12 +61,14 @@ export class SolveImporter {
             if (input && typeof input === 'object') {
                 return this.validator.validate(input, this.schema).valid
             }
-        // tslint:disable-next-line: no-empty
-        } catch (e) {}
+        } catch (e) {
+            return false
+        }
         return false
     }
 
     public import(inputData: string): void {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let input: any
 
         try {
@@ -77,9 +81,16 @@ export class SolveImporter {
             const year = parseInt(date.split('/')[2], 10)
             const month = parseInt(date.split('/')[0], 10) - 1
             const day = parseInt(date.split('/')[1], 10)
-            const sessionMoment = moment().utc().year(year).month(month).date(day).startOf('day')
+            const sessionMoment = moment()
+                .utc()
+                .year(year)
+                .month(month)
+                .date(day)
+                .startOf('day')
 
-            const newSessionRef = database().ref(`/users/${this.userId}/sessions`).push()
+            const newSessionRef = database()
+                .ref(`/users/${this.userId}/sessions`)
+                .push()
             if (newSessionRef.key) {
                 const newSessionId = newSessionRef.key
                 newSessionRef.set({
@@ -90,34 +101,39 @@ export class SolveImporter {
                 Object.keys(input[date]).forEach(puzzle => {
                     const solves: Solve[] = []
                     input[date][puzzle].forEach((solve: SolvePayload) => {
-                        database().ref(`/solves/${this.userId}/${puzzle}`).push().then((ref: Reference) => {
-                            ref.set({
-                                sessionId: newSessionId,
-                                time: solve.time,
-                                timestamp: solve.timestamp,
-                                scramble: solve.scramble,
-                                penalty: solve.penalty
+                        database()
+                            .ref(`/solves/${this.userId}/${puzzle}`)
+                            .push()
+                            .then((ref: Reference) => {
+                                ref.set({
+                                    sessionId: newSessionId,
+                                    time: solve.time,
+                                    timestamp: solve.timestamp,
+                                    scramble: solve.scramble,
+                                    penalty: solve.penalty
+                                })
+                                solves.push(new Solve(ref.key as string, newSessionId, solve.time, solve.timestamp, solve.scramble, solve.penalty))
                             })
-                            solves.push(new Solve(ref.key as string, newSessionId, solve.time, solve.timestamp, solve.scramble, solve.penalty))
+                    })
+                    database()
+                        .ref(`/stats/${this.userId}/${puzzle}/${newSessionId}`)
+                        .set({
+                            mean: Stats.mean(solves),
+                            count: Stats.count(solves),
+                            best: Stats.best(solves),
+                            worst: Stats.worst(solves),
+                            stdDev: Stats.stdDev(solves),
+                            mo3: Stats.mo3(solves),
+                            ao5: Stats.ao5(solves),
+                            ao12: Stats.ao12(solves),
+                            ao50: Stats.ao50(solves),
+                            ao100: Stats.ao100(solves),
+                            bestMo3: Stats.bestMo3(solves),
+                            bestAo5: Stats.bestAo5(solves),
+                            bestAo12: Stats.bestAo12(solves),
+                            bestAo50: Stats.bestAo50(solves),
+                            bestAo100: Stats.bestAo100(solves)
                         })
-                    })
-                    database().ref(`/stats/${this.userId}/${puzzle}/${newSessionId}`).set({
-                        mean: Stats.mean(solves),
-                        count: Stats.count(solves),
-                        best: Stats.best(solves),
-                        worst: Stats.worst(solves),
-                        stdDev: Stats.stdDev(solves),
-                        mo3: Stats.mo3(solves),
-                        ao5: Stats.ao5(solves),
-                        ao12: Stats.ao12(solves),
-                        ao50: Stats.ao50(solves),
-                        ao100: Stats.ao100(solves),
-                        bestMo3: Stats.bestMo3(solves),
-                        bestAo5: Stats.bestAo5(solves),
-                        bestAo12: Stats.bestAo12(solves),
-                        bestAo50: Stats.bestAo50(solves),
-                        bestAo100: Stats.bestAo100(solves)
-                    })
                 })
             }
         })

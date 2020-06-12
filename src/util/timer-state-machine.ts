@@ -53,11 +53,11 @@ export default class TimerStateMachine {
                 {
                     name: 'goto',
                     from: '*',
-                    to: (state) => state
+                    to: state => state
                 },
                 {
                     name: 'reset',
-                    from: [ TimerState.INSPECTION, TimerState.STARTING, TimerState.READY, TimerState.RUNNING, TimerState.COMPLETE ],
+                    from: [TimerState.INSPECTION, TimerState.STARTING, TimerState.READY, TimerState.RUNNING, TimerState.COMPLETE],
                     to: TimerState.IDLE
                 }
             ],
@@ -76,7 +76,7 @@ export default class TimerStateMachine {
 
     get state(): TimerState {
         try {
-            return this.stateMachine.state as unknown as TimerState
+            return (this.stateMachine.state as unknown) as TimerState
         } catch (e) {
             return TimerState.IDLE
         }

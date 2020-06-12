@@ -1,4 +1,5 @@
-const webpack = require('webpack');
+/* eslint-disable */
+const webpack = require('webpack')
 
 module.exports = {
     configureWebpack: {
@@ -11,8 +12,6 @@ module.exports = {
         ]
     },
     devServer: {
-        allowedHosts: [
-            '.stiles.me'
-        ]
+        allowedHosts: ['.stiles.me']
     }
 }
