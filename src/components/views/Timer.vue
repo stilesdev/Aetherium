@@ -1,12 +1,12 @@
 <template>
     <div id="app">
         <div class="container-fluid">
-            <div id="timerTouchArea" @touchstart="timerState.triggerDown()" @touchend="timerState.triggerUp()">
+            <div id="timerTouchArea" @touchstart="onTouchStart" @touchend="onTouchEnd">
                 <!-- this needs to go to 100vh height when timing -->
                 <div class="row">
                     <transition name="fade">
                         <div id="scrambleArea" class="col-md-10 col-md-offset-1" v-if="!hideUI">
-                            <h3>{{ scramble.text }}</h3>
+                            <h3>{{ scramble }}</h3>
                         </div>
                     </transition>
                 </div>
@@ -71,7 +71,7 @@
         public stackmat: Stackmat = new Stackmat()
 
         get scramble(): string {
-            return this.$store.state.scramble
+            return this.$store.state.scramble?.text
         }
 
         get hideUI(): boolean {
@@ -271,6 +271,18 @@
             this.timerLabel = formatTimeDelta(delta)
             this.stackmatLastTime = 0
             this.$store.dispatch(Actions.STORE_SOLVE, delta)
+        }
+
+        public onTouchStart() {
+            if (this.timerState) {
+                this.timerState.triggerDown()
+            }
+        }
+
+        public onTouchEnd() {
+            if (this.timerState) {
+                this.timerState.triggerUp()
+            }
         }
 
         @Watch('hideUI')
