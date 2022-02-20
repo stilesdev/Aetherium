@@ -85,7 +85,7 @@
                     },
                     labels: {
                         formatter(): string {
-                            return formatTimeDelta(this.value)
+                            return formatTimeDelta(this.value as number)
                         }
                     },
                     min: 0
