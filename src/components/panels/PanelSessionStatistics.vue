@@ -74,7 +74,8 @@
     import { Component, Watch } from 'vue-property-decorator'
     import PanelRoot from './PanelRoot.vue'
     import { formatTimeDelta } from '@/util/format'
-    import { database } from 'firebase'
+    import firebase from 'firebase/app'
+    import 'firebase/database'
     import { Solve } from '@/classes/solve'
     import { Stats } from '@/util/stats'
     import { StatisticsPayload } from '@/types/firebase'
@@ -96,7 +97,7 @@
                 .orderByChild('timestamp')
                 .limitToLast(1000)
                 .once('value')
-                .then((snapshot: database.DataSnapshot) => {
+                .then((snapshot: firebase.database.DataSnapshot) => {
                     const solves: Solve[] = []
                     snapshot.forEach(childSnapshot => {
                         solves.push(Solve.fromSnapshot(childSnapshot))

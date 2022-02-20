@@ -1,9 +1,9 @@
 import { Schema, Validator } from 'jsonschema'
 import moment from 'moment'
-import { database } from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/database'
 import { Solve } from '@/classes/solve'
 import { Stats } from '@/util/stats'
-import Reference = firebase.database.Reference
 import { SolvePayload } from '@/types/firebase'
 
 export class SolveImporter {
@@ -88,7 +88,7 @@ export class SolveImporter {
                 .date(day)
                 .startOf('day')
 
-            const newSessionRef = database()
+            const newSessionRef = firebase.database()
                 .ref(`/users/${this.userId}/sessions`)
                 .push()
             if (newSessionRef.key) {
@@ -101,10 +101,10 @@ export class SolveImporter {
                 Object.keys(input[date]).forEach(puzzle => {
                     const solves: Solve[] = []
                     input[date][puzzle].forEach((solve: SolvePayload) => {
-                        database()
+                        firebase.database()
                             .ref(`/solves/${this.userId}/${puzzle}`)
                             .push()
-                            .then((ref: Reference) => {
+                            .then((ref: firebase.database.Reference) => {
                                 ref.set({
                                     sessionId: newSessionId,
                                     time: solve.time,
@@ -115,7 +115,7 @@ export class SolveImporter {
                                 solves.push(new Solve(ref.key as string, newSessionId, solve.time, solve.timestamp, solve.scramble, solve.penalty))
                             })
                     })
-                    database()
+                    firebase.database()
                         .ref(`/stats/${this.userId}/${puzzle}/${newSessionId}`)
                         .set({
                             mean: Stats.mean(solves),

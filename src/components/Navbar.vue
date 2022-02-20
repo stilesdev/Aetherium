@@ -247,7 +247,8 @@
     import { ThemeData } from '@/types'
     import { Actions } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
-    import { auth } from 'firebase'
+    import firebase from 'firebase/app'
+    import 'firebase/auth'
     import { FirebaseList, ProfileOptions, Puzzle, TimerTrigger } from '@/types/firebase'
 
     @Component
@@ -359,7 +360,7 @@
         }
 
         public logout(): void {
-            auth()
+            firebase.auth()
                 .signOut()
                 .then(() => this.$router.push('/login'))
                 .catch((error: Error) => alert(error.message))

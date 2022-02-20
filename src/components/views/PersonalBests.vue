@@ -40,7 +40,8 @@
 </template>
 
 <script lang="ts">
-    import { database } from 'firebase'
+    import firebase from 'firebase/app'
+    import 'firebase/database'
     import Vue from 'vue'
     import { Component } from 'vue-property-decorator'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
@@ -64,8 +65,8 @@
             return this.$store.state.allSessions
         }
 
-        get puzzleStatsRef(): (puzzle: string) => database.Reference {
-            return puzzle => database().ref(`/stats/${this.userId}/${puzzle}`)
+        get puzzleStatsRef(): (puzzle: string) => firebase.database.Reference {
+            return puzzle => firebase.database().ref(`/stats/${this.userId}/${puzzle}`)
         }
 
         public findBestStatistics(allSessions: Statistics[]): {} {
