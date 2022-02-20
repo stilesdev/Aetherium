@@ -7,14 +7,14 @@
                         <label for="emailInput">Email Address</label>
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                            <input type="email" class="form-control" id="emailInput" placeholder="Email Address" v-model="email" />
+                            <input type="email" class="form-control" id="emailInput" placeholder="Email Address" autocomplete="email" v-model="email" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="passwordInput">Password</label>
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                            <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password" />
+                            <input type="password" class="form-control" id="passwordInput" placeholder="Password" autocomplete="current-password" v-model="password" />
                         </div>
                     </div>
                     <div v-if="loginError" class="alert alert-danger alert-dismissible" role="alert">
