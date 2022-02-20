@@ -15,22 +15,22 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="header-navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <router-link to="/timer" v-slot="{ href, navigate, isActive }">
+                        <router-link to="/timer" v-slot="{ href, navigate, isActive }" custom>
                             <li :class="{ active: isActive }">
                                 <a :href="href" @click="navigate">Timer</a>
                             </li>
                         </router-link>
-                        <router-link to="/statistics" v-slot="{ href, navigate, isActive }">
+                        <router-link to="/statistics" v-slot="{ href, navigate, isActive }" custom>
                             <li :class="{ active: isActive }">
                                 <a :href="href" @click="navigate">Session Stats</a>
                             </li>
                         </router-link>
-                        <router-link to="/history" v-slot="{ href, navigate, isActive }">
+                        <router-link to="/history" v-slot="{ href, navigate, isActive }" custom>
                             <li :class="{ active: isActive }">
                                 <a :href="href" @click="navigate">History</a>
                             </li>
                         </router-link>
-                        <router-link to="/personal-bests" v-slot="{ href, navigate, isActive }">
+                        <router-link to="/personal-bests" v-slot="{ href, navigate, isActive }" custom>
                             <li :class="{ active: isActive }">
                                 <a :href="href" @click="navigate">Personal Bests</a>
                             </li>
