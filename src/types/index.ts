@@ -1,6 +1,5 @@
 import { SolvePayload, StatisticsPayload } from '@/types/firebase'
 
-// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface ISolve extends SolvePayload {
     uid: string
 
@@ -10,7 +9,6 @@ export interface ISolve extends SolvePayload {
     readonly formattedTimestamp: string
 }
 
-// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface ISession {
     solves: ISolve[]
     stats: Statistics

@@ -7,9 +7,10 @@ module.exports = {
             new webpack.ProvidePlugin({
                 jQuery: 'jquery',
                 $: 'jquery',
-                jquery: 'jquery'
-            })
-        ]
+                jquery: 'jquery',
+                url: require.resolve('url'),
+            }),
+        ],
     },
     devServer: {
         allowedHosts: ['.stiles.me']

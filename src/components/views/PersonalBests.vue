@@ -50,7 +50,7 @@
 
     @Component
     export default class PersonalBests extends Vue {
-        public personalBests: {} = {}
+        public personalBests: Record<string, unknown> = {}
 
         get userId(): string {
             return this.$store.state.userId
@@ -69,7 +69,7 @@
             return puzzle => firebase.database().ref(`/stats/${this.userId}/${puzzle}`)
         }
 
-        public findBestStatistics(allSessions: Statistics[]): {} {
+        public findBestStatistics(allSessions: Statistics[]): Record<string, unknown> {
             return {
                 best: this.findBestStatistic(allSessions, 'best'),
                 bestMo3: this.findBestStatistic(allSessions, 'bestMo3'),

@@ -1,3 +1,5 @@
-import ScramblerWorker from 'worker-loader!./scrambler-worker.js'
-
-export { ScramblerWorker }
+export class ScramblerWorker extends Worker {
+    constructor() {
+        super('/scrambler-worker.js')
+    }
+}
