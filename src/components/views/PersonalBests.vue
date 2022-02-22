@@ -40,8 +40,8 @@
 </template>
 
 <script lang="ts">
-    import firebase from 'firebase/app'
-    import 'firebase/database'
+    import firebase from 'firebase/compat/app'
+    import 'firebase/compat/database'
     import Vue from 'vue'
     import { Component } from 'vue-property-decorator'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'

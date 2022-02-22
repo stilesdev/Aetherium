@@ -2,8 +2,7 @@ import moment from 'moment'
 import { Store } from 'vuex'
 import { Mutations, References, RootState } from '@/types/store'
 import { Solve } from '@/classes/solve'
-import DataSnapshot = firebase.database.DataSnapshot
-import Reference = firebase.database.Reference
+import { DataSnapshot, Reference } from '@firebase/database-types'
 
 class FirebaseManager {
     private previousRefs: { [key in References]?: Reference } = {}

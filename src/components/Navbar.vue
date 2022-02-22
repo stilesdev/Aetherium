@@ -247,8 +247,8 @@
     import { ThemeData } from '@/types'
     import { Actions } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
-    import firebase from 'firebase/app'
-    import 'firebase/auth'
+    import firebase from 'firebase/compat/app'
+    import 'firebase/compat/auth'
     import { FirebaseList, ProfileOptions, Puzzle, TimerTrigger } from '@/types/firebase'
 
     @Component
