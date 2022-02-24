@@ -33,8 +33,7 @@
 <script lang="ts">
     import Vue from 'vue'
     import { Component, Watch } from 'vue-property-decorator'
-    import firebase from 'firebase/compat/app'
-    import 'firebase/compat/auth'
+    import { AuthError, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
     @Component
     export default class Login extends Vue {
@@ -54,9 +53,8 @@
         }
 
         public submit(): void {
-            firebase.auth()
-                .signInWithEmailAndPassword(this.email, this.password)
-                .catch((error: firebase.auth.Error) => {
+            signInWithEmailAndPassword(getAuth(), this.email, this.password)
+                .catch((error: AuthError) => {
                     switch (error.code) {
                         case 'auth/too-many-requests':
                             this.loginError = 'Too many login attempts. Wait a while and try again.'

@@ -1,10 +1,9 @@
 import { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
 import { ISolve } from '@/types/index'
-import WebWorker from 'worker-loader!*'
 
 export interface RootState {
     hideUI: boolean
-    scramblerWorker: WebWorker
+    scramblerWorker: Worker
     scramble: ScramblePayload
     puzzles?: FirebaseList<Puzzle>
     userId?: string

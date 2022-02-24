@@ -40,8 +40,7 @@
 </template>
 
 <script lang="ts">
-    import firebase from 'firebase/compat/app'
-    import 'firebase/compat/database'
+    import { DatabaseReference, get, getDatabase, ref } from 'firebase/database'
     import Vue from 'vue'
     import { Component } from 'vue-property-decorator'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
@@ -50,7 +49,7 @@
 
     @Component
     export default class PersonalBests extends Vue {
-        public personalBests: Record<string, unknown> = {}
+        public personalBests: Record<string, unknown> = {} // TODO: define a type for this
 
         get userId(): string {
             return this.$store.state.userId
@@ -65,8 +64,8 @@
             return this.$store.state.allSessions
         }
 
-        get puzzleStatsRef(): (puzzle: string) => firebase.database.Reference {
-            return puzzle => firebase.database().ref(`/stats/${this.userId}/${puzzle}`)
+        get puzzleStatsRef(): (puzzle: string) => DatabaseReference {
+            return puzzle => ref(getDatabase(), `/stats/${this.userId}/${puzzle}`)
         }
 
         public findBestStatistics(allSessions: Statistics[]): Record<string, unknown> {
@@ -96,8 +95,7 @@
 
         public mounted(): void {
             this.puzzles.forEach(puzzle => {
-                this.puzzleStatsRef(puzzle.key)
-                    .once('value')
+                get(this.puzzleStatsRef(puzzle.key))
                     .then(snapshot => {
                         const allStats: FirebaseList<Statistics> = snapshot.val()
                         const sessions: Statistics[] = []

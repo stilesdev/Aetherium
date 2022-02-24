@@ -2,16 +2,16 @@ import moment from 'moment'
 import { Store } from 'vuex'
 import { Mutations, References, RootState } from '@/types/store'
 import { Solve } from '@/classes/solve'
-import { DataSnapshot, Reference } from '@firebase/database-types'
+import { DatabaseReference, equalTo, off, onChildAdded, onChildChanged, onChildRemoved, onValue, orderByChild, query } from 'firebase/database'
 
 class FirebaseManager {
-    private previousRefs: { [key in References]?: Reference } = {}
+    private previousRefs: { [key in References]?: DatabaseReference } = {}
 
     public connectRef(ref: References, store: Store<RootState>): void {
         switch (ref) {
             case References.OPTIONS:
                 this.previousRefs[ref] = store.getters.optionsRef
-                store.getters.optionsRef.on('value', (snapshot: DataSnapshot) => {
+                onValue(store.getters.optionsRef, (snapshot) => {
                     store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer)
                     store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger)
                     store.commit(Mutations.SET_OPTION_THEME_URL, snapshot.val().themeUrl)
@@ -21,7 +21,7 @@ class FirebaseManager {
                 break
             case References.CURRENT_SESSION_ID:
                 this.previousRefs[ref] = store.getters.currentSessionIdRef
-                store.getters.currentSessionIdRef.on('value', (snapshot: DataSnapshot) => {
+                onValue(store.getters.currentSessionIdRef, (snapshot) => {
                     store.commit(Mutations.RECEIVE_SESSION_ID, snapshot.val())
 
                     this.disconnectRef(References.SOLVES)
@@ -38,13 +38,13 @@ class FirebaseManager {
                 break
             case References.CURRENT_PUZZLE:
                 this.previousRefs[ref] = store.getters.currentPuzzleRef
-                store.getters.currentPuzzleRef.on('value', (snapshot: DataSnapshot) => {
+                onValue(store.getters.currentPuzzleRef, (snapshot) => {
                     store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, snapshot.val())
                 })
                 break
             case References.SESSION:
                 this.previousRefs[ref] = store.getters.currentSessionRef
-                store.getters.currentSessionRef.on('value', (snapshot: DataSnapshot) => {
+                onValue(store.getters.currentSessionRef, (snapshot) => {
                     if (snapshot.exists()) {
                         store.commit(Mutations.RECEIVE_SESSION_DATE, {
                             moment: moment(snapshot.val().timestamp).utc()
@@ -54,43 +54,49 @@ class FirebaseManager {
                 break
             case References.SOLVES:
                 this.previousRefs[ref] = store.getters.solvesRef
-                store.getters.solvesRef
-                    .orderByChild('sessionId')
-                    .equalTo(store.state.sessionId as string)
-                    .on('child_added', (snapshot: DataSnapshot) => {
+                onChildAdded(
+                    query(
+                        store.getters.solvesRef,
+                        orderByChild('sessionId'),
+                        equalTo(store.state.sessionId as string),
+                    ), (snapshot) => {
                         store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot))
                     })
-                store.getters.solvesRef
-                    .orderByChild('sessionId')
-                    .equalTo(store.state.sessionId as string)
-                    .on('child_changed', (snapshot: DataSnapshot) => {
+                onChildChanged(
+                    query(
+                        store.getters.solvesRef,
+                        orderByChild('sessionId'),
+                        equalTo(store.state.sessionId as string),
+                    ), (snapshot) => {
                         store.commit(Mutations.UPDATE_SOLVE, {
                             uid: snapshot.key,
                             solve: Solve.fromSnapshot(snapshot)
                         })
                     })
-                store.getters.solvesRef
-                    .orderByChild('sessionId')
-                    .equalTo(store.state.sessionId as string)
-                    .on('child_removed', (snapshot: DataSnapshot) => {
+                onChildRemoved(
+                    query(
+                        store.getters.solvesRef,
+                        orderByChild('sessionId'),
+                        equalTo(store.state.sessionId as string),
+                    ), (snapshot) => {
                         store.commit(Mutations.DELETE_SOLVE, snapshot.key)
                     })
                 break
             case References.SESSION_STATS:
                 this.previousRefs[ref] = store.getters.sessionStatsRef
-                store.getters.sessionStatsRef.on('value', (snapshot: DataSnapshot) => {
+                onValue(store.getters.sessionStatsRef, (snapshot) => {
                     store.commit(Mutations.RECEIVE_SESSION_STATS, snapshot.val())
                 })
                 break
             case References.ALL_SESSIONS:
                 this.previousRefs[ref] = store.getters.sessionsRef
-                store.getters.sessionsRef.on('value', (snapshot: DataSnapshot) => {
+                onValue(store.getters.sessionsRef, (snapshot) => {
                     store.commit(Mutations.RECEIVE_ALL_SESSIONS, snapshot.val())
                 })
                 break
             case References.ALL_STATS:
                 this.previousRefs[ref] = store.getters.statsRef
-                store.getters.statsRef.on('value', (snapshot: DataSnapshot) => {
+                onValue(store.getters.statsRef, (snapshot) => {
                     store.commit(Mutations.RECEIVE_ALL_STATS, snapshot.val())
                 })
                 break
@@ -98,14 +104,19 @@ class FirebaseManager {
     }
 
     public disconnectRef(ref: References) {
-        if (this.previousRefs[ref]) {
-            this.previousRefs[ref]?.off()
+        const previousRef = this.previousRefs[ref]
+        if (typeof previousRef !== 'undefined') {
+            off(previousRef)
             delete this.previousRefs[ref]
         }
     }
 
     public disconnectAllRefs() {
-        Object.values(this.previousRefs).forEach(ref => ref?.off())
+        Object.values(this.previousRefs).forEach(previousRef => {
+            if (typeof previousRef !== 'undefined') {
+                off(previousRef)
+            }
+        })
         this.previousRefs = {}
     }
 }

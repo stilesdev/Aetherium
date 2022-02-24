@@ -74,8 +74,7 @@
     import { Component, Watch } from 'vue-property-decorator'
     import PanelRoot from './PanelRoot.vue'
     import { formatTimeDelta } from '@/util/format'
-    import firebase from 'firebase/compat/app'
-    import 'firebase/compat/database'
+    import { get, limitToLast, orderByChild, query } from 'firebase/database'
     import { Solve } from '@/classes/solve'
     import { Stats } from '@/util/stats'
     import { StatisticsPayload } from '@/types/firebase'
@@ -93,18 +92,17 @@
         public formatSolve = formatTimeDelta
 
         public calculateAo1000(): void {
-            this.$store.getters.solvesRef
-                .orderByChild('timestamp')
-                .limitToLast(1000)
-                .once('value')
-                .then((snapshot: firebase.database.DataSnapshot) => {
-                    const solves: Solve[] = []
-                    snapshot.forEach(childSnapshot => {
-                        solves.push(Solve.fromSnapshot(childSnapshot))
-                    })
-
-                    this.ao1000 = Stats.average(solves)
+            get(query(this.$store.getters.solvesRef,
+                orderByChild('timestamp'),
+                limitToLast(1000)
+            )).then((solveSnapshot) => {
+                const solves: Solve[] = []
+                solveSnapshot.forEach(childSnapshot => {
+                    solves.push(Solve.fromSnapshot(childSnapshot))
                 })
+
+                this.ao1000 = Stats.average(solves)
+            })
         }
 
         @Watch('stats')

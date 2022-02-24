@@ -33,7 +33,6 @@
     "vuex": "^3.4.0"
   },
   "devDependencies": {
-    "@firebase/database-types": "^0.9.4",
     "@types/bootstrap": "^3.4.0",
     "@types/jquery": "^3.3.38",
     "@typescript-eslint/eslint-plugin": "^5.12.0",

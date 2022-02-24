@@ -1,6 +1,6 @@
-import firebase from 'firebase/compat/app'
-import 'firebase/compat/auth'
-import 'firebase/compat/database'
+import { initializeApp } from 'firebase/app'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { child, DatabaseReference, get, getDatabase, onValue, push, ref, remove, serverTimestamp, set, update } from 'firebase/database'
 import moment, { Moment } from 'moment'
 import Vue from 'vue'
 import Vuex, { ActionContext, MutationPayload } from 'vuex'
@@ -12,12 +12,9 @@ import { ScramblerWorker } from '@/workers'
 import firebaseConfig from '../firebase.config'
 import { FirebaseList, ProfileOptions, Puzzle, SessionPayload, SolvePenalty, StatisticsPayload, TimerTrigger } from '@/types/firebase'
 
-try {
-    firebase.initializeApp(firebaseConfig.development)
-} catch (e) {
-    // tslint:disable-next-line: no-console
-    console.error(e)
-}
+const firebaseApp = initializeApp(firebaseConfig.development)
+const db = getDatabase(firebaseApp)
+
 Vue.use(Vuex)
 
 export default new Vuex.Store<RootState>({
@@ -50,32 +47,32 @@ export default new Vuex.Store<RootState>({
         isLoggedIn(state: RootState): boolean {
             return state.userId !== undefined
         },
-        puzzlesRef(): firebase.database.Reference {
-            return firebase.database().ref('/puzzles')
+        puzzlesRef(): DatabaseReference {
+            return ref(db, '/puzzles')
         },
-        optionsRef(state: RootState): firebase.database.Reference {
-            return firebase.database().ref(`/users/${state.userId}/options`)
+        optionsRef(state: RootState): DatabaseReference {
+            return ref(db, `/users/${state.userId}/options`)
         },
-        currentSessionIdRef(state: RootState): firebase.database.Reference {
-            return firebase.database().ref(`/users/${state.userId}/currentSessionId`)
+        currentSessionIdRef(state: RootState): DatabaseReference {
+            return ref(db, `/users/${state.userId}/currentSessionId`)
         },
-        currentPuzzleRef(state: RootState): firebase.database.Reference {
-            return firebase.database().ref(`/users/${state.userId}/currentPuzzle`)
+        currentPuzzleRef(state: RootState): DatabaseReference {
+            return ref(db, `/users/${state.userId}/currentPuzzle`)
         },
-        sessionsRef(state: RootState): firebase.database.Reference {
-            return firebase.database().ref(`/users/${state.userId}/sessions`)
+        sessionsRef(state: RootState): DatabaseReference {
+            return ref(db, `/users/${state.userId}/sessions`)
         },
-        currentSessionRef(state: RootState): firebase.database.Reference {
-            return firebase.database().ref(`/users/${state.userId}/sessions/${state.sessionId}`)
+        currentSessionRef(state: RootState): DatabaseReference {
+            return ref(db, `/users/${state.userId}/sessions/${state.sessionId}`)
         },
-        solvesRef(state: RootState): firebase.database.Reference {
-            return firebase.database().ref(`/solves/${state.userId}/${state.activePuzzle}`)
+        solvesRef(state: RootState): DatabaseReference {
+            return ref(db, `/solves/${state.userId}/${state.activePuzzle}`)
         },
-        statsRef(state: RootState): firebase.database.Reference {
-            return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}`)
+        statsRef(state: RootState): DatabaseReference {
+            return ref(db, `/stats/${state.userId}/${state.activePuzzle}`)
         },
-        sessionStatsRef(state: RootState): firebase.database.Reference {
-            return firebase.database().ref(`/stats/${state.userId}/${state.activePuzzle}/${state.sessionId}`)
+        sessionStatsRef(state: RootState): DatabaseReference {
+            return ref(db, `/stats/${state.userId}/${state.activePuzzle}/${state.sessionId}`)
         }
     },
     mutations: {
@@ -146,13 +143,13 @@ export default new Vuex.Store<RootState>({
     },
     actions: {
         [Actions.SET_OPTIONS](context: ActionContext<RootState, RootState>, payload: ProfileOptions): void {
-            context.getters.optionsRef.set(payload)
+            set(context.getters.optionsRef, payload)
         },
         [Actions.SET_ACTIVE_PUZZLE](context: ActionContext<RootState, RootState>, payload: { puzzle: string }): void {
-            context.getters.currentPuzzleRef.set(payload.puzzle)
+            set(context.getters.currentPuzzleRef, payload.puzzle)
         },
         [Actions.UPDATE_SESSION_DATE](context: ActionContext<RootState, RootState>, payload: { moment: Moment }): void {
-            context.getters.currentSessionRef.update({
+            update(context.getters.currentSessionRef, {
                 date: payload.moment.format('M/D/YYYY'),
                 timestamp: payload.moment.valueOf()
             })
@@ -176,10 +173,11 @@ export default new Vuex.Store<RootState>({
                         .utc()
                         .dayOfYear(moment().dayOfYear())
                         .startOf('day')
-                    const newSessionRef = context.getters.sessionsRef.push()
+                    
+                    const newSessionRef = push(context.getters.sessionsRef)
 
-                    context.getters.currentSessionIdRef.set(newSessionRef.key).then(() => {
-                        newSessionRef.set({
+                    set(context.getters.currentSessionIdRef, newSessionRef.key).then(() => {
+                        set(context.getters.currentSessionRef, {
                             date: date.format('M/D/YYYY'),
                             timestamp: date.valueOf()
                         })
@@ -192,43 +190,37 @@ export default new Vuex.Store<RootState>({
             })
         },
         [Actions.CLOSE_SESSION](context: ActionContext<RootState, RootState>): void {
-            context.getters.currentSessionIdRef.set(undefined)
+            set(context.getters.currentSessionIdRef, undefined)
         },
         [Actions.STORE_SOLVE](context: ActionContext<RootState, RootState>, delta: number): void {
             context.dispatch(Actions.CHECK_SESSION).then(() => {
-                context.getters.solvesRef
-                    .push()
-                    .set({
-                        sessionId: context.state.sessionId,
-                        time: delta,
-                        timestamp: firebase.database.ServerValue.TIMESTAMP,
-                        scramble: context.state.scramble.text,
-                        penalty: ''
-                    })
-                    .then(() => context.dispatch(Actions.UPDATE_STATS))
+                push(context.getters.solvesRef, {
+                    sessionId: context.state.sessionId,
+                    time: delta,
+                    timestamp: serverTimestamp(),
+                    scramble: context.state.scramble.text,
+                    penalty: ''
+                })
+                .then(() => context.dispatch(Actions.UPDATE_STATS))
 
                 context.dispatch(Actions.REQUEST_SCRAMBLE)
             })
         },
-        [Actions.SET_PENALTY](context: ActionContext<RootState, RootState>, update: { solve: ISolve; penalty: SolvePenalty }): void {
-            const newPenalty = update.solve.penalty === update.penalty ? '' : update.penalty
-            context.getters.solvesRef
-                .child(update.solve.uid)
-                .update({ penalty: newPenalty })
+        [Actions.SET_PENALTY](context: ActionContext<RootState, RootState>, payload: { solve: ISolve; penalty: SolvePenalty }): void {
+            const newPenalty = payload.solve.penalty === payload.penalty ? '' : payload.penalty
+            update(child(context.getters.solvesRef, payload.solve.uid), { penalty: newPenalty })
                 .then(() => context.dispatch(Actions.UPDATE_STATS))
         },
         [Actions.DELETE_SOLVE](context: ActionContext<RootState, RootState>, solveId: string): void {
-            context.getters.solvesRef
-                .child(solveId)
-                .remove()
+            remove(child(context.getters.solvesRef, solveId))
                 .then(() => context.dispatch(Actions.UPDATE_STATS))
         },
         [Actions.UPDATE_STATS](context: ActionContext<RootState, RootState>): void {
             if (context.state.solves.length === 0) {
-                context.getters.sessionStatsRef.remove()
+                remove(context.getters.sessionStatsRef)
                 context.commit(Mutations.RECEIVE_SESSION_STATS, undefined)
             } else {
-                context.getters.sessionStatsRef.update({
+                update(context.getters.sessionStatsRef, {
                     mean: Stats.mean(context.state.solves),
                     count: Stats.count(context.state.solves),
                     best: Stats.best(context.state.solves),
@@ -249,13 +241,13 @@ export default new Vuex.Store<RootState>({
         }
     },
     plugins: [
-        store =>
-            firebase.auth().onAuthStateChanged(user => {
+        store => {
+            onAuthStateChanged(getAuth(), user => {
                 if (user) {
-                    const userRef = firebase.database().ref(`/users/${user.uid}`)
-                    userRef.once('value').then(snapshot => {
+                    const userRef = ref(db, `users/${user.uid}`)
+                    get(userRef).then(snapshot => {
                         if (!snapshot.exists()) {
-                            userRef.set({
+                            set(userRef, {
                                 currentPuzzle: '333',
                                 email: user.email,
                                 options: {
@@ -272,7 +264,8 @@ export default new Vuex.Store<RootState>({
                 } else {
                     store.commit(Mutations.RECEIVE_USER_ID, undefined)
                 }
-            }),
+            })
+        },
         store =>
             store.state.scramblerWorker.addEventListener('message', (event: MessageEvent) => {
                 if (event.data === undefined) {
@@ -288,7 +281,7 @@ export default new Vuex.Store<RootState>({
                 }
             }),
         store =>
-            store.getters.puzzlesRef.on('value', (snapshot: firebase.database.DataSnapshot) => {
+            onValue(store.getters.puzzlesRef, snapshot => {
                 store.commit(Mutations.RECEIVE_PUZZLES, snapshot.val())
             }),
         store =>

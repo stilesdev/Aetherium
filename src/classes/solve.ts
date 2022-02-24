@@ -1,4 +1,4 @@
-import { DataSnapshot } from '@firebase/database-types'
+import { DataSnapshot } from 'firebase/database'
 import { ISolve } from '@/types'
 import { formatTimeDelta, formatTimeDeltaShort, formatTimestamp } from '@/util/format'
 import { SolvePenalty } from '@/types/firebase'
