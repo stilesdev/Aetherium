@@ -65,7 +65,7 @@
         }
 
         get puzzleStatsRef(): (puzzle: string) => DatabaseReference {
-            return puzzle => ref(getDatabase(), `/stats/${this.userId}/${puzzle}`)
+            return (puzzle) => ref(getDatabase(), `/stats/${this.userId}/${puzzle}`)
         }
 
         public findBestStatistics(allSessions: Statistics[]): Record<string, unknown> {
@@ -75,18 +75,18 @@
                 bestAo5: this.findBestStatistic(allSessions, 'bestAo5'),
                 bestAo12: this.findBestStatistic(allSessions, 'bestAo12'),
                 bestAo50: this.findBestStatistic(allSessions, 'bestAo50'),
-                bestAo100: this.findBestStatistic(allSessions, 'bestAo100')
+                bestAo100: this.findBestStatistic(allSessions, 'bestAo100'),
             }
         }
 
         public findBestStatistic(sessions: Statistics[], statistic: keyof StatisticsPayload): { time: string; date?: string } {
-            const filteredSessions = sessions.filter(session => session[statistic] > 0)
+            const filteredSessions = sessions.filter((session) => session[statistic] > 0)
 
             if (filteredSessions.length > 0) {
                 const session = filteredSessions.reduce((previous, current) => (previous[statistic] < current[statistic] ? previous : current))
                 return {
                     time: formatTimeDeltaShort(session[statistic]),
-                    date: session.date
+                    date: session.date,
                 }
             } else {
                 return { time: formatTimeDelta(0), date: undefined }
@@ -94,22 +94,21 @@
         }
 
         public mounted(): void {
-            this.puzzles.forEach(puzzle => {
-                get(this.puzzleStatsRef(puzzle.key))
-                    .then(snapshot => {
-                        const allStats: FirebaseList<Statistics> = snapshot.val()
-                        const sessions: Statistics[] = []
-                        if (allStats && this.allSessions) {
-                            Object.entries(allStats).forEach(entry => {
-                                const sessionId = entry[0]
-                                const stat = entry[1]
-                                stat.date = this.allSessions[sessionId].date
-                                sessions.push(stat)
-                            })
-                        }
+            this.puzzles.forEach((puzzle) => {
+                get(this.puzzleStatsRef(puzzle.key)).then((snapshot) => {
+                    const allStats: FirebaseList<Statistics> = snapshot.val()
+                    const sessions: Statistics[] = []
+                    if (allStats && this.allSessions) {
+                        Object.entries(allStats).forEach((entry) => {
+                            const sessionId = entry[0]
+                            const stat = entry[1]
+                            stat.date = this.allSessions[sessionId].date
+                            sessions.push(stat)
+                        })
+                    }
 
-                        Vue.set(this.personalBests, puzzle.key, this.findBestStatistics(sessions))
-                    })
+                    Vue.set(this.personalBests, puzzle.key, this.findBestStatistics(sessions))
+                })
             })
         }
     }

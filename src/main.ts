@@ -20,5 +20,5 @@ declare global {
 window.vApp = new Vue({
     store,
     router,
-    render: (h: CreateElement) => h(Aetherium)
+    render: (h: CreateElement) => h(Aetherium),
 }).$mount('#app')

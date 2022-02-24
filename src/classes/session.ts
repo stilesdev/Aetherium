@@ -19,7 +19,7 @@ export class Session implements ISession {
         bestAo5: 0,
         bestAo12: 0,
         bestAo50: 0,
-        bestAo100: 0
+        bestAo100: 0,
     }
 
     public addSolve(solve: ISolve): void {
@@ -29,7 +29,7 @@ export class Session implements ISession {
     }
 
     public updateSolve(solveUid: string, payload: SolvePayload): void {
-        this.solves.forEach(solve => {
+        this.solves.forEach((solve) => {
             if (solve.uid === solveUid) {
                 solve.time = payload.time
                 solve.timestamp = payload.timestamp
@@ -43,7 +43,7 @@ export class Session implements ISession {
 
     public deleteSolve(solveUid: string): void {
         this.solves.splice(
-            this.solves.findIndex(solve => solve.uid === solveUid),
+            this.solves.findIndex((solve) => solve.uid === solveUid),
             1
         )
         this.updateStats()

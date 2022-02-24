@@ -23,43 +23,43 @@ export default class TimerStateMachine {
                 {
                     name: 'triggerDown',
                     from: '*',
-                    to: () => this.onTriggerDown()
+                    to: () => this.onTriggerDown(),
                 },
                 {
                     name: 'triggerUp',
                     from: '*',
-                    to: () => this.onTriggerUp()
+                    to: () => this.onTriggerUp(),
                 },
                 {
                     name: 'stackmatTrigger',
                     from: '*',
-                    to: (newState: TimerState) => this.onStackmatTrigger(newState)
+                    to: (newState: TimerState) => this.onStackmatTrigger(newState),
                 },
                 {
                     name: 'inspectionExceeded',
                     from: TimerState.INSPECTION,
-                    to: TimerState.IDLE
+                    to: TimerState.IDLE,
                 },
                 {
                     name: 'timerReady',
                     from: TimerState.STARTING,
-                    to: TimerState.READY
+                    to: TimerState.READY,
                 },
                 {
                     name: 'timerReset',
                     from: TimerState.COMPLETE,
-                    to: TimerState.IDLE
+                    to: TimerState.IDLE,
                 },
                 {
                     name: 'goto',
                     from: '*',
-                    to: state => state
+                    to: (state) => state,
                 },
                 {
                     name: 'reset',
                     from: [TimerState.INSPECTION, TimerState.STARTING, TimerState.READY, TimerState.RUNNING, TimerState.COMPLETE],
-                    to: TimerState.IDLE
-                }
+                    to: TimerState.IDLE,
+                },
             ],
             methods: {
                 onBeforeTransition(lifecycle: LifeCycle): boolean {
@@ -69,14 +69,14 @@ export default class TimerStateMachine {
                     // tslint:disable-next-line: no-console
                     console.log(`TRANSITION: ${lifecycle.transition}, FROM: ${lifecycle.from}, TO: ${lifecycle.to}`)
                     return true
-                }
-            }
+                },
+            },
         })
     }
 
     get state(): TimerState {
         try {
-            return (this.stateMachine.state as unknown) as TimerState
+            return this.stateMachine.state as unknown as TimerState
         } catch (e) {
             return TimerState.IDLE
         }

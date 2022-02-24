@@ -23,7 +23,7 @@
 
         get bestSolves(): ChartSeries {
             const bestSolves: ChartSeries = []
-            this.allSolves.forEach(solve => {
+            this.allSolves.forEach((solve) => {
                 if (bestSolves.length === 0 || solve[1] < bestSolves[bestSolves.length - 1][1]) {
                     bestSolves.push(solve)
                 }
@@ -46,35 +46,35 @@
             this.sessionChart = new Chart('sessionChart', {
                 chart: {
                     zoomType: 'x',
-                    type: 'line'
+                    type: 'line',
                 },
                 title: {
-                    text: 'Session Solves'
+                    text: 'Session Solves',
                 },
                 xAxis: {
                     type: 'datetime',
                     labels: {
                         formatter() {
                             return moment(this.value).format('h:mm A')
-                        }
-                    }
+                        },
+                    },
                 },
                 yAxis: {
                     title: {
-                        text: 'Solve Time'
+                        text: 'Solve Time',
                     },
                     labels: {
                         formatter() {
                             return formatTimeDelta(this.value as number)
-                        }
+                        },
                     },
-                    min: 0
+                    min: 0,
                 },
                 lang: {
-                    noData: 'No solves yet!'
+                    noData: 'No solves yet!',
                 },
                 legend: {
-                    enabled: true
+                    enabled: true,
                 },
                 plotOptions: {
                     line: {
@@ -82,32 +82,32 @@
                             enabled: true,
                             formatter() {
                                 return formatTimeDeltaShort(this.y as number)
-                            }
+                            },
                         },
                         marker: {
-                            enabled: true
-                        }
-                    }
+                            enabled: true,
+                        },
+                    },
                 },
                 series: [
                     {
                         name: 'Solve Time',
                         data: this.allSolves,
-                        type: 'line'
+                        type: 'line',
                     },
                     {
                         name: 'Best Time',
                         data: this.bestSolves,
                         dashStyle: 'Dash',
                         color: '#FFD280',
-                        type: 'line'
-                    }
+                        type: 'line',
+                    },
                 ],
                 tooltip: {
                     formatter() {
                         return `<b>${formatTimestamp(this.x)}</b><br/>${formatTimeDelta(this.y)}`
-                    }
-                }
+                    },
+                },
             })
         }
     }

@@ -8,22 +8,7 @@ export function formatTimeDelta(delta: number): string {
 
     const d = new Date(delta)
 
-    return (
-        d
-            .getMinutes()
-            .toString()
-            .padStart(2, '0') +
-        ':' +
-        d
-            .getSeconds()
-            .toString()
-            .padStart(2, '0') +
-        '.' +
-        d
-            .getMilliseconds()
-            .toString()
-            .padStart(3, '0')
-    )
+    return d.getMinutes().toString().padStart(2, '0') + ':' + d.getSeconds().toString().padStart(2, '0') + '.' + d.getMilliseconds().toString().padStart(3, '0')
 }
 
 export function formatTimeDeltaShort(delta: number): string {

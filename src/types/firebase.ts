@@ -20,7 +20,7 @@ export interface SolvePayload {
 export enum SolvePenalty {
     NONE = '',
     PLUSTWO = '+2',
-    DNF = 'dnf'
+    DNF = 'dnf',
 }
 
 export interface StatisticsPayload {
@@ -59,7 +59,7 @@ export interface ProfileOptions {
 
 export enum TimerTrigger {
     SPACEBAR = 'spacebar',
-    STACKMAT = 'stackmat'
+    STACKMAT = 'stackmat',
 }
 
 export interface SessionPayload {

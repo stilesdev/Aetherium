@@ -24,7 +24,7 @@ export default new Vuex.Store<RootState>({
         scramblerWorker: new ScramblerWorker(),
         scramble: {
             text: 'Generating scramble...',
-            svg: undefined
+            svg: undefined,
         },
         puzzles: undefined,
         userId: undefined,
@@ -33,7 +33,7 @@ export default new Vuex.Store<RootState>({
             timerTrigger: TimerTrigger.SPACEBAR,
             themeUrl: '/themes/default.min.css',
             holdToStart: true,
-            useInspection: true
+            useInspection: true,
         },
         sessionId: undefined,
         sessionDate: undefined,
@@ -41,7 +41,7 @@ export default new Vuex.Store<RootState>({
         solves: [],
         sessionStats: undefined,
         allSessions: undefined,
-        allStats: undefined
+        allStats: undefined,
     },
     getters: {
         isLoggedIn(state: RootState): boolean {
@@ -73,7 +73,7 @@ export default new Vuex.Store<RootState>({
         },
         sessionStatsRef(state: RootState): DatabaseReference {
             return ref(db, `/stats/${state.userId}/${state.activePuzzle}/${state.sessionId}`)
-        }
+        },
     },
     mutations: {
         [Mutations.RECEIVE_USER_ID](state: RootState, userId: string): void {
@@ -139,7 +139,7 @@ export default new Vuex.Store<RootState>({
         },
         [Mutations.RECEIVE_ALL_STATS](state: RootState, stats: FirebaseList<StatisticsPayload>): void {
             state.allStats = stats
-        }
+        },
     },
     actions: {
         [Actions.SET_OPTIONS](context: ActionContext<RootState, RootState>, payload: ProfileOptions): void {
@@ -151,35 +151,32 @@ export default new Vuex.Store<RootState>({
         [Actions.UPDATE_SESSION_DATE](context: ActionContext<RootState, RootState>, payload: { moment: Moment }): void {
             update(context.getters.currentSessionRef, {
                 date: payload.moment.format('M/D/YYYY'),
-                timestamp: payload.moment.valueOf()
+                timestamp: payload.moment.valueOf(),
             })
         },
         [Actions.REQUEST_SCRAMBLE](context: ActionContext<RootState, RootState>): void {
             context.commit(Mutations.RECEIVE_SCRAMBLE, {
                 text: 'Generating scramble...',
-                svg: undefined
+                svg: undefined,
             })
 
             if (context.state.puzzles) {
                 context.state.scramblerWorker.postMessage({
-                    scrambler: context.state.puzzles[context.state.activePuzzle].scrambler
+                    scrambler: context.state.puzzles[context.state.activePuzzle].scrambler,
                 })
             }
         },
         [Actions.CHECK_SESSION](context: ActionContext<RootState, RootState>): Promise<void> {
-            return new Promise(resolve => {
+            return new Promise((resolve) => {
                 if (!context.state.sessionId) {
-                    const date = moment()
-                        .utc()
-                        .dayOfYear(moment().dayOfYear())
-                        .startOf('day')
-                    
+                    const date = moment().utc().dayOfYear(moment().dayOfYear()).startOf('day')
+
                     const newSessionRef = push(context.getters.sessionsRef)
 
                     set(context.getters.currentSessionIdRef, newSessionRef.key).then(() => {
                         set(context.getters.currentSessionRef, {
                             date: date.format('M/D/YYYY'),
-                            timestamp: date.valueOf()
+                            timestamp: date.valueOf(),
                         })
 
                         resolve()
@@ -199,21 +196,18 @@ export default new Vuex.Store<RootState>({
                     time: delta,
                     timestamp: serverTimestamp(),
                     scramble: context.state.scramble.text,
-                    penalty: ''
-                })
-                .then(() => context.dispatch(Actions.UPDATE_STATS))
+                    penalty: '',
+                }).then(() => context.dispatch(Actions.UPDATE_STATS))
 
                 context.dispatch(Actions.REQUEST_SCRAMBLE)
             })
         },
         [Actions.SET_PENALTY](context: ActionContext<RootState, RootState>, payload: { solve: ISolve; penalty: SolvePenalty }): void {
             const newPenalty = payload.solve.penalty === payload.penalty ? '' : payload.penalty
-            update(child(context.getters.solvesRef, payload.solve.uid), { penalty: newPenalty })
-                .then(() => context.dispatch(Actions.UPDATE_STATS))
+            update(child(context.getters.solvesRef, payload.solve.uid), { penalty: newPenalty }).then(() => context.dispatch(Actions.UPDATE_STATS))
         },
         [Actions.DELETE_SOLVE](context: ActionContext<RootState, RootState>, solveId: string): void {
-            remove(child(context.getters.solvesRef, solveId))
-                .then(() => context.dispatch(Actions.UPDATE_STATS))
+            remove(child(context.getters.solvesRef, solveId)).then(() => context.dispatch(Actions.UPDATE_STATS))
         },
         [Actions.UPDATE_STATS](context: ActionContext<RootState, RootState>): void {
             if (context.state.solves.length === 0) {
@@ -235,17 +229,17 @@ export default new Vuex.Store<RootState>({
                     bestAo5: Stats.bestAo5(context.state.solves),
                     bestAo12: Stats.bestAo12(context.state.solves),
                     bestAo50: Stats.bestAo50(context.state.solves),
-                    bestAo100: Stats.bestAo100(context.state.solves)
+                    bestAo100: Stats.bestAo100(context.state.solves),
                 })
             }
-        }
+        },
     },
     plugins: [
-        store => {
-            onAuthStateChanged(getAuth(), user => {
+        (store) => {
+            onAuthStateChanged(getAuth(), (user) => {
                 if (user) {
                     const userRef = ref(db, `users/${user.uid}`)
-                    get(userRef).then(snapshot => {
+                    get(userRef).then((snapshot) => {
                         if (!snapshot.exists()) {
                             set(userRef, {
                                 currentPuzzle: '333',
@@ -254,8 +248,8 @@ export default new Vuex.Store<RootState>({
                                     showTimer: true,
                                     timerTrigger: 'spacebar',
                                     holdToStart: true,
-                                    useInspection: true
-                                }
+                                    useInspection: true,
+                                },
                             })
                         }
 
@@ -266,25 +260,25 @@ export default new Vuex.Store<RootState>({
                 }
             })
         },
-        store =>
+        (store) =>
             store.state.scramblerWorker.addEventListener('message', (event: MessageEvent) => {
                 if (event.data === undefined) {
                     store.commit(Mutations.RECEIVE_SCRAMBLE, {
                         text: 'No valid scrambler for this puzzle',
-                        svg: undefined
+                        svg: undefined,
                     })
                 } else {
                     store.commit(Mutations.RECEIVE_SCRAMBLE, {
                         text: event.data.scramble,
-                        svg: event.data.svg
+                        svg: event.data.svg,
                     })
                 }
             }),
-        store =>
-            onValue(store.getters.puzzlesRef, snapshot => {
+        (store) =>
+            onValue(store.getters.puzzlesRef, (snapshot) => {
                 store.commit(Mutations.RECEIVE_PUZZLES, snapshot.val())
             }),
-        store =>
+        (store) =>
             store.subscribe((mutation: MutationPayload, state: RootState) => {
                 if (mutation.type === Mutations.RECEIVE_USER_ID) {
                     FirebaseManager.disconnectAllRefs()
@@ -296,7 +290,7 @@ export default new Vuex.Store<RootState>({
                     }
                 }
             }),
-        store =>
+        (store) =>
             store.subscribe((mutation: MutationPayload, state: RootState) => {
                 if (mutation.type === Mutations.RECEIVE_SESSION_ID) {
                     FirebaseManager.disconnectRef(References.SESSION)
@@ -306,7 +300,7 @@ export default new Vuex.Store<RootState>({
                     }
                 }
             }),
-        store =>
+        (store) =>
             store.subscribe((mutation: MutationPayload) => {
                 if (mutation.type === Mutations.RECEIVE_ACTIVE_PUZZLE) {
                     FirebaseManager.disconnectRef(References.SOLVES)
@@ -322,12 +316,12 @@ export default new Vuex.Store<RootState>({
                     store.dispatch(Actions.REQUEST_SCRAMBLE)
                 }
             }),
-        store =>
+        (store) =>
             store.subscribe((mutation: MutationPayload) => {
                 // tslint:disable-next-line: no-console
                 console.log(mutation.type)
                 // tslint:disable-next-line: no-console
                 console.log(mutation.payload)
-            })
-    ]
+            }),
+    ],
 })

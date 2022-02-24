@@ -21,7 +21,7 @@ export abstract class Stats {
         let best = Number.MAX_VALUE
         let dnfCount = 0
 
-        solves.forEach(solve => {
+        solves.forEach((solve) => {
             const time = solve.finalTime
 
             if (time === -1) {
@@ -37,7 +37,7 @@ export abstract class Stats {
     public static worst(solves: ISolve[]): number {
         let worst = 0
 
-        solves.forEach(solve => {
+        solves.forEach((solve) => {
             if (worst !== -1) {
                 const time = solve.finalTime
 
@@ -61,7 +61,7 @@ export abstract class Stats {
 
         let stDev = 0
 
-        solves.forEach(solve => {
+        solves.forEach((solve) => {
             stDev += Math.pow(solve.finalTime - mean, 2)
         })
 

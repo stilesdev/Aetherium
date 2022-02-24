@@ -53,24 +53,23 @@
         }
 
         public submit(): void {
-            signInWithEmailAndPassword(getAuth(), this.email, this.password)
-                .catch((error: AuthError) => {
-                    switch (error.code) {
-                        case 'auth/too-many-requests':
-                            this.loginError = 'Too many login attempts. Wait a while and try again.'
-                            break
-                        case 'auth/user-not-found':
-                        case 'auth/wrong-password':
-                        case 'auth/invalid-email':
-                        case 'auth/user-disabled':
-                            this.loginError = 'Invalid username or password.'
-                            break
-                        default:
-                            this.loginError = 'Unknown error'
-                            console.error(`${error.code}: ${error.message}`)
-                            break
-                    }
-                })
+            signInWithEmailAndPassword(getAuth(), this.email, this.password).catch((error: AuthError) => {
+                switch (error.code) {
+                    case 'auth/too-many-requests':
+                        this.loginError = 'Too many login attempts. Wait a while and try again.'
+                        break
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                    case 'auth/invalid-email':
+                    case 'auth/user-disabled':
+                        this.loginError = 'Invalid username or password.'
+                        break
+                    default:
+                        this.loginError = 'Unknown error'
+                        console.error(`${error.code}: ${error.message}`)
+                        break
+                }
+            })
         }
     }
 </script>

@@ -51,7 +51,7 @@
     import { Statistics } from '@/types'
 
     @Component({
-        components: { panel: PanelRoot }
+        components: { panel: PanelRoot },
     })
     export default class PanelHistoryStatistics extends Vue {
         get sessionsArray(): Statistics[] {
@@ -59,7 +59,7 @@
             const allStats: FirebaseList<StatisticsPayload> = this.$store.state.allStats
             const sessions: Statistics[] = []
             if (allSessions && allStats) {
-                Object.entries(allStats).forEach(entry => {
+                Object.entries(allStats).forEach((entry) => {
                     const sessionId = entry[0]
                     const stat = entry[1] as Statistics
                     stat.date = allSessions[sessionId].date
@@ -104,7 +104,7 @@
                 const session = filteredSessions.reduce((previous, current) => (previous[statistic] < current[statistic] ? previous : current))
                 return {
                     time: formatTimeDelta(session[statistic]),
-                    date: session.date
+                    date: session.date,
                 }
             } else {
                 return { time: formatTimeDelta(0), date: undefined }

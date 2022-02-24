@@ -41,7 +41,7 @@ export enum TimerState {
     STARTING = 'starting',
     READY = 'ready',
     RUNNING = 'running',
-    COMPLETE = 'complete'
+    COMPLETE = 'complete',
 }
 
 export type ChartSeries = Array<[number, number]>

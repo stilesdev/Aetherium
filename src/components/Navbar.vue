@@ -44,9 +44,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <button type="button" class="btn btn-primary" @click="onCloseSessionClick">
-                                Close Session
-                            </button>
+                            <button type="button" class="btn btn-primary" @click="onCloseSessionClick">Close Session</button>
                         </div>
                     </form>
 
@@ -80,17 +78,13 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h4 class="modal-title" id="closeSessionModalLabel">
-                            Close Session
-                        </h4>
+                        <h4 class="modal-title" id="closeSessionModalLabel">Close Session</h4>
                     </div>
 
                     <div class="modal-body">
                         <form class="form-inline">
                             <div class="form-group">
-                                <p>
-                                    Are you sure you would like to close the current session?
-                                </p>
+                                <p>Are you sure you would like to close the current session?</p>
                             </div>
                             <div class="form-group">
                                 <label for="sessionDatePicker">Session Date:</label>
@@ -102,12 +96,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
-                            Cancel
-                        </button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="onCloseSessionConfirm">
-                            Close Session
-                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="onCloseSessionConfirm">Close Session</button>
                     </div>
                 </div>
             </div>
@@ -121,9 +111,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h4 class="modal-title" id="optionsModalLabel">
-                            Options
-                        </h4>
+                        <h4 class="modal-title" id="optionsModalLabel">Options</h4>
                     </div>
 
                     <div class="modal-body">
@@ -132,7 +120,7 @@
                             <label
                                 class="btn btn-default"
                                 :class="{
-                                    active: options.timerTrigger === 'spacebar'
+                                    active: options.timerTrigger === 'spacebar',
                                 }"
                                 @click="options.timerTrigger = 'spacebar'"
                             >
@@ -141,7 +129,7 @@
                             <label
                                 class="btn btn-default"
                                 :class="{
-                                    active: options.timerTrigger === 'stackmat'
+                                    active: options.timerTrigger === 'stackmat',
                                 }"
                                 @click="options.timerTrigger = 'stackmat'"
                             >
@@ -175,12 +163,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
-                            Cancel
-                        </button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="onOptionsModalSave">
-                            Save
-                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="onOptionsModalSave">Save</button>
                     </div>
                 </div>
             </div>
@@ -194,9 +178,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h4 class="modal-title" id="importModalLabel">
-                            Import
-                        </h4>
+                        <h4 class="modal-title" id="importModalLabel">Import</h4>
                     </div>
 
                     <div class="modal-body">
@@ -218,7 +200,7 @@
                             class="form-group"
                             :class="{
                                 'has-error': !importTextValid,
-                                'has-success': importTextValid
+                                'has-success': importTextValid,
                             }"
                         >
                             <textarea class="form-control" @input="validateImportText" v-model="importText"></textarea>
@@ -226,12 +208,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
-                            Cancel
-                        </button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="runImport">
-                            Import
-                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="runImport">Import</button>
                     </div>
                 </div>
             </div>
@@ -257,10 +235,10 @@
             timerTrigger: TimerTrigger.SPACEBAR,
             holdToStart: true,
             useInspection: true,
-            themeUrl: '/themes/default.min.css'
+            themeUrl: '/themes/default.min.css',
         }
         public datePickerConfig = {
-            format: 'MM/DD/YYYY'
+            format: 'MM/DD/YYYY',
         }
         public importTextValid = true
         public importText = ''
@@ -282,7 +260,7 @@
             { name: 'Spacelab', url: '/themes/spacelab.min.css' },
             { name: 'Superhero', url: '/themes/superhero.min.css' },
             { name: 'United', url: '/themes/united.min.css' },
-            { name: 'Yeti', url: '/themes/yeti.min.css' }
+            { name: 'Yeti', url: '/themes/yeti.min.css' },
         ]
 
         get puzzles(): Puzzle[] {
@@ -316,10 +294,7 @@
 
         set sessionDate(value: string) {
             this.$store.dispatch(Actions.UPDATE_SESSION_DATE, {
-                moment: moment()
-                    .utc()
-                    .dayOfYear(moment(value, 'MM/DD/YYYY').dayOfYear())
-                    .startOf('day')
+                moment: moment().utc().dayOfYear(moment(value, 'MM/DD/YYYY').dayOfYear()).startOf('day'),
             })
         }
 

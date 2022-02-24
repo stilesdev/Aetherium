@@ -57,8 +57,8 @@
         components: {
             'stats-panel': PanelSessionStatistics,
             'solves-panel': PanelSolvesList,
-            'scramble-panel': PanelScrambleImage
-        }
+            'scramble-panel': PanelScrambleImage,
+        },
     })
     export default class Timer extends Vue {
         public timerStart = 0
@@ -128,7 +128,7 @@
             if (this.timerTrigger === TimerTrigger.SPACEBAR) {
                 this.stackmat.stop()
 
-                $(document).on('keydown.aetherium', this, event => {
+                $(document).on('keydown.aetherium', this, (event) => {
                     if (event.which === 32) {
                         event.preventDefault()
                         if (event.data.timerState) {
@@ -137,7 +137,7 @@
                     }
                 })
 
-                $(document).on('keyup.aetherium', this, event => {
+                $(document).on('keyup.aetherium', this, (event) => {
                     if (event.which === 32) {
                         event.preventDefault()
                         if (event.data.timerState) {
@@ -208,7 +208,7 @@
                 useInspection: this.useInspection,
                 onSolveStart: this.startTimer,
                 onSolveComplete: this.stopTimer,
-                onInspectionStart: this.startInspection
+                onInspectionStart: this.startInspection,
             }
 
             this.timerState = new TimerStateMachine(options)

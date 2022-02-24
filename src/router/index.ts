@@ -10,39 +10,39 @@ const routes: RouteConfig[] = [
     {
         path: '/',
         name: 'Home',
-        redirect: '/timer'
+        redirect: '/timer',
     },
     {
         path: '/login',
         name: 'Login',
-        component: Login
+        component: Login,
     },
     {
         path: '/timer',
         name: 'Timer',
-        component: Timer
+        component: Timer,
     },
     {
         path: '/statistics',
         name: 'Statistics',
-        component: () => import(/* webpackChunkName: "stats" */ '@/components/views/Stats.vue')
+        component: () => import(/* webpackChunkName: "stats" */ '@/components/views/Stats.vue'),
     },
     {
         path: '/history',
         name: 'History',
-        component: () => import(/* webpackChunkName: "history" */ '@/components/views/History.vue')
+        component: () => import(/* webpackChunkName: "history" */ '@/components/views/History.vue'),
     },
     {
         path: '/personal-bests',
         name: 'PersonalBests',
-        component: () => import(/* webpackChunkName: "pb" */ '@/components/views/PersonalBests.vue')
-    }
+        component: () => import(/* webpackChunkName: "pb" */ '@/components/views/PersonalBests.vue'),
+    },
 ]
 
 const router = new VueRouter({
     mode: 'history',
     base: process.env.BASE_URL,
-    routes
+    routes,
 })
 
 router.beforeEach((to, from, next) => {

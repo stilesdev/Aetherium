@@ -30,7 +30,7 @@ export enum References {
     SOLVES = 'SOLVES',
     SESSION_STATS = 'SESSION_STATS',
     ALL_SESSIONS = 'ALL_SESSIONS',
-    ALL_STATS = 'ALL_STATS'
+    ALL_STATS = 'ALL_STATS',
 }
 
 export enum Mutations {
@@ -52,7 +52,7 @@ export enum Mutations {
     DELETE_SOLVE = 'DELETE_SOLVE',
     RECEIVE_SESSION_STATS = 'RECEIVE_SESSION_STATS',
     RECEIVE_ALL_SESSIONS = 'RECEIVE_ALL_SESSIONS',
-    RECEIVE_ALL_STATS = 'RECEIVE_ALL_STATS'
+    RECEIVE_ALL_STATS = 'RECEIVE_ALL_STATS',
 }
 
 export enum Actions {
@@ -65,5 +65,5 @@ export enum Actions {
     STORE_SOLVE = 'STORE_SOLVE',
     SET_PENALTY = 'SET_PENALTY',
     DELETE_SOLVE = 'DELETE_SOLVE',
-    UPDATE_STATS = 'UPDATE_STATS'
+    UPDATE_STATS = 'UPDATE_STATS',
 }

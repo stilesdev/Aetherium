@@ -17,7 +17,7 @@
     import { ChartSeries } from '@/types'
 
     @Component({
-        components: { 'panel-history-statistics': PanelHistoryStatistics }
+        components: { 'panel-history-statistics': PanelHistoryStatistics },
     })
     export default class History extends Vue {
         public sessionHistoryChart?: Chart
@@ -25,18 +25,18 @@
         get sessionMeans(): ChartSeries {
             const sessions: FirebaseList<SessionPayload> = this.$store.state.allSessions
             const stats: FirebaseList<StatisticsPayload> = this.$store.state.allStats
-            return stats ? Object.entries(stats).map(stat => [sessions[stat[0]].timestamp, stat[1].mean]) : []
+            return stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].mean]) : []
         }
 
         get sessionBests(): ChartSeries {
             const sessions: FirebaseList<SessionPayload> = this.$store.state.allSessions
             const stats: FirebaseList<StatisticsPayload> = this.$store.state.allStats
-            return stats ? Object.entries(stats).map(stat => [sessions[stat[0]].timestamp, stat[1].best]) : []
+            return stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].best]) : []
         }
 
         get personalBests(): ChartSeries {
             const personalBests: ChartSeries = []
-            this.sessionBests.forEach(bestTime => {
+            this.sessionBests.forEach((bestTime) => {
                 if (personalBests.length === 0 || bestTime[1] < personalBests[personalBests.length - 1][1]) {
                     personalBests.push(bestTime)
                 }
@@ -64,37 +64,37 @@
             this.sessionHistoryChart = new Chart('sessionHistoryChart', {
                 chart: {
                     zoomType: 'x',
-                    type: 'line'
+                    type: 'line',
                 },
                 title: {
-                    text: 'Session History'
+                    text: 'Session History',
                 },
                 xAxis: {
                     type: 'datetime',
                     dateTimeLabelFormats: {
                         day: {
-                            main: '%m/%d/%Y'
-                        }
+                            main: '%m/%d/%Y',
+                        },
                     },
                     tickInterval: 86400000,
-                    startOnTick: false
+                    startOnTick: false,
                 },
                 yAxis: {
                     title: {
-                        text: 'Solve Time'
+                        text: 'Solve Time',
                     },
                     labels: {
                         formatter(): string {
                             return formatTimeDelta(this.value as number)
-                        }
+                        },
                     },
-                    min: 0
+                    min: 0,
                 },
                 lang: {
-                    noData: 'No solves yet!'
+                    noData: 'No solves yet!',
                 },
                 legend: {
-                    enabled: true
+                    enabled: true,
                 },
                 plotOptions: {
                     line: {
@@ -102,24 +102,24 @@
                             enabled: true,
                             formatter(): string {
                                 return this.y ? formatTimeDeltaShort(this.y) : ''
-                            }
+                            },
                         },
                         marker: {
-                            enabled: true
+                            enabled: true,
                         },
-                        turboThreshold: 0
-                    }
+                        turboThreshold: 0,
+                    },
                 },
                 series: [
                     {
                         type: 'line',
                         name: 'Session Mean',
-                        data: this.sessionMeans
+                        data: this.sessionMeans,
                     },
                     {
                         type: 'line',
                         name: 'Session Best',
-                        data: this.sessionBests
+                        data: this.sessionBests,
                     },
                     {
                         type: 'line',
@@ -127,17 +127,15 @@
                         data: this.personalBests,
                         dashStyle: 'Dash',
                         marker: {
-                            symbol: 'triangle-down'
-                        }
-                    }
+                            symbol: 'triangle-down',
+                        },
+                    },
                 ],
                 tooltip: {
                     formatter(): string {
-                        return `<b>${moment(this.x)
-                            .utc()
-                            .format('M/D/YYYY')}</b><br/>${formatTimeDelta(this.y)}`
-                    }
-                }
+                        return `<b>${moment(this.x).utc().format('M/D/YYYY')}</b><br/>${formatTimeDelta(this.y)}`
+                    },
+                },
             })
         }
     }

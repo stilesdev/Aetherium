@@ -53,9 +53,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <button class="btn btn-sm" @click="calculateAo1000">
-                                Calculate Global Ao1000
-                            </button>
+                            <button class="btn btn-sm" @click="calculateAo1000">Calculate Global Ao1000</button>
                         </td>
                         <td>Global Ao1000</td>
                         <td>{{ formatSolve(ao1000) }}</td>
@@ -80,7 +78,7 @@
     import { StatisticsPayload } from '@/types/firebase'
 
     @Component({
-        components: { panel: PanelRoot }
+        components: { panel: PanelRoot },
     })
     export default class PanelSessionStatistics extends Vue {
         public ao1000 = 0
@@ -92,12 +90,9 @@
         public formatSolve = formatTimeDelta
 
         public calculateAo1000(): void {
-            get(query(this.$store.getters.solvesRef,
-                orderByChild('timestamp'),
-                limitToLast(1000)
-            )).then((solveSnapshot) => {
+            get(query(this.$store.getters.solvesRef, orderByChild('timestamp'), limitToLast(1000))).then((solveSnapshot) => {
                 const solves: Solve[] = []
-                solveSnapshot.forEach(childSnapshot => {
+                solveSnapshot.forEach((childSnapshot) => {
                     solves.push(Solve.fromSnapshot(childSnapshot))
                 })
 

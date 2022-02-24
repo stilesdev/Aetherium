@@ -47,40 +47,25 @@ class FirebaseManager {
                 onValue(store.getters.currentSessionRef, (snapshot) => {
                     if (snapshot.exists()) {
                         store.commit(Mutations.RECEIVE_SESSION_DATE, {
-                            moment: moment(snapshot.val().timestamp).utc()
+                            moment: moment(snapshot.val().timestamp).utc(),
                         })
                     }
                 })
                 break
             case References.SOLVES:
                 this.previousRefs[ref] = store.getters.solvesRef
-                onChildAdded(
-                    query(
-                        store.getters.solvesRef,
-                        orderByChild('sessionId'),
-                        equalTo(store.state.sessionId as string),
-                    ), (snapshot) => {
-                        store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot))
+                onChildAdded(query(store.getters.solvesRef, orderByChild('sessionId'), equalTo(store.state.sessionId as string)), (snapshot) => {
+                    store.commit(Mutations.ADD_SOLVE, Solve.fromSnapshot(snapshot))
+                })
+                onChildChanged(query(store.getters.solvesRef, orderByChild('sessionId'), equalTo(store.state.sessionId as string)), (snapshot) => {
+                    store.commit(Mutations.UPDATE_SOLVE, {
+                        uid: snapshot.key,
+                        solve: Solve.fromSnapshot(snapshot),
                     })
-                onChildChanged(
-                    query(
-                        store.getters.solvesRef,
-                        orderByChild('sessionId'),
-                        equalTo(store.state.sessionId as string),
-                    ), (snapshot) => {
-                        store.commit(Mutations.UPDATE_SOLVE, {
-                            uid: snapshot.key,
-                            solve: Solve.fromSnapshot(snapshot)
-                        })
-                    })
-                onChildRemoved(
-                    query(
-                        store.getters.solvesRef,
-                        orderByChild('sessionId'),
-                        equalTo(store.state.sessionId as string),
-                    ), (snapshot) => {
-                        store.commit(Mutations.DELETE_SOLVE, snapshot.key)
-                    })
+                })
+                onChildRemoved(query(store.getters.solvesRef, orderByChild('sessionId'), equalTo(store.state.sessionId as string)), (snapshot) => {
+                    store.commit(Mutations.DELETE_SOLVE, snapshot.key)
+                })
                 break
             case References.SESSION_STATS:
                 this.previousRefs[ref] = store.getters.sessionStatsRef
@@ -112,7 +97,7 @@ class FirebaseManager {
     }
 
     public disconnectAllRefs() {
-        Object.values(this.previousRefs).forEach(previousRef => {
+        Object.values(this.previousRefs).forEach((previousRef) => {
             if (typeof previousRef !== 'undefined') {
                 off(previousRef)
             }

@@ -18,7 +18,7 @@
                     <td
                         class="time-column"
                         :class="{
-                            'penalty-active': solve.penalty !== SolvePenalty.NONE
+                            'penalty-active': solve.penalty !== SolvePenalty.NONE,
                         }"
                     >
                         {{ solve.formattedTime }}
@@ -30,7 +30,7 @@
                         <span
                             class="penalty-link"
                             :class="{
-                                'penalty-active': solve.penalty === SolvePenalty.PLUSTWO
+                                'penalty-active': solve.penalty === SolvePenalty.PLUSTWO,
                             }"
                             @click="setPenalty(solve, SolvePenalty.PLUSTWO)"
                             >+2</span
@@ -38,7 +38,7 @@
                         <span
                             class="penalty-link"
                             :class="{
-                                'penalty-active': solve.penalty === SolvePenalty.DNF
+                                'penalty-active': solve.penalty === SolvePenalty.DNF,
                             }"
                             @click="setPenalty(solve, SolvePenalty.DNF)"
                             >DNF</span
@@ -60,7 +60,7 @@
     import { SolvePenalty } from '@/types/firebase'
 
     @Component({
-        components: { panel: PanelRoot }
+        components: { panel: PanelRoot },
     })
     export default class PanelSolvesList extends Vue {
         public SolvePenalty = SolvePenalty

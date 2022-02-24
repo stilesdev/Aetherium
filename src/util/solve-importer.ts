@@ -21,10 +21,10 @@ export class SolveImporter {
                 penalty: { type: 'string', pattern: '|\\+2|dnf' },
                 scramble: { type: 'string' },
                 time: { type: 'integer', minimum: 1 },
-                timestamp: { type: 'integer', minimum: 1000000000000 }
+                timestamp: { type: 'integer', minimum: 1000000000000 },
             },
             required: ['penalty', 'scramble', 'time', 'timestamp'],
-            additionalProperties: false
+            additionalProperties: false,
         }
 
         const puzzleSchema: Schema = {
@@ -33,9 +33,9 @@ export class SolveImporter {
             patternProperties: {
                 '.*': {
                     type: 'array',
-                    items: { $ref: '/Solve' }
-                }
-            }
+                    items: { $ref: '/Solve' },
+                },
+            },
         }
 
         const sessionSchema: Schema = {
@@ -43,10 +43,10 @@ export class SolveImporter {
             type: 'object',
             patternProperties: {
                 '([2-9]|1[0-2]?)/([1-9]|[1-2][0-9]|3[0-1])/(20\\d{2})': {
-                    $ref: '/Puzzle'
-                }
+                    $ref: '/Puzzle',
+                },
             },
-            additionalProperties: false
+            additionalProperties: false,
         }
 
         this.validator.addSchema(solveSchema, '/Solve')
@@ -78,16 +78,11 @@ export class SolveImporter {
 
         const db = getDatabase()
 
-        Object.keys(input).forEach(date => {
+        Object.keys(input).forEach((date) => {
             const year = parseInt(date.split('/')[2], 10)
             const month = parseInt(date.split('/')[0], 10) - 1
             const day = parseInt(date.split('/')[1], 10)
-            const sessionMoment = moment()
-                .utc()
-                .year(year)
-                .month(month)
-                .date(day)
-                .startOf('day')
+            const sessionMoment = moment().utc().year(year).month(month).date(day).startOf('day')
 
             const newSessionRef = push(ref(db, `/users/${this.userId}/sessions`))
 
@@ -95,23 +90,22 @@ export class SolveImporter {
                 const newSessionId = newSessionRef.key
                 set(newSessionRef, {
                     date: sessionMoment.format('M/D/YYYY'),
-                    timestamp: sessionMoment.valueOf()
+                    timestamp: sessionMoment.valueOf(),
                 })
 
-                Object.keys(input[date]).forEach(puzzle => {
+                Object.keys(input[date]).forEach((puzzle) => {
                     const solves: Solve[] = []
                     input[date][puzzle].forEach((solve: SolvePayload) => {
-                        push(ref(db, `/solves/${this.userId}/${puzzle}`))
-                            .then((solveRef) => {
-                                set(solveRef, {
-                                    sessionId: newSessionId,
-                                    time: solve.time,
-                                    timestamp: solve.timestamp,
-                                    scramble: solve.scramble,
-                                    penalty: solve.penalty
-                                })
-                                solves.push(new Solve(solveRef.key as string, newSessionId, solve.time, solve.timestamp, solve.scramble, solve.penalty))
+                        push(ref(db, `/solves/${this.userId}/${puzzle}`)).then((solveRef) => {
+                            set(solveRef, {
+                                sessionId: newSessionId,
+                                time: solve.time,
+                                timestamp: solve.timestamp,
+                                scramble: solve.scramble,
+                                penalty: solve.penalty,
                             })
+                            solves.push(new Solve(solveRef.key as string, newSessionId, solve.time, solve.timestamp, solve.scramble, solve.penalty))
+                        })
                     })
                     set(ref(db, `/stats/${this.userId}/${puzzle}/${newSessionId}`), {
                         mean: Stats.mean(solves),
@@ -128,7 +122,7 @@ export class SolveImporter {
                         bestAo5: Stats.bestAo5(solves),
                         bestAo12: Stats.bestAo12(solves),
                         bestAo50: Stats.bestAo50(solves),
-                        bestAo100: Stats.bestAo100(solves)
+                        bestAo100: Stats.bestAo100(solves),
                     })
                 })
             }

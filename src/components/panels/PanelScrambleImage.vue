@@ -10,7 +10,7 @@
     import PanelRoot from './PanelRoot.vue'
 
     @Component({
-        components: { panel: PanelRoot }
+        components: { panel: PanelRoot },
     })
     export default class PanelScrambleImage extends Vue {
         get scrambleImage(): string {

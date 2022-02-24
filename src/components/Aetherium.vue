@@ -14,7 +14,7 @@
     import Navbar from './Navbar.vue'
 
     @Component({
-        components: { Navbar }
+        components: { Navbar },
     })
     export default class Aetherium extends Vue {
         get showNavbar(): boolean {
