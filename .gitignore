@@ -3,6 +3,5 @@
 node_modules/
 .firebaserc
 firebase-debug.log
-firebase.config.ts
 dist/
 .firebase/
