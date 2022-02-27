@@ -1,15 +1,23 @@
 import { resolve } from 'path'
 import inject from '@rollup/plugin-inject'
 import { defineConfig } from 'vite'
-import { createVuePlugin } from 'vite-plugin-vue2'
+import createVuePlugin from '@vitejs/plugin-vue'
 
 export default defineConfig({
     plugins: [
-        createVuePlugin(),
+        createVuePlugin({
+            template: {
+                compilerOptions: {
+                    compatConfig: {
+                        MODE: 2,
+                    },
+                },
+            },
+        }),
         inject({
             jQuery: 'jquery',
             $: 'jquery',
-        })
+        }),
     ],
     // css: {
     //     postcss: {
@@ -21,6 +29,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': resolve(__dirname, 'src'),
-        }
-    }
+            vue: '@vue/compat',
+        },
+    },
 })

@@ -1,7 +1,8 @@
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-import Vue, { CreateElement } from 'vue'
+import Vue from 'vue'
+import { CompatVue } from '@vue/runtime-dom'
 
 import store from './store'
 import router from './router'
@@ -9,12 +10,12 @@ import Aetherium from './components/Aetherium.vue'
 
 declare global {
     interface Window {
-        vApp: Vue
+        vApp: CompatVue
     }
 }
 
-window.vApp = new Vue({
+new Vue({
     store,
     router,
-    render: (h: CreateElement) => h(Aetherium),
+    render: (h: Function) => h(Aetherium),
 }).$mount('#app')
