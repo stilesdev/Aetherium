@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { child, DatabaseReference, get, getDatabase, onValue, push, ref, remove, serverTimestamp, set, update } from 'firebase/database'
 import moment, { Moment } from 'moment'
@@ -13,6 +14,9 @@ import firebaseConfig from '../firebase.config'
 import { FirebaseList, ProfileOptions, Puzzle, SessionPayload, SolvePenalty, StatisticsPayload, TimerTrigger } from '@/types/firebase'
 
 const firebaseApp = initializeApp(firebaseConfig.development)
+initializeAppCheck(firebaseApp, {
+    provider: new ReCaptchaV3Provider(firebaseConfig.reCaptchaV3SiteKey),
+})
 const db = getDatabase(firebaseApp)
 
 Vue.use(Vuex)
