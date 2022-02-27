@@ -16,7 +16,6 @@
   "dependencies": {
     "bootstrap": "^3.4.1",
     "core-js": "^3.6.5",
-    "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "firebase": "^9.6.7",
     "highcharts": "^9.3.3",
     "javascript-state-machine": "^3.1.0",
@@ -26,7 +25,6 @@
     "stackmat": "^1.0.0",
     "url": "^0.11.0",
     "vue": "^2.6.11",
-    "vue-bootstrap-datetimepicker": "^5.0.1",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^8.4.2",
     "vue-router": "^3.2.0",

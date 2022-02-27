@@ -88,7 +88,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="sessionDatePicker">Session Date:</label>
-                                <date-picker id="sessionDatePicker" v-model="sessionDate" :config="datePickerConfig"></date-picker>
+                                <input type="date" id="sessionDatePicker" v-model="sessionDate" />
                             </div>
                         </form>
 
@@ -237,9 +237,6 @@
             useInspection: true,
             themeUrl: '/themes/default.min.css',
         }
-        public datePickerConfig = {
-            format: 'MM/DD/YYYY',
-        }
         public importTextValid = true
         public importText = ''
         public solveImporter?: SolveImporter
@@ -289,12 +286,20 @@
         }
 
         get sessionDate(): string {
-            return this.$store.state.sessionDate
+            let temp
+
+            if (moment.isMoment(this.$store.state.sessionDate)) {
+                temp = this.$store.state.sessionDate
+            } else {
+                temp = moment()
+            }
+
+            return moment().utc().dayOfYear(temp.dayOfYear()).startOf('day').format('YYYY-MM-DD')
         }
 
         set sessionDate(value: string) {
             this.$store.dispatch(Actions.UPDATE_SESSION_DATE, {
-                moment: moment().utc().dayOfYear(moment(value, 'MM/DD/YYYY').dayOfYear()).startOf('day'),
+                moment: moment().utc().dayOfYear(moment(value, 'YYYY-MM-DD').dayOfYear()).startOf('day'),
             })
         }
 
