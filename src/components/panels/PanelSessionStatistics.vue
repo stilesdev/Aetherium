@@ -68,41 +68,44 @@
 </template>
 
 <script lang="ts">
-    import Vue from 'vue'
-    import { Component, Watch } from 'vue-property-decorator'
     import PanelRoot from './PanelRoot.vue'
+
+    export default {
+        components: {
+            panel: PanelRoot,
+        },
+    }
+</script>
+
+<script lang="ts" setup>
+    import { computed, ref, watch } from 'vue'
+    import { useStore } from 'vuex'
     import { formatTimeDelta } from '@/util/format'
     import { get, limitToLast, orderByChild, query } from 'firebase/database'
     import { Solve } from '@/classes/solve'
     import { Stats } from '@/util/stats'
     import { StatisticsPayload } from '@/types/firebase'
 
-    @Component({
-        components: { panel: PanelRoot },
-    })
-    export default class PanelSessionStatistics extends Vue {
-        public ao1000 = 0
+    const store = useStore()
 
-        get stats(): StatisticsPayload | undefined {
-            return this.$store.state.sessionStats
-        }
+    const ao1000 = ref(0)
 
-        public formatSolve = formatTimeDelta
+    const stats = computed<StatisticsPayload | undefined>(() => store.state.sessionStats)
 
-        public calculateAo1000(): void {
-            get(query(this.$store.getters.solvesRef, orderByChild('timestamp'), limitToLast(1000))).then((solveSnapshot) => {
-                const solves: Solve[] = []
-                solveSnapshot.forEach((childSnapshot) => {
-                    solves.push(Solve.fromSnapshot(childSnapshot))
-                })
+    const formatSolve = formatTimeDelta
 
-                this.ao1000 = Stats.average(solves)
+    const calculateAo1000 = () => {
+        get(query(store.getters.solvesRef, orderByChild('timestamp'), limitToLast(1000))).then((solveSnapshot) => {
+            const solves: Solve[] = []
+            solveSnapshot.forEach((childSnapshot) => {
+                solves.push(Solve.fromSnapshot(childSnapshot))
             })
-        }
 
-        @Watch('stats')
-        public onStatsChange(): void {
-            this.ao1000 = 0
-        }
+            ao1000.value = Stats.average(solves)
+        })
     }
+
+    watch(stats, () => {
+        ao1000.value = 0
+    })
 </script>

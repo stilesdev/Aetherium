@@ -38,14 +38,11 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import moment from 'moment'
     import $ from 'jquery'
-    import Vue from 'vue'
-    import { Component, Watch } from 'vue-property-decorator'
-    import PanelSessionStatistics from '@/components/panels/PanelSessionStatistics.vue'
-    import PanelSolvesList from '@/components/panels/PanelSolvesList.vue'
-    import PanelScrambleImage from '@/components/panels/PanelScrambleImage.vue'
+    import { computed, onUnmounted, ref, watch } from 'vue'
+    import { useStore } from 'vuex'
     import Stackmat, { Packet } from 'stackmat'
     import TimerStateMachine from '@/util/timer-state-machine'
     import { TimerState, TimerStateMachineOptions } from '@/types'
@@ -53,262 +50,227 @@
     import { formatTimeDelta } from '@/util/format'
     import { TimerTrigger } from '@/types/firebase'
 
-    @Component({
+    const store = useStore()
+
+    const timerStart = ref(0)
+    const timerLabel = ref('00:00:00')
+    const stackmatStarted = ref(false)
+    const stackmatLastTime = ref(0)
+    const timerState = ref<TimerStateMachine | undefined>(undefined)
+    const inspectionCountdown = ref(0)
+    const inspectionTimer = ref<number | undefined>(undefined)
+    const stackmat = new Stackmat()
+
+    const scramble = computed(() => store.state.scramble?.text)
+    const hideUI = computed(() => (timerState.value ? !(timerState.value.state === TimerState.IDLE || timerState.value.state === TimerState.COMPLETE) : false))
+    const timerTrigger = computed(() => store.state.options.timerTrigger)
+    const showTimer = computed(() => store.state.options.showTimer)
+    const holdToStart = computed(() => store.state.options.holdToStart)
+    const useInspection = computed(() => store.state.options.useInspection)
+    const currentPuzzle = computed(() => {
+        return { puzzle: store.state.currentPuzzle }
+    })
+    const timerClass = computed(() => {
+        if (timerState.value) {
+            switch (timerState.value.state) {
+                case TimerState.INSPECTION:
+                    return 'timer-color-inspection timer-size-inspection'
+                case TimerState.STARTING:
+                    return 'timer-color-starting ' + (useInspection.value ? 'timer-size-inspection' : 'timer-size-active')
+                case TimerState.READY:
+                    return 'timer-color-ready ' + (useInspection.value ? 'timer-size-inspection' : 'timer-size-active')
+                case TimerState.RUNNING:
+                    return 'timer-color-running timer-size-active'
+            }
+        }
+
+        return 'timer-idle'
+    })
+
+    const initTimers = () => {
+        if (timerTrigger.value === TimerTrigger.SPACEBAR) {
+            stackmat.stop()
+
+            $(document).on('keydown.aetherium', this, (event) => {
+                if (event.which === 32) {
+                    event.preventDefault()
+                    timerState.value?.triggerDown()
+                }
+            })
+
+            $(document).on('keyup.aetherium', this, (event) => {
+                if (event.which === 32) {
+                    event.preventDefault()
+                    timerState.value?.triggerUp()
+                }
+            })
+        } else if (timerTrigger.value === TimerTrigger.STACKMAT) {
+            $(document).off('.aetherium')
+
+            stackmat.on('reset', () => {
+                timerLabel.value = '00:00:00'
+            })
+
+            stackmat.on('ready', () => {
+                timerState.value?.stackmatTrigger(TimerState.READY)
+            })
+
+            stackmat.on('starting', () => {
+                timerState.value?.stackmatTrigger(TimerState.STARTING)
+            })
+
+            stackmat.on('started', () => {
+                stackmatStarted.value = true
+                timerState.value?.stackmatTrigger(TimerState.RUNNING)
+            })
+
+            stackmat.on('stopped', (packet: Packet) => {
+                stackmatStarted.value = false
+                timerStart.value = 0
+                stackmatLastTime.value = packet.timeInMilliseconds
+                timerState.value?.stackmatTrigger(TimerState.COMPLETE)
+            })
+
+            stackmat.on('leftHandDown', () => {
+                if (!stackmatStarted.value) {
+                    timerState.value?.stackmatTrigger(TimerState.INSPECTION)
+                }
+            })
+
+            stackmat.on('rightHandDown', () => {
+                if (!stackmatStarted.value) {
+                    timerState.value?.stackmatTrigger(TimerState.INSPECTION)
+                }
+            })
+
+            stackmat.start()
+        }
+    }
+
+    const createTimerState = () => {
+        const options: TimerStateMachineOptions = {
+            holdToStart: holdToStart.value,
+            useInspection: useInspection.value,
+            onSolveStart: startTimer,
+            onSolveComplete: stopTimer,
+            onInspectionStart: startInspection,
+        }
+
+        timerState.value = new TimerStateMachine(options)
+    }
+
+    const disconnectTimers = () => {
+        $(document).off('.aetherium')
+        stackmat.stop()
+        stackmat.off()
+    }
+
+    const startInspection = () => {
+        inspectionCountdown.value = 15
+        timerLabel.value = inspectionCountdown.value.toString()
+
+        inspectionTimer.value = setInterval(updateInspection, 1000)
+    }
+
+    const updateInspection = () => {
+        inspectionCountdown.value -= 1
+
+        if (inspectionCountdown.value === 0) {
+            timerState.value?.inspectionExceeded()
+            timerLabel.value = 'DNS'
+            clearInterval(inspectionTimer.value)
+            inspectionTimer.value = undefined
+        } else {
+            timerLabel.value = inspectionCountdown.value.toString()
+        }
+    }
+
+    const startTimer = () => {
+        timerStart.value = moment().valueOf()
+        clearInterval(inspectionTimer.value)
+        inspectionTimer.value = undefined
+
+        if (showTimer.value) {
+            setTimeout(updateTimer, 10)
+        } else {
+            timerLabel.value = 'Solve!'
+        }
+    }
+
+    const updateTimer = () => {
+        if (timerStart.value !== 0) {
+            timerLabel.value = formatTimeDelta(moment().valueOf() - timerStart.value)
+            setTimeout(updateTimer, 30)
+        }
+    }
+
+    const stopTimer = () => {
+        if (timerTrigger.value === TimerTrigger.SPACEBAR) {
+            const stop = moment().valueOf()
+            const start = timerStart.value
+            timerStart.value = 0
+            completeSolve(stop - start)
+        } else if (timerTrigger.value === TimerTrigger.STACKMAT) {
+            timerStart.value = 0
+            completeSolve(stackmatLastTime.value)
+        }
+    }
+
+    const completeSolve = (delta: number) => {
+        timerLabel.value = formatTimeDelta(delta)
+        stackmatLastTime.value = 0
+        store.dispatch(Actions.STORE_SOLVE, delta)
+    }
+
+    const onTouchStart = () => {
+        timerState.value?.triggerDown()
+    }
+
+    const onTouchEnd = () => {
+        timerState.value?.triggerUp()
+    }
+
+    watch(hideUI, (newValue: boolean) => {
+        store.commit(Mutations.SET_HIDE_UI, newValue)
+    })
+
+    watch(timerTrigger, (newTrigger: TimerTrigger, oldTrigger: TimerTrigger) => {
+        if (oldTrigger !== newTrigger) {
+            timerStart.value = 0
+            timerLabel.value = '00:00:00'
+            disconnectTimers()
+            initTimers()
+        }
+    })
+
+    watch(holdToStart, () => {
+        createTimerState()
+    })
+
+    watch(useInspection, () => {
+        createTimerState()
+    })
+
+    onUnmounted(() => {
+        disconnectTimers()
+    })
+
+    // This was run in created() in Vue 2, run directly in setup() for Vue 3
+    createTimerState()
+    initTimers()
+</script>
+
+<script lang="ts">
+    import PanelSessionStatistics from '@/components/panels/PanelSessionStatistics.vue'
+    import PanelSolvesList from '@/components/panels/PanelSolvesList.vue'
+    import PanelScrambleImage from '@/components/panels/PanelScrambleImage.vue'
+
+    export default {
         components: {
             'stats-panel': PanelSessionStatistics,
             'solves-panel': PanelSolvesList,
             'scramble-panel': PanelScrambleImage,
         },
-    })
-    export default class Timer extends Vue {
-        public timerStart = 0
-        public timerLabel = '00:00:00'
-        public stackmatStarted = false
-        public stackmatLastTime = 0
-        public timerState?: TimerStateMachine
-        public inspectionCountdown = 0
-        public inspectionTimer?: number
-        public stackmat: Stackmat = new Stackmat()
-
-        get scramble(): string {
-            return this.$store.state.scramble?.text
-        }
-
-        get hideUI(): boolean {
-            return this.timerState ? !(this.timerState.state === TimerState.IDLE || this.timerState.state === TimerState.COMPLETE) : false
-        }
-
-        get timerTrigger(): string {
-            return this.$store.state.options.timerTrigger
-        }
-
-        get showTimer(): boolean {
-            return this.$store.state.options.showTimer
-        }
-
-        get holdToStart(): boolean {
-            return this.$store.state.options.holdToStart
-        }
-
-        get useInspection(): boolean {
-            return this.$store.state.options.useInspection
-        }
-
-        get currentPuzzle(): { puzzle: string } {
-            return { puzzle: this.$store.state.activePuzzle }
-        }
-
-        get timerClass(): string {
-            if (this.timerState) {
-                switch (this.timerState.state) {
-                    case TimerState.INSPECTION:
-                        return 'timer-color-inspection timer-size-inspection'
-                    case TimerState.STARTING:
-                        return 'timer-color-starting ' + (this.useInspection ? 'timer-size-inspection' : 'timer-size-active')
-                    case TimerState.READY:
-                        return 'timer-color-ready ' + (this.useInspection ? 'timer-size-inspection' : 'timer-size-active')
-                    case TimerState.RUNNING:
-                        return 'timer-color-running timer-size-active'
-                }
-            }
-
-            return 'timer-idle'
-        }
-
-        public created(): void {
-            this.createTimerState()
-            this.initTimers()
-        }
-
-        public destroyed(): void {
-            this.disconnectTimers()
-        }
-
-        public initTimers(): void {
-            if (this.timerTrigger === TimerTrigger.SPACEBAR) {
-                this.stackmat.stop()
-
-                $(document).on('keydown.aetherium', this, (event) => {
-                    if (event.which === 32) {
-                        event.preventDefault()
-                        if (event.data.timerState) {
-                            event.data.timerState.triggerDown()
-                        }
-                    }
-                })
-
-                $(document).on('keyup.aetherium', this, (event) => {
-                    if (event.which === 32) {
-                        event.preventDefault()
-                        if (event.data.timerState) {
-                            event.data.timerState.triggerUp()
-                        }
-                    }
-                })
-            } else if (this.timerTrigger === TimerTrigger.STACKMAT) {
-                $(document).off('.aetherium')
-
-                this.stackmat.on('reset', () => {
-                    this.timerLabel = '00:00:00'
-                })
-
-                this.stackmat.on('ready', () => {
-                    if (this.timerState) {
-                        this.timerState.stackmatTrigger(TimerState.READY)
-                    }
-                })
-
-                this.stackmat.on('starting', () => {
-                    if (this.timerState) {
-                        this.timerState.stackmatTrigger(TimerState.STARTING)
-                    }
-                })
-
-                this.stackmat.on('started', () => {
-                    this.stackmatStarted = true
-                    if (this.timerState) {
-                        this.timerState.stackmatTrigger(TimerState.RUNNING)
-                    }
-                })
-
-                this.stackmat.on('stopped', (packet: Packet) => {
-                    this.stackmatStarted = false
-                    this.timerStart = 0
-                    this.stackmatLastTime = packet.timeInMilliseconds
-                    if (this.timerState) {
-                        this.timerState.stackmatTrigger(TimerState.COMPLETE)
-                    }
-                })
-
-                this.stackmat.on('leftHandDown', () => {
-                    if (this.timerState && !this.stackmatStarted) {
-                        this.timerState.stackmatTrigger(TimerState.INSPECTION)
-                    }
-                })
-
-                this.stackmat.on('rightHandDown', () => {
-                    if (this.timerState && !this.stackmatStarted) {
-                        this.timerState.stackmatTrigger(TimerState.INSPECTION)
-                    }
-                })
-
-                this.stackmat.start()
-            }
-        }
-
-        public disconnectTimers(): void {
-            $(document).off('.aetherium')
-            this.stackmat.stop()
-            this.stackmat.off()
-        }
-
-        public createTimerState(): void {
-            const options: TimerStateMachineOptions = {
-                holdToStart: this.holdToStart,
-                useInspection: this.useInspection,
-                onSolveStart: this.startTimer,
-                onSolveComplete: this.stopTimer,
-                onInspectionStart: this.startInspection,
-            }
-
-            this.timerState = new TimerStateMachine(options)
-        }
-
-        public startInspection(): void {
-            this.inspectionCountdown = 15
-            this.timerLabel = this.inspectionCountdown.toString()
-
-            this.inspectionTimer = setInterval(this.updateInspection, 1000)
-        }
-
-        public updateInspection(): void {
-            this.inspectionCountdown -= 1
-
-            if (this.inspectionCountdown === 0) {
-                if (this.timerState) {
-                    this.timerState.inspectionExceeded()
-                }
-                this.timerLabel = 'DNS'
-                clearInterval(this.inspectionTimer)
-                this.inspectionTimer = undefined
-            } else {
-                this.timerLabel = this.inspectionCountdown.toString()
-            }
-        }
-
-        public startTimer(): void {
-            this.timerStart = moment().valueOf()
-            clearInterval(this.inspectionTimer)
-            this.inspectionTimer = undefined
-
-            if (this.showTimer) {
-                setTimeout(this.updateTimer, 10)
-            } else {
-                this.timerLabel = 'Solve!'
-            }
-        }
-
-        public updateTimer(): void {
-            if (this.timerStart !== 0) {
-                this.timerLabel = formatTimeDelta(moment().valueOf() - this.timerStart)
-                setTimeout(this.updateTimer, 30)
-            }
-        }
-
-        public stopTimer(): void {
-            if (this.timerTrigger === TimerTrigger.SPACEBAR) {
-                const stop = moment().valueOf()
-                const start = this.timerStart
-                this.timerStart = 0
-                this.completeSolve(stop - start)
-            } else if (this.timerTrigger === TimerTrigger.STACKMAT) {
-                this.timerStart = 0
-                this.completeSolve(this.stackmatLastTime)
-            }
-        }
-
-        public completeSolve(delta: number): void {
-            this.timerLabel = formatTimeDelta(delta)
-            this.stackmatLastTime = 0
-            this.$store.dispatch(Actions.STORE_SOLVE, delta)
-        }
-
-        public onTouchStart() {
-            if (this.timerState) {
-                this.timerState.triggerDown()
-            }
-        }
-
-        public onTouchEnd() {
-            if (this.timerState) {
-                this.timerState.triggerUp()
-            }
-        }
-
-        @Watch('hideUI')
-        public onHideUIChange(newValue: boolean): void {
-            this.$store.commit(Mutations.SET_HIDE_UI, newValue)
-        }
-
-        @Watch('timerTrigger')
-        public onTimerTriggerChange(newTrigger: TimerTrigger, oldTrigger: TimerTrigger): void {
-            if (oldTrigger !== newTrigger) {
-                this.timerStart = 0
-                this.timerLabel = '00:00:00'
-                this.disconnectTimers()
-                this.initTimers()
-            }
-        }
-
-        @Watch('holdToStart')
-        public onHoldToStartChange(): void {
-            this.createTimerState()
-        }
-
-        @Watch('useInspection')
-        public onUseInspectionChange(): void {
-            this.createTimerState()
-        }
     }
 </script>
 

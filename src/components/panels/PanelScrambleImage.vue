@@ -5,16 +5,20 @@
 </template>
 
 <script lang="ts">
-    import Vue from 'vue'
-    import { Component } from 'vue-property-decorator'
     import PanelRoot from './PanelRoot.vue'
 
-    @Component({
-        components: { panel: PanelRoot },
-    })
-    export default class PanelScrambleImage extends Vue {
-        get scrambleImage(): string {
-            return this.$store.state.scramble.svg
-        }
+    export default {
+        components: {
+            panel: PanelRoot,
+        },
     }
+</script>
+
+<script lang="ts" setup>
+    import { computed } from 'vue'
+    import { useStore } from 'vuex'
+
+    const store = useStore()
+
+    const scrambleImage = computed(() => store.state.scramble.svg)
 </script>

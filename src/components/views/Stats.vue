@@ -4,113 +4,103 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import { Chart } from 'highcharts'
     import moment from 'moment'
-    import Vue from 'vue'
-    import { Component, Watch } from 'vue-property-decorator'
+    import { computed, onMounted, watch } from 'vue'
+    import { useStore } from 'vuex'
     import { formatTimeDelta, formatTimeDeltaShort, formatTimestamp } from '@/util/format'
     import { Solve } from '@/classes/solve'
     import { ChartSeries } from '@/types'
 
-    @Component
-    export default class Stats extends Vue {
-        public sessionChart?: Chart
+    const store = useStore()
 
-        get allSolves(): ChartSeries {
-            return this.$store.state.solves.map((solve: Solve) => [solve.timestamp, solve.time]).reverse()
-        }
+    let sessionChart: Chart | undefined
 
-        get bestSolves(): ChartSeries {
-            const bestSolves: ChartSeries = []
-            this.allSolves.forEach((solve) => {
-                if (bestSolves.length === 0 || solve[1] < bestSolves[bestSolves.length - 1][1]) {
-                    bestSolves.push(solve)
-                }
-            })
+    const allSolves = computed<ChartSeries>(() => store.state.solves.map((solve: Solve) => [solve.timestamp, solve.time]).reverse())
+    const bestSolves = computed<ChartSeries>(() => {
+        const bestSolves: ChartSeries = []
 
-            return bestSolves
-        }
+        allSolves.value.forEach((solve) => {
+            if (bestSolves.length === 0 || solve[1] < bestSolves[bestSolves.length - 1][1]) {
+                bestSolves.push(solve)
+            }
+        })
 
-        @Watch('allSolves')
-        public onAllSolvesChange(newValue: ChartSeries): void {
-            this.sessionChart?.series[0]?.setData(newValue)
-        }
+        return bestSolves
+    })
 
-        @Watch('bestSolves')
-        public onBestSolvesChange(newValue: ChartSeries): void {
-            this.sessionChart?.series[1]?.setData(newValue)
-        }
+    watch(allSolves, (newValue: ChartSeries) => sessionChart?.series[0].setData(newValue))
+    watch(bestSolves, (newValue: ChartSeries) => sessionChart?.series[1].setData(newValue))
 
-        public mounted(): void {
-            this.sessionChart = new Chart('sessionChart', {
-                chart: {
-                    zoomType: 'x',
+    onMounted(() => {
+        sessionChart = new Chart('sessionChart', {
+            chart: {
+                zoomType: 'x',
+                type: 'line',
+            },
+            title: {
+                text: 'Session Solves',
+            },
+            xAxis: {
+                type: 'datetime',
+                labels: {
+                    formatter() {
+                        return moment(this.value).format('h:mm A')
+                    },
+                },
+            },
+            yAxis: {
+                title: {
+                    text: 'Solve Time',
+                },
+                labels: {
+                    formatter() {
+                        return formatTimeDelta(this.value as number)
+                    },
+                },
+                min: 0,
+            },
+            lang: {
+                noData: 'No solves yet!',
+            },
+            legend: {
+                enabled: true,
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter() {
+                            return formatTimeDeltaShort(this.y as number)
+                        },
+                    },
+                    marker: {
+                        enabled: true,
+                    },
+                },
+            },
+            series: [
+                {
+                    name: 'Solve Time',
+                    data: allSolves.value,
                     type: 'line',
                 },
-                title: {
-                    text: 'Session Solves',
+                {
+                    name: 'Best Time',
+                    data: bestSolves.value,
+                    dashStyle: 'Dash',
+                    color: '#FFD280',
+                    type: 'line',
                 },
-                xAxis: {
-                    type: 'datetime',
-                    labels: {
-                        formatter() {
-                            return moment(this.value).format('h:mm A')
-                        },
-                    },
+            ],
+            tooltip: {
+                formatter() {
+                    return `<b>${formatTimestamp(this.x)}</b><br/>${formatTimeDelta(this.y)}`
                 },
-                yAxis: {
-                    title: {
-                        text: 'Solve Time',
-                    },
-                    labels: {
-                        formatter() {
-                            return formatTimeDelta(this.value as number)
-                        },
-                    },
-                    min: 0,
-                },
-                lang: {
-                    noData: 'No solves yet!',
-                },
-                legend: {
-                    enabled: true,
-                },
-                plotOptions: {
-                    line: {
-                        dataLabels: {
-                            enabled: true,
-                            formatter() {
-                                return formatTimeDeltaShort(this.y as number)
-                            },
-                        },
-                        marker: {
-                            enabled: true,
-                        },
-                    },
-                },
-                series: [
-                    {
-                        name: 'Solve Time',
-                        data: this.allSolves,
-                        type: 'line',
-                    },
-                    {
-                        name: 'Best Time',
-                        data: this.bestSolves,
-                        dashStyle: 'Dash',
-                        color: '#FFD280',
-                        type: 'line',
-                    },
-                ],
-                tooltip: {
-                    formatter() {
-                        return `<b>${formatTimestamp(this.x)}</b><br/>${formatTimeDelta(this.y)}`
-                    },
-                },
-            })
-        }
-    }
+            },
+        })
+    })
 </script>
 
 <style>

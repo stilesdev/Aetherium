@@ -1,21 +1,17 @@
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-import Vue from 'vue'
-import { CompatVue } from '@vue/runtime-dom'
-
-import store from './store'
-import router from './router'
+import { createApp } from 'vue'
+import { createStore } from './store'
+import { createRouter } from './router'
 import Aetherium from './components/Aetherium.vue'
 
-declare global {
-    interface Window {
-        vApp: CompatVue
-    }
-}
+const store = createStore()
+const router = createRouter(store)
 
-new Vue({
-    store,
-    router,
-    render: (h: Function) => h(Aetherium),
-}).$mount('#app')
+const app = createApp(Aetherium)
+
+app.use(store)
+app.use(router)
+
+app.mount('#app')

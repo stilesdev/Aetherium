@@ -39,77 +39,67 @@
     </div>
 </template>
 
-<script lang="ts">
-    import { DatabaseReference, get, getDatabase, ref } from 'firebase/database'
-    import Vue from 'vue'
-    import { Component } from 'vue-property-decorator'
+<script lang="ts" setup>
+    import { DatabaseReference, get, getDatabase, ref as dbRef } from 'firebase/database'
+    import { computed, onMounted, ref } from 'vue'
+    import { useStore } from 'vuex'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
     import { FirebaseList, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
     import { Statistics } from '@/types'
 
-    @Component
-    export default class PersonalBests extends Vue {
-        public personalBests: Record<string, unknown> = {} // TODO: define a type for this
+    const store = useStore()
 
-        get userId(): string {
-            return this.$store.state.userId
-        }
+    const personalBests = ref<Record<string, Record<string, { time: string; date: string | undefined }>>>({}) // TODO: define a type for this
 
-        get puzzles(): Puzzle[] {
-            const puzzles: FirebaseList<Puzzle> = this.$store.state.puzzles
-            return Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-        }
+    const userId = computed<string>(() => store.state.userId)
+    const puzzles = computed<Puzzle[]>(() => {
+        const puzzles: FirebaseList<Puzzle> = store.state.puzzles
+        return Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+    })
+    const allSessions = computed<FirebaseList<SessionPayload>>(() => store.state.allSessions)
+    const puzzleStatsRef = computed<(puzzle: string) => DatabaseReference>(() => (puzzle) => dbRef(getDatabase(), `/stats/${userId.value}/${puzzle}`))
 
-        get allSessions(): FirebaseList<SessionPayload> {
-            return this.$store.state.allSessions
-        }
+    const findBestStatistic = (sessions: Statistics[], statistic: keyof StatisticsPayload): { time: string; date: string | undefined } => {
+        const filteredSessions = sessions.filter((session) => session[statistic] > 0)
 
-        get puzzleStatsRef(): (puzzle: string) => DatabaseReference {
-            return (puzzle) => ref(getDatabase(), `/stats/${this.userId}/${puzzle}`)
-        }
-
-        public findBestStatistics(allSessions: Statistics[]): Record<string, unknown> {
+        if (filteredSessions.length > 0) {
+            const session = filteredSessions.reduce((previous, current) => (previous[statistic] < current[statistic] ? previous : current))
             return {
-                best: this.findBestStatistic(allSessions, 'best'),
-                bestMo3: this.findBestStatistic(allSessions, 'bestMo3'),
-                bestAo5: this.findBestStatistic(allSessions, 'bestAo5'),
-                bestAo12: this.findBestStatistic(allSessions, 'bestAo12'),
-                bestAo50: this.findBestStatistic(allSessions, 'bestAo50'),
-                bestAo100: this.findBestStatistic(allSessions, 'bestAo100'),
+                time: formatTimeDeltaShort(session[statistic]),
+                date: session.date,
             }
-        }
-
-        public findBestStatistic(sessions: Statistics[], statistic: keyof StatisticsPayload): { time: string; date?: string } {
-            const filteredSessions = sessions.filter((session) => session[statistic] > 0)
-
-            if (filteredSessions.length > 0) {
-                const session = filteredSessions.reduce((previous, current) => (previous[statistic] < current[statistic] ? previous : current))
-                return {
-                    time: formatTimeDeltaShort(session[statistic]),
-                    date: session.date,
-                }
-            } else {
-                return { time: formatTimeDelta(0), date: undefined }
-            }
-        }
-
-        public mounted(): void {
-            this.puzzles.forEach((puzzle) => {
-                get(this.puzzleStatsRef(puzzle.key)).then((snapshot) => {
-                    const allStats: FirebaseList<Statistics> = snapshot.val()
-                    const sessions: Statistics[] = []
-                    if (allStats && this.allSessions) {
-                        Object.entries(allStats).forEach((entry) => {
-                            const sessionId = entry[0]
-                            const stat = entry[1]
-                            stat.date = this.allSessions[sessionId].date
-                            sessions.push(stat)
-                        })
-                    }
-
-                    Vue.set(this.personalBests, puzzle.key, this.findBestStatistics(sessions))
-                })
-            })
+        } else {
+            return { time: formatTimeDelta(0), date: undefined }
         }
     }
+
+    const findBestStatistics = (allSessions: Statistics[]): Record<string, { time: string; date: string | undefined }> => {
+        return {
+            best: findBestStatistic(allSessions, 'best'),
+            bestMo3: findBestStatistic(allSessions, 'bestMo3'),
+            bestAo5: findBestStatistic(allSessions, 'bestAo5'),
+            bestAo12: findBestStatistic(allSessions, 'bestAo12'),
+            bestAo50: findBestStatistic(allSessions, 'bestAo50'),
+            bestAo100: findBestStatistic(allSessions, 'bestAo100'),
+        }
+    }
+
+    onMounted(() => {
+        puzzles.value.forEach((puzzle) => {
+            get(puzzleStatsRef.value(puzzle.key)).then((snapshot) => {
+                const allStats: FirebaseList<Statistics> = snapshot.val()
+                const sessions: Statistics[] = []
+                if (allStats && allSessions.value) {
+                    Object.entries(allStats).forEach((entry) => {
+                        const sessionId = entry[0]
+                        const stat = entry[1]
+                        stat.date = allSessions.value[sessionId].date
+                        sessions.push(stat)
+                    })
+                }
+
+                personalBests.value[puzzle.key] = findBestStatistics(sessions)
+            })
+        })
+    })
 </script>

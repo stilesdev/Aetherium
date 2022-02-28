@@ -10,20 +10,25 @@
 </template>
 
 <script lang="ts">
-    import { Vue, Component } from 'vue-property-decorator'
     import Navbar from './Navbar.vue'
 
-    @Component({
-        components: { Navbar },
-    })
-    export default class Aetherium extends Vue {
-        get showNavbar(): boolean {
-            return !this.$store.state.hideUI && this.$route.name !== 'Login'
-        }
-        get themeUrl(): string {
-            return this.$store.state.options.themeUrl
-        }
+    export default {
+        components: {
+            Navbar,
+        },
     }
+</script>
+
+<script lang="ts" setup>
+    import { computed } from 'vue'
+    import { useRoute } from 'vue-router'
+    import { useStore } from 'vuex'
+
+    const store = useStore()
+    const route = useRoute()
+
+    const showNavbar = computed<boolean>(() => !store.state.hideUI && route.name !== 'Login')
+    const themeUrl = computed<string>(() => store.state.options.themeUrl)
 </script>
 
 <style>
