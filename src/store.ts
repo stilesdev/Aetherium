@@ -3,7 +3,6 @@ import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { child, DatabaseReference, get, getDatabase, onValue, push, ref, remove, serverTimestamp, set, update } from 'firebase/database'
 import moment, { Moment } from 'moment'
-import Vue from 'vue'
 import { ActionContext, createStore as _createStore, MutationPayload, Store } from 'vuex'
 import { Actions, Mutations, References, RootState, ScramblePayload } from '@/types/store'
 import FirebaseManager from '@/util/firebase-manager'
@@ -122,9 +121,9 @@ export function createStore(): Store<RootState> {
                 state.solves.unshift(solve)
             },
             [Mutations.UPDATE_SOLVE](state: RootState, payload: { uid: string; solve: ISolve }): void {
-                Vue.set(
-                    state.solves,
-                    state.solves.findIndex((solve: ISolve) => solve.uid === payload.uid),
+                state.solves.splice(
+                    state.solves.findIndex((solve) => solve.uid === payload.uid),
+                    1,
                     payload.solve
                 )
             },
@@ -162,7 +161,7 @@ export function createStore(): Store<RootState> {
                     text: 'Generating scramble...',
                     svg: undefined,
                 })
-    
+
                 if (context.state.puzzles) {
                     context.state.scramblerWorker.postMessage({
                         scrambler: context.state.puzzles[context.state.activePuzzle].scrambler,
@@ -173,15 +172,15 @@ export function createStore(): Store<RootState> {
                 return new Promise((resolve) => {
                     if (!context.state.sessionId) {
                         const date = moment().utc().dayOfYear(moment().dayOfYear()).startOf('day')
-    
+
                         const newSessionRef = push(context.getters.sessionsRef)
-    
+
                         set(context.getters.currentSessionIdRef, newSessionRef.key).then(() => {
                             set(context.getters.currentSessionRef, {
                                 date: date.format('M/D/YYYY'),
                                 timestamp: date.valueOf(),
                             })
-    
+
                             resolve()
                         })
                     } else {
@@ -201,7 +200,7 @@ export function createStore(): Store<RootState> {
                         scramble: context.state.scramble.text,
                         penalty: '',
                     }).then(() => context.dispatch(Actions.UPDATE_STATS))
-    
+
                     context.dispatch(Actions.REQUEST_SCRAMBLE)
                 })
             },
@@ -255,7 +254,7 @@ export function createStore(): Store<RootState> {
                                     },
                                 })
                             }
-    
+
                             store.commit(Mutations.RECEIVE_USER_ID, user.uid)
                         })
                     } else {
@@ -285,7 +284,7 @@ export function createStore(): Store<RootState> {
                 store.subscribe((mutation: MutationPayload, state: RootState) => {
                     if (mutation.type === Mutations.RECEIVE_USER_ID) {
                         FirebaseManager.disconnectAllRefs()
-    
+
                         if (state.userId) {
                             FirebaseManager.connectRef(References.OPTIONS, store)
                             FirebaseManager.connectRef(References.CURRENT_SESSION_ID, store)
@@ -297,7 +296,7 @@ export function createStore(): Store<RootState> {
                 store.subscribe((mutation: MutationPayload, state: RootState) => {
                     if (mutation.type === Mutations.RECEIVE_SESSION_ID) {
                         FirebaseManager.disconnectRef(References.SESSION)
-    
+
                         if (state.sessionId) {
                             FirebaseManager.connectRef(References.SESSION, store)
                         }
@@ -311,7 +310,7 @@ export function createStore(): Store<RootState> {
                         FirebaseManager.disconnectRef(References.ALL_SESSIONS)
                         FirebaseManager.disconnectRef(References.ALL_STATS)
                         store.commit(Mutations.CLEAR_SOLVES)
-    
+
                         FirebaseManager.connectRef(References.SOLVES, store)
                         FirebaseManager.connectRef(References.SESSION_STATS, store)
                         FirebaseManager.connectRef(References.ALL_SESSIONS, store)
