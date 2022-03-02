@@ -1,7 +1,10 @@
 import { createRouter as _createRouter, createWebHistory, RouterLink, RouterView } from 'vue-router'
 import { Store } from 'vuex'
-import Timer from '@/components/views/Timer.vue'
-import Login from '@/components/Login.vue'
+const Login = () => import('@/components/Login.vue')
+const Timer = () => import('@/components/views/Timer.vue')
+const Stats = () => import('@/components/views/Stats.vue')
+const History = () => import('@/components/views/History.vue')
+const PersonalBests = () => import('@/components/views/PersonalBests.vue')
 
 export function createRouter(store: Store<any>) {
     const router = _createRouter({
@@ -25,17 +28,17 @@ export function createRouter(store: Store<any>) {
             {
                 path: '/statistics',
                 name: 'Statistics',
-                component: () => import(/* webpackChunkName: "stats" */ '@/components/views/Stats.vue'),
+                component: Stats,
             },
             {
                 path: '/history',
                 name: 'History',
-                component: () => import(/* webpackChunkName: "history" */ '@/components/views/History.vue'),
+                component: History,
             },
             {
                 path: '/personal-bests',
                 name: 'PersonalBests',
-                component: () => import(/* webpackChunkName: "pb" */ '@/components/views/PersonalBests.vue'),
+                component: PersonalBests,
             },
         ],
     })
