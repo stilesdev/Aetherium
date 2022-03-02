@@ -1,7 +1,11 @@
-import { createRouter as _createRouter, createWebHistory, RouterOptions } from 'vue-router'
+import { createRouter as _createRouter, createWebHistory, RouterLink, RouterView } from 'vue-router'
 import { Store } from 'vuex'
 import Timer from '@/components/views/Timer.vue'
 import Login from '@/components/Login.vue'
+
+// TODO: remove this when removing the compatibility build
+RouterLink.compatConfig = { MODE: 3 }
+RouterView.compatConfig = { MODE: 3 }
 
 export function createRouter(store: Store<any>) {
     const router = _createRouter({
@@ -38,7 +42,6 @@ export function createRouter(store: Store<any>) {
                 component: () => import(/* webpackChunkName: "pb" */ '@/components/views/PersonalBests.vue'),
             },
         ],
-        
     })
 
     router.beforeEach((to, from, next) => {

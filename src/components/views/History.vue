@@ -51,9 +51,10 @@
         return personalBests
     })
 
-    watch(sessionMeans, (newValue: ChartSeries) => sessionHistoryChart?.series[0].setData(newValue))
-    watch(sessionBests, (newValue: ChartSeries) => sessionHistoryChart?.series[1].setData(newValue))
-    watch(personalBests, (newValue: ChartSeries) => sessionHistoryChart?.series[2].setData(newValue))
+    // TODO: is deep: true necessary here? (Vue 3 deprecation WATCH_ARRAY)
+    watch(sessionMeans, (newValue: ChartSeries) => sessionHistoryChart?.series[0].setData(newValue), { deep: true })
+    watch(sessionBests, (newValue: ChartSeries) => sessionHistoryChart?.series[1].setData(newValue), { deep: true })
+    watch(personalBests, (newValue: ChartSeries) => sessionHistoryChart?.series[2].setData(newValue), { deep: true })
 
     onMounted(() => {
         sessionHistoryChart = new Chart('sessionHistoryChart', {

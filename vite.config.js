@@ -9,6 +9,7 @@ export default defineConfig({
             template: {
                 compilerOptions: {
                     compatConfig: {
+                        // Remove compat config from router/index.ts when removing this
                         MODE: 2,
                     },
                 },

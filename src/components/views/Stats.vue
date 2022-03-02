@@ -30,8 +30,9 @@
         return bestSolves
     })
 
-    watch(allSolves, (newValue: ChartSeries) => sessionChart?.series[0].setData(newValue))
-    watch(bestSolves, (newValue: ChartSeries) => sessionChart?.series[1].setData(newValue))
+    // TODO: is deep: true necessary here? (Vue 3 deprecation WATCH_ARRAY)
+    watch(allSolves, (newValue: ChartSeries) => sessionChart?.series[0].setData(newValue), { deep: true })
+    watch(bestSolves, (newValue: ChartSeries) => sessionChart?.series[1].setData(newValue), { deep: true })
 
     onMounted(() => {
         sessionChart = new Chart('sessionChart', {

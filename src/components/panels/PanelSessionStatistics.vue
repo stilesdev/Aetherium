@@ -105,7 +105,11 @@
         })
     }
 
-    watch(stats, () => {
-        ao1000.value = 0
-    })
+    watch(
+        stats,
+        () => {
+            ao1000.value = 0
+        },
+        { deep: true }
+    )
 </script>
