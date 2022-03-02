@@ -40,13 +40,9 @@ export function createRouter(store: Store<any>) {
         ],
     })
 
-    router.beforeEach((to, from, next) => {
-        if (to.name === 'Login') {
-            next()
-        } else if (store.getters.isLoggedIn) {
-            next()
-        } else {
-            next({ name: 'Login' })
+    router.beforeEach((to) => {
+        if (!store.getters.isLoggedIn && to.name !== 'Login') {
+            return { name: 'Login' }
         }
     })
 
