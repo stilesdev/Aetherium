@@ -3,10 +3,6 @@ import { Store } from 'vuex'
 import Timer from '@/components/views/Timer.vue'
 import Login from '@/components/Login.vue'
 
-// TODO: remove this when removing the compatibility build
-RouterLink.compatConfig = { MODE: 3 }
-RouterView.compatConfig = { MODE: 3 }
-
 export function createRouter(store: Store<any>) {
     const router = _createRouter({
         history: createWebHistory(),

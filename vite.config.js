@@ -5,16 +5,7 @@ import createVuePlugin from '@vitejs/plugin-vue'
 
 export default defineConfig({
     plugins: [
-        createVuePlugin({
-            template: {
-                compilerOptions: {
-                    compatConfig: {
-                        // Remove compat config from router/index.ts when removing this
-                        MODE: 2,
-                    },
-                },
-            },
-        }),
+        createVuePlugin(),
         inject({
             jQuery: 'jquery',
             $: 'jquery',
@@ -30,7 +21,6 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': resolve(__dirname, 'src'),
-            vue: '@vue/compat',
         },
     },
 })
