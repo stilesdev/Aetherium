@@ -14,6 +14,10 @@ import type { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPa
 import { SolvePenalty, TimerTrigger } from '@/types/firebase'
 
 const firebaseApp = initializeApp(firebaseConfig.development)
+if (import.meta.env.VITE_APPCHECK_DEBUG_TOKEN) {
+    console.log('[app-check]', 'initializing app-check with debug token: ' + import.meta.env.VITE_APPCHECK_DEBUG_TOKEN)
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN
+}
 initializeAppCheck(firebaseApp, {
     provider: new ReCaptchaV3Provider(firebaseConfig.reCaptchaV3SiteKey),
 })
