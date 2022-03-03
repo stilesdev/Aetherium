@@ -20,13 +20,11 @@ export default defineConfig({
             },
         },
     },
-    // css: {
-    //     postcss: {
-    //         plugins: {
-    //             autoprefixer: {},
-    //         }
-    //     }
-    // },
+    css: {
+        postcss: {
+            plugins: [require('autoprefixer')],
+        },
+    },
     resolve: {
         alias: {
             '@': resolve(__dirname, 'src'),
