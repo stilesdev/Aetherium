@@ -11,6 +11,15 @@ export default defineConfig({
             $: 'jquery',
         }),
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    firebase: ['firebase/app', 'firebase/app-check', 'firebase/auth', 'firebase/database'],
+                },
+            },
+        },
+    },
     // css: {
     //     postcss: {
     //         plugins: {
