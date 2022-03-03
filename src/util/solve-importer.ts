@@ -1,9 +1,9 @@
-import { Schema, Validator } from 'jsonschema'
+import { type Schema, Validator } from 'jsonschema'
 import moment from 'moment'
 import { getDatabase, push, ref, set } from 'firebase/database'
 import { Solve } from '@/classes/solve'
 import { Stats } from '@/util/stats'
-import { SolvePayload } from '@/types/firebase'
+import type { SolvePayload } from '@/types/firebase'
 
 export class SolveImporter {
     private userId: string

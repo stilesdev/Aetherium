@@ -38,14 +38,28 @@
     </div>
 </template>
 
+<script lang="ts">
+    import PanelSessionStatistics from '@/components/panels/PanelSessionStatistics.vue'
+    import PanelSolvesList from '@/components/panels/PanelSolvesList.vue'
+    import PanelScrambleImage from '@/components/panels/PanelScrambleImage.vue'
+
+    export default {
+        components: {
+            'stats-panel': PanelSessionStatistics,
+            'solves-panel': PanelSolvesList,
+            'scramble-panel': PanelScrambleImage,
+        },
+    }
+</script>
+
 <script lang="ts" setup>
     import moment from 'moment'
     import $ from 'jquery'
     import { computed, onUnmounted, ref, watch } from 'vue'
     import { useStore } from 'vuex'
-    import Stackmat, { Packet } from 'stackmat'
+    import Stackmat, { type Packet } from 'stackmat'
     import TimerStateMachine from '@/util/timer-state-machine'
-    import { TimerState, TimerStateMachineOptions } from '@/types'
+    import { TimerState, type TimerStateMachineOptions } from '@/types'
     import { Actions, Mutations } from '@/types/store'
     import { formatTimeDelta } from '@/util/format'
     import { TimerTrigger } from '@/types/firebase'
@@ -258,20 +272,6 @@
     // This was run in created() in Vue 2, run directly in setup() for Vue 3
     createTimerState()
     initTimers()
-</script>
-
-<script lang="ts">
-    import PanelSessionStatistics from '@/components/panels/PanelSessionStatistics.vue'
-    import PanelSolvesList from '@/components/panels/PanelSolvesList.vue'
-    import PanelScrambleImage from '@/components/panels/PanelScrambleImage.vue'
-
-    export default {
-        components: {
-            'stats-panel': PanelSessionStatistics,
-            'solves-panel': PanelSolvesList,
-            'scramble-panel': PanelScrambleImage,
-        },
-    }
 </script>
 
 <style src="./Timer.css"></style>

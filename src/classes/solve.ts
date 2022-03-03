@@ -1,7 +1,7 @@
-import { DataSnapshot } from 'firebase/database'
-import { ISolve } from '@/types'
+import type { DataSnapshot } from 'firebase/database'
+import type { ISolve } from '@/types'
 import { formatTimeDelta, formatTimeDeltaShort, formatTimestamp } from '@/util/format'
-import { SolvePenalty } from '@/types/firebase'
+import type { SolvePenalty } from '@/types/firebase'
 
 export class Solve implements ISolve {
     public static fromSnapshot(solveSnapshot: DataSnapshot): Solve {

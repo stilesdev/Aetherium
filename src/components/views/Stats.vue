@@ -10,8 +10,8 @@
     import { computed, onMounted, watch } from 'vue'
     import { useStore } from 'vuex'
     import { formatTimeDelta, formatTimeDeltaShort, formatTimestamp } from '@/util/format'
-    import { Solve } from '@/classes/solve'
-    import { ChartSeries } from '@/types'
+    import type { Solve } from '@/classes/solve'
+    import type { ChartSeries } from '@/types'
 
     const store = useStore()
 

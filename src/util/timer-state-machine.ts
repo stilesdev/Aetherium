@@ -1,5 +1,5 @@
-import StateMachine, { LifeCycle } from 'javascript-state-machine'
-import { TimerState, TimerStateMachineOptions } from '@/types'
+import StateMachine, { type LifeCycle } from 'javascript-state-machine'
+import { TimerState, type TimerStateMachineOptions } from '@/types'
 
 export default class TimerStateMachine {
     private readonly holdToStart: boolean

@@ -1,4 +1,4 @@
-import { SolvePayload, StatisticsPayload } from '@/types/firebase'
+import type { SolvePayload, StatisticsPayload } from '@/types/firebase'
 
 export interface ISolve extends SolvePayload {
     uid: string

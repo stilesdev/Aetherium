@@ -40,12 +40,12 @@
 </template>
 
 <script lang="ts" setup>
-    import { DatabaseReference, get, getDatabase, ref as dbRef } from 'firebase/database'
+    import { type DatabaseReference, get, getDatabase, ref as dbRef } from 'firebase/database'
     import { computed, onMounted, ref } from 'vue'
     import { useStore } from 'vuex'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
-    import { FirebaseList, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
-    import { Statistics } from '@/types'
+    import type { FirebaseList, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
+    import type { Statistics } from '@/types'
 
     const store = useStore()
 

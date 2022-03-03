@@ -1,5 +1,5 @@
-import { createRouter as _createRouter, createWebHistory, RouterLink, RouterView } from 'vue-router'
-import { Store } from 'vuex'
+import { createRouter as _createRouter, createWebHistory } from 'vue-router'
+import type { Store } from 'vuex'
 const Login = () => import('@/components/Login.vue')
 const Timer = () => import('@/components/views/Timer.vue')
 const Stats = () => import('@/components/views/Stats.vue')

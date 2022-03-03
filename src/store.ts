@@ -1,16 +1,17 @@
 import { initializeApp } from 'firebase/app'
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { child, DatabaseReference, get, getDatabase, onValue, push, ref, remove, serverTimestamp, set, update } from 'firebase/database'
-import moment, { Moment } from 'moment'
-import { ActionContext, createStore as _createStore, MutationPayload, Store } from 'vuex'
-import { Actions, Mutations, References, RootState, ScramblePayload } from '@/types/store'
+import { child, type DatabaseReference, get, getDatabase, onValue, push, ref, remove, serverTimestamp, set, update } from 'firebase/database'
+import moment, { type Moment } from 'moment'
+import { type ActionContext, createStore as _createStore, type MutationPayload, Store } from 'vuex'
+import { Actions, Mutations, References, type RootState, type ScramblePayload } from '@/types/store'
 import FirebaseManager from '@/util/firebase-manager'
 import { Stats } from '@/util/stats'
-import { ISolve } from '@/types'
+import type { ISolve } from '@/types'
 import { ScramblerWorker } from '@/workers'
 import firebaseConfig from '../firebase.config'
-import { FirebaseList, ProfileOptions, Puzzle, SessionPayload, SolvePenalty, StatisticsPayload, TimerTrigger } from '@/types/firebase'
+import type { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
+import { SolvePenalty, TimerTrigger } from '@/types/firebase'
 
 const firebaseApp = initializeApp(firebaseConfig.development)
 initializeAppCheck(firebaseApp, {

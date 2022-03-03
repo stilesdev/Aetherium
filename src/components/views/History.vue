@@ -21,8 +21,8 @@
     import { computed, onMounted, watch } from 'vue'
     import { useStore } from 'vuex'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
-    import { FirebaseList, SessionPayload, StatisticsPayload } from '@/types/firebase'
-    import { ChartSeries } from '@/types'
+    import type { FirebaseList, SessionPayload, StatisticsPayload } from '@/types/firebase'
+    import type { ChartSeries } from '@/types'
 
     const store = useStore()
 

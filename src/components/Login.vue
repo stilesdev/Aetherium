@@ -34,7 +34,7 @@
     import { computed, ref, watch } from 'vue'
     import { useRouter } from 'vue-router'
     import { useStore } from 'vuex'
-    import { AuthError, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+    import { type AuthError, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
     const store = useStore()
     const router = useRouter()

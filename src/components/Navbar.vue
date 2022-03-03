@@ -224,10 +224,11 @@
     import { useRouter } from 'vue-router'
     import { useStore } from 'vuex'
     import { getAuth } from 'firebase/auth'
-    import { ThemeData } from '@/types'
+    import type { ThemeData } from '@/types'
     import { Actions } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
-    import { FirebaseList, ProfileOptions, Puzzle, TimerTrigger } from '@/types/firebase'
+    import type { FirebaseList, ProfileOptions, Puzzle } from '@/types/firebase'
+    import { TimerTrigger } from '@/types/firebase'
 
     const router = useRouter()
     const store = useStore()

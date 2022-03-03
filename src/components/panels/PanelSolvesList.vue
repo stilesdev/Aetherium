@@ -64,7 +64,7 @@
 <script lang="ts" setup>
     import { computed } from 'vue'
     import { useStore } from 'vuex'
-    import { ISolve } from '@/types'
+    import type { ISolve } from '@/types'
     import { Actions } from '@/types/store'
     import { SolvePenalty } from '@/types/firebase'
 

@@ -1,4 +1,4 @@
-import { ISolve } from '@/types'
+import type { ISolve } from '@/types'
 
 export abstract class Stats {
     public static mean(solves: ISolve[]): number {

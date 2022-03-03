@@ -84,7 +84,7 @@
     import { get, limitToLast, orderByChild, query } from 'firebase/database'
     import { Solve } from '@/classes/solve'
     import { Stats } from '@/util/stats'
-    import { StatisticsPayload } from '@/types/firebase'
+    import type { StatisticsPayload } from '@/types/firebase'
 
     const store = useStore()
 

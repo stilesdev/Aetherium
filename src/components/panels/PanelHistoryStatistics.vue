@@ -56,8 +56,8 @@
     import { computed } from 'vue'
     import { useStore } from 'vuex'
     import { formatTimeDelta } from '@/util/format'
-    import { FirebaseList, SessionPayload, StatisticsPayload } from '@/types/firebase'
-    import { Statistics } from '@/types'
+    import type { FirebaseList, SessionPayload, StatisticsPayload } from '@/types/firebase'
+    import type { Statistics } from '@/types'
 
     const store = useStore()
 
