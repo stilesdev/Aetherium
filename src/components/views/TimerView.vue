@@ -81,9 +81,6 @@
     const showTimer = computed(() => store.state.options.showTimer)
     const holdToStart = computed(() => store.state.options.holdToStart)
     const useInspection = computed(() => store.state.options.useInspection)
-    const currentPuzzle = computed(() => {
-        return { puzzle: store.state.currentPuzzle }
-    })
     const timerClass = computed(() => {
         if (timerState.value) {
             switch (timerState.value.state) {
@@ -274,4 +271,4 @@
     initTimers()
 </script>
 
-<style src="./Timer.css"></style>
+<style src="./TimerView.css"></style>

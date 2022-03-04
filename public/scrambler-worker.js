@@ -4,11 +4,11 @@ const document = {}
 
 window.document = document
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-document['write'] = function() {}
+document['write'] = function () {}
 window.write = document['write']
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-document.getElementById = function() {}
-document.getElementsByTagName = function() {
+document.getElementById = function () {}
+document.getElementsByTagName = function () {
     return []
 }
 document.readyState = 'loaded'
@@ -20,14 +20,14 @@ if (window.location) {
     document.location = window.location
 }
 
-self.puzzlesLoaded = function(p) {
+self.puzzlesLoaded = function (p) {
     self.puzzles = p
 }
 
 // eslint-disable-next-line no-undef
 importScripts('tnoodle.js')
 
-self.generateScramble = function(scrambler) {
+self.generateScramble = function (scrambler) {
     if (self.puzzles) {
         const puzzle = self.puzzles[scrambler]
 
@@ -44,6 +44,6 @@ self.generateScramble = function(scrambler) {
     }
 }
 
-self.addEventListener('message', event => {
+self.addEventListener('message', (event) => {
     self.generateScramble(event.data.scrambler)
 })

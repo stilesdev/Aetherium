@@ -10,11 +10,11 @@
 </template>
 
 <script lang="ts">
-    import Navbar from './Navbar.vue'
+    import AppNavbar from './AppNavbar.vue'
 
     export default {
         components: {
-            Navbar,
+            navbar: AppNavbar,
         },
     }
 </script>

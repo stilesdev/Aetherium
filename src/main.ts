@@ -4,12 +4,12 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { createApp } from 'vue'
 import { createStore } from './store'
 import { createRouter } from './router'
-import Aetherium from './components/Aetherium.vue'
+import App from './components/App.vue'
 
 const store = createStore()
 const router = createRouter(store)
 
-const app = createApp(Aetherium)
+const app = createApp(App)
 
 app.use(store)
 app.use(router)

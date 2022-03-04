@@ -1,12 +1,13 @@
 import { createRouter as _createRouter, createWebHistory } from 'vue-router'
 import type { Store } from 'vuex'
-const Login = () => import('@/components/Login.vue')
-const Timer = () => import('@/components/views/Timer.vue')
-const Stats = () => import('@/components/views/Stats.vue')
-const History = () => import('@/components/views/History.vue')
-const PersonalBests = () => import('@/components/views/PersonalBests.vue')
+import type { RootState } from '@/types/store'
+const LoginView = () => import('@/components/views/LoginView.vue')
+const TimerView = () => import('@/components/views/TimerView.vue')
+const StatsView = () => import('@/components/views/StatsView.vue')
+const HistoryView = () => import('@/components/views/HistoryView.vue')
+const PersonalBestsView = () => import('@/components/views/PersonalBestsView.vue')
 
-export function createRouter(store: Store<any>) {
+export function createRouter(store: Store<RootState>) {
     const router = _createRouter({
         history: createWebHistory(),
         routes: [
@@ -18,27 +19,27 @@ export function createRouter(store: Store<any>) {
             {
                 path: '/login',
                 name: 'Login',
-                component: Login,
+                component: LoginView,
             },
             {
                 path: '/timer',
                 name: 'Timer',
-                component: Timer,
+                component: TimerView,
             },
             {
                 path: '/statistics',
                 name: 'Statistics',
-                component: Stats,
+                component: StatsView,
             },
             {
                 path: '/history',
                 name: 'History',
-                component: History,
+                component: HistoryView,
             },
             {
                 path: '/personal-bests',
                 name: 'PersonalBests',
-                component: PersonalBests,
+                component: PersonalBestsView,
             },
         ],
     })
