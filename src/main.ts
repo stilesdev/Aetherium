@@ -1,20 +1,17 @@
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-import Vue, { CreateElement } from 'vue'
+import { createApp } from 'vue'
+import { createStore } from './store'
+import { createRouter } from './router'
+import App from './components/App.vue'
 
-import store from './store'
-import router from './router'
-import Aetherium from './components/Aetherium.vue'
+const store = createStore()
+const router = createRouter(store)
 
-declare global {
-    interface Window {
-        vApp: Vue
-    }
-}
+const app = createApp(App)
 
-window.vApp = new Vue({
-    store,
-    router,
-    render: (h: CreateElement) => h(Aetherium),
-}).$mount('#app')
+app.use(store)
+app.use(router)
+
+app.mount('#app')

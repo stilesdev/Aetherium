@@ -52,30 +52,32 @@
 </template>
 
 <script lang="ts">
-    import Vue from 'vue'
-    import { Component } from 'vue-property-decorator'
     import PanelRoot from './PanelRoot.vue'
-    import { ISolve } from '@/types'
+
+    export default {
+        components: {
+            panel: PanelRoot,
+        },
+    }
+</script>
+
+<script lang="ts" setup>
+    import { computed } from 'vue'
+    import { useStore } from '@/composables/useStore'
+    import type { ISolve } from '@/types'
     import { Actions } from '@/types/store'
     import { SolvePenalty } from '@/types/firebase'
 
-    @Component({
-        components: { panel: PanelRoot },
-    })
-    export default class PanelSolvesList extends Vue {
-        public SolvePenalty = SolvePenalty
+    const store = useStore()
 
-        get solves(): ISolve[] {
-            return this.$store.state.solves
-        }
+    const solves = computed(() => store.state.solves)
 
-        public setPenalty(solve: ISolve, penalty: SolvePenalty): void {
-            this.$store.dispatch(Actions.SET_PENALTY, { solve, penalty })
-        }
+    const setPenalty = (solve: ISolve, penalty: SolvePenalty) => {
+        store.dispatch(Actions.SET_PENALTY, { solve, penalty })
+    }
 
-        public deleteSolve(solveId: string): void {
-            this.$store.dispatch(Actions.DELETE_SOLVE, solveId)
-        }
+    const deleteSolve = (solveId: string) => {
+        store.dispatch(Actions.DELETE_SOLVE, solveId)
     }
 </script>
 

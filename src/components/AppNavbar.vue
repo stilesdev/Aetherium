@@ -120,18 +120,18 @@
                             <label
                                 class="btn btn-default"
                                 :class="{
-                                    active: options.timerTrigger === 'spacebar',
+                                    active: options.timerTrigger === TimerTrigger.SPACEBAR,
                                 }"
-                                @click="options.timerTrigger = 'spacebar'"
+                                @click="options.timerTrigger = TimerTrigger.SPACEBAR"
                             >
                                 <input type="radio" name="timerTriggerOptions" id="spacebarTimerTrigger" autocomplete="off" />Spacebar
                             </label>
                             <label
                                 class="btn btn-default"
                                 :class="{
-                                    active: options.timerTrigger === 'stackmat',
+                                    active: options.timerTrigger === TimerTrigger.STACKMAT,
                                 }"
-                                @click="options.timerTrigger = 'stackmat'"
+                                @click="options.timerTrigger = TimerTrigger.STACKMAT"
                             >
                                 <input type="radio" name="timerTriggerOptions" id="stackmatTimerTrigger" autocomplete="off" />Stackmat
                             </label>
@@ -217,135 +217,133 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import moment from 'moment'
     import $ from 'jquery'
-    import Vue from 'vue'
-    import { Component } from 'vue-property-decorator'
-    import { ThemeData } from '@/types'
+    import { computed, ref } from 'vue'
+    import { useRouter } from 'vue-router'
+    import { useStore } from '@/composables/useStore'
+    import { getAuth } from 'firebase/auth'
+    import type { ThemeData } from '@/types'
     import { Actions } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
-    import { getAuth } from 'firebase/auth'
-    import { FirebaseList, ProfileOptions, Puzzle, TimerTrigger } from '@/types/firebase'
+    import type { ProfileOptions } from '@/types/firebase'
+    import { TimerTrigger } from '@/types/firebase'
 
-    @Component
-    export default class Navbar extends Vue {
-        public options: ProfileOptions = {
-            showTimer: true,
-            timerTrigger: TimerTrigger.SPACEBAR,
-            holdToStart: true,
-            useInspection: true,
-            themeUrl: '/themes/default.min.css',
+    const router = useRouter()
+    const store = useStore()
+
+    const options = ref<ProfileOptions>({
+        showTimer: true,
+        timerTrigger: TimerTrigger.SPACEBAR,
+        holdToStart: true,
+        useInspection: true,
+        themeUrl: '/themes/default.min.css',
+    })
+
+    const importTextValid = ref(true)
+    const importText = ref('')
+    const solveImporter = ref<SolveImporter | undefined>()
+    const themes: ThemeData[] = [
+        { name: 'Default', url: '/themes/default.min.css' },
+        { name: 'Cerulean', url: '/themes/cerulean.min.css' },
+        { name: 'Cosmo', url: '/themes/cosmo.min.css' },
+        { name: 'Cyborg', url: '/themes/cyborg.min.css' },
+        { name: 'Darkly', url: '/themes/darkly.min.css' },
+        { name: 'Flatly', url: '/themes/flatly.min.css' },
+        { name: 'Journal', url: '/themes/journal.min.css' },
+        { name: 'Lumen', url: '/themes/lumen.min.css' },
+        { name: 'Paper', url: '/themes/paper.min.css' },
+        { name: 'Readable', url: '/themes/readable.min.css' },
+        { name: 'Sandstone', url: '/themes/sandstone.min.css' },
+        { name: 'Simplex', url: '/themes/simplex.min.css' },
+        { name: 'Slate', url: '/themes/slate.min.css' },
+        { name: 'Spacelab', url: '/themes/spacelab.min.css' },
+        { name: 'Superhero', url: '/themes/superhero.min.css' },
+        { name: 'United', url: '/themes/united.min.css' },
+        { name: 'Yeti', url: '/themes/yeti.min.css' },
+    ]
+
+    const puzzles = computed(() => {
+        if (store.state.puzzles) {
+            const puzzles = store.state.puzzles
+            return Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        } else {
+            return []
         }
-        public importTextValid = true
-        public importText = ''
-        public solveImporter?: SolveImporter
-        public themes: ThemeData[] = [
-            { name: 'Default', url: '/themes/default.min.css' },
-            { name: 'Cerulean', url: '/themes/cerulean.min.css' },
-            { name: 'Cosmo', url: '/themes/cosmo.min.css' },
-            { name: 'Cyborg', url: '/themes/cyborg.min.css' },
-            { name: 'Darkly', url: '/themes/darkly.min.css' },
-            { name: 'Flatly', url: '/themes/flatly.min.css' },
-            { name: 'Journal', url: '/themes/journal.min.css' },
-            { name: 'Lumen', url: '/themes/lumen.min.css' },
-            { name: 'Paper', url: '/themes/paper.min.css' },
-            { name: 'Readable', url: '/themes/readable.min.css' },
-            { name: 'Sandstone', url: '/themes/sandstone.min.css' },
-            { name: 'Simplex', url: '/themes/simplex.min.css' },
-            { name: 'Slate', url: '/themes/slate.min.css' },
-            { name: 'Spacelab', url: '/themes/spacelab.min.css' },
-            { name: 'Superhero', url: '/themes/superhero.min.css' },
-            { name: 'United', url: '/themes/united.min.css' },
-            { name: 'Yeti', url: '/themes/yeti.min.css' },
-        ]
+    })
 
-        get puzzles(): Puzzle[] {
-            if (this.$store.state.puzzles) {
-                const puzzles: FirebaseList<Puzzle> = this.$store.state.puzzles
-                return Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-            } else {
-                return []
-            }
-        }
+    const activePuzzle = computed({
+        get: () => store.state.activePuzzle,
+        set: (value) => store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value }),
+    })
 
-        get activePuzzle(): string {
-            return this.$store.state.activePuzzle
-        }
+    const storeOptions = computed({
+        get: () => store.state.options,
+        set: (value) => store.dispatch(Actions.SET_OPTIONS, value),
+    })
 
-        set activePuzzle(value: string) {
-            this.$store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value })
-        }
-
-        get storeOptions(): ProfileOptions {
-            return this.$store.state.options
-        }
-
-        set storeOptions(value: ProfileOptions) {
-            this.$store.dispatch(Actions.SET_OPTIONS, value)
-        }
-
-        get sessionDate(): string {
+    const sessionDate = computed({
+        get: () => {
             let temp
 
-            if (moment.isMoment(this.$store.state.sessionDate)) {
-                temp = this.$store.state.sessionDate
+            if (moment.isMoment(store.state.sessionDate)) {
+                temp = store.state.sessionDate
             } else {
                 temp = moment()
             }
 
             return moment().utc().dayOfYear(temp.dayOfYear()).startOf('day').format('YYYY-MM-DD')
-        }
-
-        set sessionDate(value: string) {
-            this.$store.dispatch(Actions.UPDATE_SESSION_DATE, {
+        },
+        set: (value) => {
+            store.dispatch(Actions.UPDATE_SESSION_DATE, {
                 moment: moment().utc().dayOfYear(moment(value, 'YYYY-MM-DD').dayOfYear()).startOf('day'),
             })
-        }
+        },
+    })
 
-        public onCloseSessionClick(): void {
-            $('#closeSessionModal').modal()
-        }
+    const onCloseSessionClick = () => {
+        $('#closeSessionModal').modal()
+    }
 
-        public onCloseSessionConfirm(): void {
-            this.$store.dispatch(Actions.CLOSE_SESSION)
-        }
+    const onCloseSessionConfirm = () => {
+        store.dispatch(Actions.CLOSE_SESSION)
+    }
 
-        public openOptionsModal(): void {
-            this.options = Object.assign({}, this.storeOptions)
-            $('#optionsModal').modal()
-        }
+    const openOptionsModal = () => {
+        options.value = Object.assign({}, store.state.options)
+        $('#optionsModal').modal()
+    }
 
-        public onOptionsModalSave(): void {
-            this.storeOptions = this.options
-        }
+    const onOptionsModalSave = () => {
+        storeOptions.value = Object.assign({}, options.value)
+    }
 
-        public openImportModal(): void {
-            this.solveImporter = new SolveImporter(this.$store.state.userId)
-            $('#importModal').modal()
-        }
+    const openImportModal = () => {
+        solveImporter.value = new SolveImporter(store.state.userId)
+        $('#importModal').modal()
+    }
 
-        public validateImportText(): void {
-            this.importTextValid = this.solveImporter?.validate(this.importText) || false
-        }
+    const validateImportText = () => {
+        importTextValid.value = solveImporter.value?.validate(importText.value) || false
+    }
 
-        public runImport(): void {
-            if (this.importTextValid) {
-                this.solveImporter?.import(this.importText)
-            } else {
-                alert('Invalid JSON entered.')
-                return
-            }
-        }
-
-        public logout(): void {
-            getAuth()
-                .signOut()
-                .then(() => this.$router.push('/login'))
-                .catch((error: Error) => alert(error.message))
+    const runImport = () => {
+        if (importTextValid.value) {
+            solveImporter.value?.import(importText.value)
+        } else {
+            alert('Invalid JSON entered.')
         }
     }
+
+    const logout = () => {
+        getAuth()
+            .signOut()
+            .then(() => router.push('/login'))
+            .catch((error: Error) => alert(error.message))
+    }
 </script>
+
 <style>
     pre {
         text-align: left;

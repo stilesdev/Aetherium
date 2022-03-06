@@ -9,15 +9,10 @@
     </div>
 </template>
 
-<script lang="ts">
-    import Vue from 'vue'
-    import { Component, Prop } from 'vue-property-decorator'
-
-    @Component
-    export default class PanelRoot extends Vue {
-        @Prop(String)
-        public readonly panelTitle?: string
-    }
+<script lang="ts" setup>
+    defineProps<{
+        panelTitle: string
+    }>()
 </script>
 
 <style>

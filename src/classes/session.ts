@@ -1,6 +1,6 @@
-import { ISession, ISolve } from '@/types'
+import type { ISession, ISolve } from '@/types'
 import { Stats } from '@/util/stats'
-import { SolvePayload, StatisticsPayload } from '@/types/firebase'
+import type { SolvePayload, StatisticsPayload } from '@/types/firebase'
 
 export class Session implements ISession {
     public solves: ISolve[] = []

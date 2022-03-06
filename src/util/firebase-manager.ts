@@ -1,8 +1,8 @@
 import moment from 'moment'
-import { Store } from 'vuex'
-import { Mutations, References, RootState } from '@/types/store'
+import type { Store } from 'vuex'
+import { Mutations, References, type RootState } from '@/types/store'
 import { Solve } from '@/classes/solve'
-import { DatabaseReference, equalTo, off, onChildAdded, onChildChanged, onChildRemoved, onValue, orderByChild, query } from 'firebase/database'
+import { type DatabaseReference, equalTo, off, onChildAdded, onChildChanged, onChildRemoved, onValue, orderByChild, query } from 'firebase/database'
 
 class FirebaseManager {
     private previousRefs: { [key in References]?: DatabaseReference } = {}

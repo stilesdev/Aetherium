@@ -1,4 +1,4 @@
-import { SolvePayload, StatisticsPayload } from '@/types/firebase'
+import type { SolvePayload, StatisticsPayload } from '@/types/firebase'
 
 export interface ISolve extends SolvePayload {
     uid: string
@@ -44,4 +44,5 @@ export enum TimerState {
     COMPLETE = 'complete',
 }
 
-export type ChartSeries = Array<[number, number]>
+export type ChartSeriesEntry = [timestamp: number, time: number]
+export type ChartSeries = ChartSeriesEntry[]

@@ -1,5 +1,5 @@
-import { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
-import { ISolve } from '@/types/index'
+import type { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
+import type { ISolve } from '@/types/index'
 
 export interface RootState {
     hideUI: boolean

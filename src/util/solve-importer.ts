@@ -1,16 +1,16 @@
-import { Schema, Validator } from 'jsonschema'
+import { type Schema, Validator } from 'jsonschema'
 import moment from 'moment'
 import { getDatabase, push, ref, set } from 'firebase/database'
 import { Solve } from '@/classes/solve'
 import { Stats } from '@/util/stats'
-import { SolvePayload } from '@/types/firebase'
+import type { SolvePayload } from '@/types/firebase'
 
 export class SolveImporter {
-    private userId: string
+    private userId: string | undefined
     private validator: Validator
     private readonly schema: Schema
 
-    constructor(userId: string) {
+    constructor(userId: string | undefined) {
         this.userId = userId
         this.validator = new Validator()
 
@@ -55,6 +55,10 @@ export class SolveImporter {
     }
 
     public validate(inputData: string): boolean {
+        if (typeof this.userId === undefined) {
+            return false
+        }
+
         try {
             const input = JSON.parse(inputData)
             if (input && typeof input === 'object') {

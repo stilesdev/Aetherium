@@ -1,58 +1,54 @@
-import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
-import Store from '@/store'
-import Timer from '@/components/views/Timer.vue'
-import Login from '@/components/Login.vue'
+import { createRouter as _createRouter, createWebHistory } from 'vue-router'
+import type { Store } from 'vuex'
+import type { RootState } from '@/types/store'
+const LoginView = () => import('@/components/views/LoginView.vue')
+const TimerView = () => import('@/components/views/TimerView.vue')
+const StatsView = () => import('@/components/views/StatsView.vue')
+const HistoryView = () => import('@/components/views/HistoryView.vue')
+const PersonalBestsView = () => import('@/components/views/PersonalBestsView.vue')
 
-Vue.use(VueRouter)
+export function createRouter(store: Store<RootState>) {
+    const router = _createRouter({
+        history: createWebHistory(),
+        routes: [
+            {
+                path: '/',
+                name: 'Home',
+                redirect: '/timer',
+            },
+            {
+                path: '/login',
+                name: 'Login',
+                component: LoginView,
+            },
+            {
+                path: '/timer',
+                name: 'Timer',
+                component: TimerView,
+            },
+            {
+                path: '/statistics',
+                name: 'Statistics',
+                component: StatsView,
+            },
+            {
+                path: '/history',
+                name: 'History',
+                component: HistoryView,
+            },
+            {
+                path: '/personal-bests',
+                name: 'PersonalBests',
+                component: PersonalBestsView,
+            },
+        ],
+    })
 
-const routes: RouteConfig[] = [
-    {
-        path: '/',
-        name: 'Home',
-        redirect: '/timer',
-    },
-    {
-        path: '/login',
-        name: 'Login',
-        component: Login,
-    },
-    {
-        path: '/timer',
-        name: 'Timer',
-        component: Timer,
-    },
-    {
-        path: '/statistics',
-        name: 'Statistics',
-        component: () => import(/* webpackChunkName: "stats" */ '@/components/views/Stats.vue'),
-    },
-    {
-        path: '/history',
-        name: 'History',
-        component: () => import(/* webpackChunkName: "history" */ '@/components/views/History.vue'),
-    },
-    {
-        path: '/personal-bests',
-        name: 'PersonalBests',
-        component: () => import(/* webpackChunkName: "pb" */ '@/components/views/PersonalBests.vue'),
-    },
-]
+    router.beforeEach((to) => {
+        if (!store.getters.isLoggedIn && to.name !== 'Login') {
+            return { name: 'Login' }
+        }
+    })
 
-const router = new VueRouter({
-    mode: 'history',
-    base: process.env.BASE_URL,
-    routes,
-})
-
-router.beforeEach((to, from, next) => {
-    if (to.name === 'Login') {
-        next()
-    } else if (Store.getters.isLoggedIn) {
-        next()
-    } else {
-        next({ name: 'Login' })
-    }
-})
-
-export default router
+    return router
+}

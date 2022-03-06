@@ -30,47 +30,45 @@
     </div>
 </template>
 
-<script lang="ts">
-    import Vue from 'vue'
-    import { Component, Watch } from 'vue-property-decorator'
-    import { AuthError, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+<script lang="ts" setup>
+    import { computed, ref, watch } from 'vue'
+    import { useRouter } from 'vue-router'
+    import { useStore } from '@/composables/useStore'
+    import { type AuthError, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
-    @Component
-    export default class Login extends Vue {
-        public email = ''
-        public password = ''
-        public loginError = ''
+    const store = useStore()
+    const router = useRouter()
 
-        get isLoggedIn(): boolean {
-            return this.$store.getters.isLoggedIn
+    const email = ref('')
+    const password = ref('')
+    const loginError = ref('')
+
+    const isLoggedIn = computed<boolean>(() => store.getters.isLoggedIn)
+
+    watch(isLoggedIn, () => {
+        if (isLoggedIn.value) {
+            router.push('/')
         }
+    })
 
-        @Watch('isLoggedIn')
-        public watchIsLoggedIn() {
-            if (this.isLoggedIn) {
-                this.$router.push('/')
+    const submit = () => {
+        signInWithEmailAndPassword(getAuth(), email.value, password.value).catch((error: AuthError) => {
+            switch (error.code) {
+                case 'auth/too-many-requests':
+                    loginError.value = 'Too many login attempts. Wait a while and try again.'
+                    break
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                case 'auth/invalid-email':
+                case 'auth/user-disabled':
+                    loginError.value = 'Invalid username or password.'
+                    break
+                default:
+                    loginError.value = 'Unknown error'
+                    console.error(`${error.code}: ${error.message}`)
+                    break
             }
-        }
-
-        public submit(): void {
-            signInWithEmailAndPassword(getAuth(), this.email, this.password).catch((error: AuthError) => {
-                switch (error.code) {
-                    case 'auth/too-many-requests':
-                        this.loginError = 'Too many login attempts. Wait a while and try again.'
-                        break
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                    case 'auth/invalid-email':
-                    case 'auth/user-disabled':
-                        this.loginError = 'Invalid username or password.'
-                        break
-                    default:
-                        this.loginError = 'Unknown error'
-                        console.error(`${error.code}: ${error.message}`)
-                        break
-                }
-            })
-        }
+        })
     }
 </script>
 
