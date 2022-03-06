@@ -321,6 +321,7 @@
 
     const openImportModal = () => {
         solveImporter.value = new SolveImporter(store.state.userId)
+        $('#importModal').modal()
     }
 
     const validateImportText = () => {
