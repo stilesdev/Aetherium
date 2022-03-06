@@ -79,18 +79,17 @@
 
 <script lang="ts" setup>
     import { computed, ref, watch } from 'vue'
-    import { useStore } from 'vuex'
+    import { useStore } from '@/composables/useStore'
     import { formatTimeDelta } from '@/util/format'
     import { get, limitToLast, orderByChild, query } from 'firebase/database'
     import { Solve } from '@/classes/solve'
     import { Stats } from '@/util/stats'
-    import type { StatisticsPayload } from '@/types/firebase'
 
     const store = useStore()
 
     const ao1000 = ref(0)
 
-    const stats = computed<StatisticsPayload | undefined>(() => store.state.sessionStats)
+    const stats = computed(() => store.state.sessionStats)
 
     const formatSolve = formatTimeDelta
 

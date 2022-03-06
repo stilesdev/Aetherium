@@ -63,14 +63,14 @@
 
 <script lang="ts" setup>
     import { computed } from 'vue'
-    import { useStore } from 'vuex'
+    import { useStore } from '@/composables/useStore'
     import type { ISolve } from '@/types'
     import { Actions } from '@/types/store'
     import { SolvePenalty } from '@/types/firebase'
 
     const store = useStore()
 
-    const solves = computed<ISolve[]>(() => store.state.solves)
+    const solves = computed(() => store.state.solves)
 
     const setPenalty = (solve: ISolve, penalty: SolvePenalty) => {
         store.dispatch(Actions.SET_PENALTY, { solve, penalty })

@@ -44,4 +44,5 @@ export enum TimerState {
     COMPLETE = 'complete',
 }
 
-export type ChartSeries = Array<[number, number]>
+export type ChartSeriesEntry = [timestamp: number, time: number]
+export type ChartSeries = ChartSeriesEntry[]

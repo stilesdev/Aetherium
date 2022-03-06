@@ -22,13 +22,13 @@
 <script lang="ts" setup>
     import { computed } from 'vue'
     import { useRoute } from 'vue-router'
-    import { useStore } from 'vuex'
+    import { useStore } from '@/composables/useStore'
 
     const store = useStore()
     const route = useRoute()
 
-    const showNavbar = computed<boolean>(() => !store.state.hideUI && route.name !== 'Login')
-    const themeUrl = computed<string>(() => store.state.options.themeUrl)
+    const showNavbar = computed(() => !store.state.hideUI && route.name !== 'Login')
+    const themeUrl = computed(() => store.state.options.themeUrl)
 </script>
 
 <style>

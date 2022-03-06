@@ -8,17 +8,17 @@
     import { Chart } from 'highcharts'
     import moment from 'moment'
     import { computed, onMounted, watch } from 'vue'
-    import { useStore } from 'vuex'
+    import { useStore } from '@/composables/useStore'
     import { formatTimeDelta, formatTimeDeltaShort, formatTimestamp } from '@/util/format'
     import type { Solve } from '@/classes/solve'
-    import type { ChartSeries } from '@/types'
+    import type { ChartSeries, ChartSeriesEntry } from '@/types'
 
     const store = useStore()
 
     let sessionChart: Chart | undefined
 
-    const allSolves = computed<ChartSeries>(() => store.state.solves.map((solve: Solve) => [solve.timestamp, solve.time]).reverse())
-    const bestSolves = computed<ChartSeries>(() => {
+    const allSolves = computed<ChartSeries>(() => store.state.solves.map((solve: Solve) => [solve.timestamp, solve.time] as ChartSeriesEntry).reverse())
+    const bestSolves = computed(() => {
         const bestSolves: ChartSeries = []
 
         allSolves.value.forEach((solve) => {
@@ -31,8 +31,8 @@
     })
 
     // TODO: is deep: true necessary here? (Vue 3 deprecation WATCH_ARRAY)
-    watch(allSolves, (newValue: ChartSeries) => sessionChart?.series[0].setData(newValue), { deep: true })
-    watch(bestSolves, (newValue: ChartSeries) => sessionChart?.series[1].setData(newValue), { deep: true })
+    watch(allSolves, (newValue) => sessionChart?.series[0].setData(newValue), { deep: true })
+    watch(bestSolves, (newValue) => sessionChart?.series[1].setData(newValue), { deep: true })
 
     onMounted(() => {
         sessionChart = new Chart('sessionChart', {

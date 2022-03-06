@@ -40,24 +40,24 @@
 </template>
 
 <script lang="ts" setup>
-    import { type DatabaseReference, get, getDatabase, ref as dbRef } from 'firebase/database'
+    import { get, getDatabase, ref as dbRef } from 'firebase/database'
     import { computed, onMounted, ref } from 'vue'
-    import { useStore } from 'vuex'
+    import { useStore } from '@/composables/useStore'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
-    import type { FirebaseList, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
+    import type { FirebaseList, StatisticsPayload } from '@/types/firebase'
     import type { Statistics } from '@/types'
 
     const store = useStore()
 
     const personalBests = ref<Record<string, Record<string, { time: string; date: string | undefined }>>>({}) // TODO: define a type for this
 
-    const userId = computed<string>(() => store.state.userId)
-    const puzzles = computed<Puzzle[]>(() => {
-        const puzzles: FirebaseList<Puzzle> = store.state.puzzles
-        return Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+    const userId = computed(() => store.state.userId)
+    const puzzles = computed(() => {
+        const puzzles = store.state.puzzles
+        return puzzles ? Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) : []
     })
-    const allSessions = computed<FirebaseList<SessionPayload>>(() => store.state.allSessions)
-    const puzzleStatsRef = computed<(puzzle: string) => DatabaseReference>(() => (puzzle) => dbRef(getDatabase(), `/stats/${userId.value}/${puzzle}`))
+    const allSessions = computed(() => store.state.allSessions)
+    const puzzleStatsRef = computed(() => (puzzle: string) => dbRef(getDatabase(), `/stats/${userId.value}/${puzzle}`))
 
     const findBestStatistic = (sessions: Statistics[], statistic: keyof StatisticsPayload): { time: string; date: string | undefined } => {
         const filteredSessions = sessions.filter((session) => session[statistic] > 0)
@@ -93,7 +93,7 @@
                     Object.entries(allStats).forEach((entry) => {
                         const sessionId = entry[0]
                         const stat = entry[1]
-                        stat.date = allSessions.value[sessionId].date
+                        stat.date = allSessions.value ? allSessions.value[sessionId].date : ''
                         sessions.push(stat)
                     })
                 }

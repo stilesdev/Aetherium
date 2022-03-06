@@ -54,16 +54,16 @@
 
 <script lang="ts" setup>
     import { computed } from 'vue'
-    import { useStore } from 'vuex'
+    import { useStore } from '@/composables/useStore'
     import { formatTimeDelta } from '@/util/format'
-    import type { FirebaseList, SessionPayload, StatisticsPayload } from '@/types/firebase'
+    import type { StatisticsPayload } from '@/types/firebase'
     import type { Statistics } from '@/types'
 
     const store = useStore()
 
     const sessionsArray = computed<Statistics[]>(() => {
-        const allSessions: FirebaseList<SessionPayload> = store.state.allSessions
-        const allStats: FirebaseList<StatisticsPayload> = store.state.allStats
+        const allSessions = store.state.allSessions
+        const allStats = store.state.allStats
         const sessions: Statistics[] = []
         if (allSessions && allStats) {
             Object.entries(allStats).forEach((entry) => {

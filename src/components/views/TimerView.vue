@@ -56,10 +56,10 @@
     import moment from 'moment'
     import $ from 'jquery'
     import { computed, onUnmounted, ref, watch } from 'vue'
-    import { useStore } from 'vuex'
+    import { useStore } from '@/composables/useStore'
     import Stackmat, { type Packet } from 'stackmat'
     import TimerStateMachine from '@/util/timer-state-machine'
-    import { TimerState, type TimerStateMachineOptions } from '@/types'
+    import { TimerState } from '@/types'
     import { Actions, Mutations } from '@/types/store'
     import { formatTimeDelta } from '@/util/format'
     import { TimerTrigger } from '@/types/firebase'
@@ -159,15 +159,13 @@
     }
 
     const createTimerState = () => {
-        const options: TimerStateMachineOptions = {
+        timerState.value = new TimerStateMachine({
             holdToStart: holdToStart.value,
             useInspection: useInspection.value,
             onSolveStart: startTimer,
             onSolveComplete: stopTimer,
             onInspectionStart: startInspection,
-        }
-
-        timerState.value = new TimerStateMachine(options)
+        })
     }
 
     const disconnectTimers = () => {
@@ -245,7 +243,7 @@
         store.commit(Mutations.SET_HIDE_UI, newValue)
     })
 
-    watch(timerTrigger, (newTrigger: TimerTrigger, oldTrigger: TimerTrigger) => {
+    watch(timerTrigger, (newTrigger, oldTrigger) => {
         if (oldTrigger !== newTrigger) {
             timerStart.value = 0
             timerLabel.value = '00:00:00'

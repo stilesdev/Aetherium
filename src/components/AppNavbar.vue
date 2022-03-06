@@ -222,12 +222,12 @@
     import $ from 'jquery'
     import { computed, ref } from 'vue'
     import { useRouter } from 'vue-router'
-    import { useStore } from 'vuex'
+    import { useStore } from '@/composables/useStore'
     import { getAuth } from 'firebase/auth'
     import type { ThemeData } from '@/types'
     import { Actions } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
-    import type { FirebaseList, ProfileOptions, Puzzle } from '@/types/firebase'
+    import type { ProfileOptions } from '@/types/firebase'
     import { TimerTrigger } from '@/types/firebase'
 
     const router = useRouter()
@@ -264,26 +264,26 @@
         { name: 'Yeti', url: '/themes/yeti.min.css' },
     ]
 
-    const puzzles = computed<Puzzle[]>(() => {
+    const puzzles = computed(() => {
         if (store.state.puzzles) {
-            const puzzles: FirebaseList<Puzzle> = store.state.puzzles
+            const puzzles = store.state.puzzles
             return Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
         } else {
             return []
         }
     })
 
-    const activePuzzle = computed<string>({
+    const activePuzzle = computed({
         get: () => store.state.activePuzzle,
-        set: (value: string) => store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value }),
+        set: (value) => store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value }),
     })
 
-    const storeOptions = computed<ProfileOptions>({
+    const storeOptions = computed({
         get: () => store.state.options,
-        set: (value: ProfileOptions) => store.dispatch(Actions.SET_OPTIONS, value),
+        set: (value) => store.dispatch(Actions.SET_OPTIONS, value),
     })
 
-    const sessionDate = computed<string>({
+    const sessionDate = computed({
         get: () => {
             let temp
 
@@ -295,7 +295,7 @@
 
             return moment().utc().dayOfYear(temp.dayOfYear()).startOf('day').format('YYYY-MM-DD')
         },
-        set: (value: string) => {
+        set: (value) => {
             store.dispatch(Actions.UPDATE_SESSION_DATE, {
                 moment: moment().utc().dayOfYear(moment(value, 'YYYY-MM-DD').dayOfYear()).startOf('day'),
             })

@@ -19,9 +19,8 @@
     import { Chart } from 'highcharts'
     import moment from 'moment'
     import { computed, onMounted, watch } from 'vue'
-    import { useStore } from 'vuex'
+    import { useStore } from '@/composables/useStore'
     import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
-    import type { FirebaseList, SessionPayload, StatisticsPayload } from '@/types/firebase'
     import type { ChartSeries } from '@/types'
 
     const store = useStore()
@@ -29,15 +28,15 @@
     let sessionHistoryChart: Chart | undefined
 
     const sessionMeans = computed<ChartSeries>(() => {
-        const sessions: FirebaseList<SessionPayload> = store.state.allSessions
-        const stats: FirebaseList<StatisticsPayload> = store.state.allStats
-        return stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].mean]) : []
+        const sessions = store.state.allSessions
+        const stats = store.state.allStats
+        return sessions && stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].mean]) : []
     })
 
     const sessionBests = computed<ChartSeries>(() => {
-        const sessions: FirebaseList<SessionPayload> = store.state.allSessions
-        const stats: FirebaseList<StatisticsPayload> = store.state.allStats
-        return stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].best]) : []
+        const sessions = store.state.allSessions
+        const stats = store.state.allStats
+        return sessions && stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].best]) : []
     })
 
     const personalBests = computed<ChartSeries>(() => {
@@ -52,9 +51,9 @@
     })
 
     // TODO: is deep: true necessary here? (Vue 3 deprecation WATCH_ARRAY)
-    watch(sessionMeans, (newValue: ChartSeries) => sessionHistoryChart?.series[0].setData(newValue), { deep: true })
-    watch(sessionBests, (newValue: ChartSeries) => sessionHistoryChart?.series[1].setData(newValue), { deep: true })
-    watch(personalBests, (newValue: ChartSeries) => sessionHistoryChart?.series[2].setData(newValue), { deep: true })
+    watch(sessionMeans, (newValue) => sessionHistoryChart?.series[0].setData(newValue), { deep: true })
+    watch(sessionBests, (newValue) => sessionHistoryChart?.series[1].setData(newValue), { deep: true })
+    watch(personalBests, (newValue) => sessionHistoryChart?.series[2].setData(newValue), { deep: true })
 
     onMounted(() => {
         sessionHistoryChart = new Chart('sessionHistoryChart', {
