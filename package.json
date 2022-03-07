@@ -1,6 +1,6 @@
 {
   "name": "aetherium",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "private": true,
   "description": "A web-based twisty puzzle timer with real-time syncing of times across devices.",
   "author": "Matthew Stiles",
