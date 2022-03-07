@@ -4,20 +4,21 @@
     </panel>
 </template>
 
-<script>
-    import * as PanelRoot from './PanelRoot.vue'
+<script lang="ts">
+    import PanelRoot from './PanelRoot.vue'
 
     export default {
-        data: function() {
-            return {}
-        },
-        computed: {
-            scrambleImage() {
-                return this.$store.state.scramble.svg
-            }
-        },
         components: {
-            'panel': PanelRoot
-        }
+            panel: PanelRoot,
+        },
     }
+</script>
+
+<script lang="ts" setup>
+    import { computed } from 'vue'
+    import { useStore } from '@/composables/useStore'
+
+    const store = useStore()
+
+    const scrambleImage = computed(() => store.state.scramble.svg)
 </script>

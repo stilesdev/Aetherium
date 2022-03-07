@@ -9,13 +9,10 @@
     </div>
 </template>
 
-<script>
-    export default {
-        data: function() {
-            return {}
-        },
-        props: [ 'panelTitle' ]
-    }
+<script lang="ts" setup>
+    defineProps<{
+        panelTitle: string
+    }>()
 </script>
 
 <style>

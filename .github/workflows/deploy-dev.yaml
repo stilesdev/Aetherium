@@ -1,0 +1,32 @@
+name: Deploy development branch to beta site
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  deploy_dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: development
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build:dev
+        env:
+          CI: true
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}"
+          projectId: aetherium-development
+          channelId: live

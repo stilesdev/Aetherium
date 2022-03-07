@@ -1,0 +1,18 @@
+{
+    "extends": "@vue/tsconfig/tsconfig.web.json",
+    "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true, // TODO: Should be able to remove this when moment and jquery are removed
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "lib": ["ES2017", "DOM", "DOM.Iterable"],
+        "types": ["vite/client"]
+    },
+    "references": [
+        {
+            "path": "./tsconfig.vite-config.json"
+        }
+    ]
+}
