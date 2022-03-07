@@ -330,13 +330,13 @@ export function createStore(): Store<RootState> {
                         store.dispatch(Actions.REQUEST_SCRAMBLE)
                     }
                 }),
-            (store) =>
-                store.subscribe((mutation: MutationPayload) => {
-                    // tslint:disable-next-line: no-console
-                    console.log(mutation.type)
-                    // tslint:disable-next-line: no-console
-                    console.log(mutation.payload)
-                }),
+            (store) => {
+                if (import.meta.env.DEV) {
+                    store.subscribe((mutation: MutationPayload) => {
+                        console.debug('[vuex-mutation]', mutation.type, ':', mutation.payload)
+                    })
+                }
+            },
         ],
     })
 }

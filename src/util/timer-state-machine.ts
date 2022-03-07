@@ -66,8 +66,9 @@ export default class TimerStateMachine {
                     return lifecycle.from !== lifecycle.to
                 },
                 onTransition(lifecycle: LifeCycle): boolean {
-                    // tslint:disable-next-line: no-console
-                    console.log(`TRANSITION: ${lifecycle.transition}, FROM: ${lifecycle.from}, TO: ${lifecycle.to}`)
+                    if (import.meta.env.DEV) {
+                        console.debug(`[timer-state] TRANSITION: ${lifecycle.transition}, FROM: ${lifecycle.from}, TO: ${lifecycle.to}`)
+                    }
                     return true
                 },
             },
