@@ -20,8 +20,9 @@
     import moment from 'moment'
     import { computed, onMounted, watch } from 'vue'
     import { useStore } from '@/composables/useStore'
-    import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
     import type { ChartSeries } from '@/types'
+    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
+    import { millisToShortTimerFormat } from '@/composables/millisToShortTimerFormat'
 
     const store = useStore()
 
@@ -80,7 +81,7 @@
                 },
                 labels: {
                     formatter(): string {
-                        return formatTimeDelta(this.value as number)
+                        return millisToTimerFormat(this.value as number)
                     },
                 },
                 min: 0,
@@ -96,7 +97,7 @@
                     dataLabels: {
                         enabled: true,
                         formatter(): string {
-                            return this.y ? formatTimeDeltaShort(this.y) : ''
+                            return this.y ? millisToShortTimerFormat(this.y) : ''
                         },
                     },
                     marker: {
@@ -128,7 +129,7 @@
             ],
             tooltip: {
                 formatter(): string {
-                    return `<b>${moment(this.x).utc().format('M/D/YYYY')}</b><br/>${formatTimeDelta(this.y)}`
+                    return `<b>${moment(this.x).utc().format('M/D/YYYY')}</b><br/>${millisToTimerFormat(this.y)}`
                 },
             },
         })

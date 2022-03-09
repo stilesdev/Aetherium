@@ -55,7 +55,7 @@
 <script lang="ts" setup>
     import { computed } from 'vue'
     import { useStore } from '@/composables/useStore'
-    import { formatTimeDelta } from '@/util/format'
+    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
     import type { StatisticsPayload } from '@/types/firebase'
     import type { Statistics } from '@/types'
 
@@ -90,11 +90,11 @@
         if (filteredSessions.length > 0) {
             const session = filteredSessions.reduce((previous, current) => (previous[statistic] < current[statistic] ? previous : current))
             return {
-                time: formatTimeDelta(session[statistic]),
+                time: millisToTimerFormat(session[statistic]),
                 date: session.date,
             }
         } else {
-            return { time: formatTimeDelta(0), date: undefined }
+            return { time: millisToTimerFormat(0), date: undefined }
         }
     }
 </script>

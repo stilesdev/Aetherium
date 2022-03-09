@@ -9,9 +9,11 @@
     import moment from 'moment'
     import { computed, onMounted, watch } from 'vue'
     import { useStore } from '@/composables/useStore'
-    import { formatTimeDelta, formatTimeDeltaShort, formatTimestamp } from '@/util/format'
     import type { Solve } from '@/classes/solve'
     import type { ChartSeries, ChartSeriesEntry } from '@/types'
+    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
+    import { millisToShortTimerFormat } from '@/composables/millisToShortTimerFormat'
+    import { timestampToDateTime } from '@/composables/timestampToDateTime'
 
     const store = useStore()
 
@@ -57,7 +59,7 @@
                 },
                 labels: {
                     formatter() {
-                        return formatTimeDelta(this.value as number)
+                        return millisToTimerFormat(this.value as number)
                     },
                 },
                 min: 0,
@@ -73,7 +75,7 @@
                     dataLabels: {
                         enabled: true,
                         formatter() {
-                            return formatTimeDeltaShort(this.y as number)
+                            return millisToShortTimerFormat(this.y as number)
                         },
                     },
                     marker: {
@@ -97,7 +99,7 @@
             ],
             tooltip: {
                 formatter() {
-                    return `<b>${formatTimestamp(this.x)}</b><br/>${formatTimeDelta(this.y)}`
+                    return `<b>${timestampToDateTime(this.x)}</b><br/>${millisToTimerFormat(this.y)}`
                 },
             },
         })

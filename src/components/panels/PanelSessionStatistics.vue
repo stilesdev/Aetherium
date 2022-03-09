@@ -80,7 +80,7 @@
 <script lang="ts" setup>
     import { computed, ref, watch } from 'vue'
     import { useStore } from '@/composables/useStore'
-    import { formatTimeDelta } from '@/util/format'
+    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
     import { get, limitToLast, orderByChild, query } from 'firebase/database'
     import { Solve } from '@/classes/solve'
     import { Stats } from '@/util/stats'
@@ -91,7 +91,7 @@
 
     const stats = computed(() => store.state.sessionStats)
 
-    const formatSolve = formatTimeDelta
+    const formatSolve = millisToTimerFormat
 
     const calculateAo1000 = () => {
         get(query(store.getters.solvesRef, orderByChild('timestamp'), limitToLast(1000))).then((solveSnapshot) => {

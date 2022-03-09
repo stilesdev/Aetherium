@@ -61,7 +61,7 @@
     import TimerStateMachine from '@/util/timer-state-machine'
     import { TimerState } from '@/types'
     import { Actions, Mutations } from '@/types/store'
-    import { formatTimeDelta } from '@/util/format'
+    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
     import { TimerTrigger } from '@/types/firebase'
 
     const store = useStore()
@@ -208,7 +208,7 @@
 
     const updateTimer = () => {
         if (timerStart.value !== 0) {
-            timerLabel.value = formatTimeDelta(moment().valueOf() - timerStart.value)
+            timerLabel.value = millisToTimerFormat(moment().valueOf() - timerStart.value)
             setTimeout(updateTimer, 30)
         }
     }
@@ -226,7 +226,7 @@
     }
 
     const completeSolve = (delta: number) => {
-        timerLabel.value = formatTimeDelta(delta)
+        timerLabel.value = millisToTimerFormat(delta)
         stackmatLastTime.value = 0
         store.dispatch(Actions.STORE_SOLVE, delta)
     }

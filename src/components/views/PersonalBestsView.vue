@@ -43,9 +43,10 @@
     import { get, getDatabase, ref as dbRef } from 'firebase/database'
     import { computed, onMounted, ref } from 'vue'
     import { useStore } from '@/composables/useStore'
-    import { formatTimeDelta, formatTimeDeltaShort } from '@/util/format'
     import type { FirebaseList, StatisticsPayload } from '@/types/firebase'
     import type { Statistics } from '@/types'
+    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
+    import { millisToShortTimerFormat } from '@/composables/millisToShortTimerFormat'
 
     const store = useStore()
 
@@ -65,11 +66,11 @@
         if (filteredSessions.length > 0) {
             const session = filteredSessions.reduce((previous, current) => (previous[statistic] < current[statistic] ? previous : current))
             return {
-                time: formatTimeDeltaShort(session[statistic]),
+                time: millisToShortTimerFormat(session[statistic]),
                 date: session.date,
             }
         } else {
-            return { time: formatTimeDelta(0), date: undefined }
+            return { time: millisToTimerFormat(0), date: undefined }
         }
     }
 

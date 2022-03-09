@@ -1,7 +1,9 @@
 import type { DataSnapshot } from 'firebase/database'
 import type { ISolve } from '@/types'
-import { formatTimeDelta, formatTimeDeltaShort, formatTimestamp } from '@/util/format'
 import type { SolvePenalty } from '@/types/firebase'
+import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
+import { millisToShortTimerFormat } from '@/composables/millisToShortTimerFormat'
+import { timestampToDateTime } from '@/composables/timestampToDateTime'
 
 export class Solve implements ISolve {
     public static fromSnapshot(solveSnapshot: DataSnapshot): Solve {
@@ -34,14 +36,14 @@ export class Solve implements ISolve {
     }
 
     public get formattedTime(): string {
-        return formatTimeDelta(this.finalTime)
+        return millisToTimerFormat(this.finalTime)
     }
 
     public get formattedTimeShort(): string {
-        return formatTimeDeltaShort(this.finalTime)
+        return millisToShortTimerFormat(this.finalTime)
     }
 
     public get formattedTimestamp(): string {
-        return formatTimestamp(this.timestamp)
+        return timestampToDateTime(this.timestamp)
     }
 }
