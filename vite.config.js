@@ -25,9 +25,15 @@ export default defineConfig({
             plugins: [require('autoprefixer')],
         },
     },
+    define: {
+        'import.meta.vitest': false,
+    },
     resolve: {
         alias: {
             '@': resolve(__dirname, 'src'),
         },
+    },
+    test: {
+        includeSource: ['src/**/*.{js,ts}'],
     },
 })
