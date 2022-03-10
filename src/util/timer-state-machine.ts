@@ -108,7 +108,7 @@ export default class TimerStateMachine {
             case TimerState.IDLE:
                 if (!this.useInspection) {
                     if (this.holdToStart) {
-                        this.readyTimer = setTimeout(() => this.stateMachine.timerReady(), 500)
+                        this.readyTimer = window.setTimeout(() => this.stateMachine.timerReady(), 500)
                         return TimerState.STARTING
                     } else {
                         return TimerState.READY
@@ -119,7 +119,7 @@ export default class TimerStateMachine {
 
             case TimerState.INSPECTION:
                 if (this.holdToStart) {
-                    this.readyTimer = setTimeout(() => this.stateMachine.timerReady(), 500)
+                    this.readyTimer = window.setTimeout(() => this.stateMachine.timerReady(), 500)
                     return TimerState.STARTING
                 } else {
                     return TimerState.READY

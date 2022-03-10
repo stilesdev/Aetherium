@@ -178,7 +178,7 @@
         inspectionCountdown.value = 15
         timerLabel.value = inspectionCountdown.value.toString()
 
-        inspectionTimer.value = setInterval(updateInspection, 1000)
+        inspectionTimer.value = window.setInterval(updateInspection, 1000)
     }
 
     const updateInspection = () => {
