@@ -13,3 +13,20 @@ export function timestampToDateTime(timestamp: number): string {
 
     return date + ' ' + time
 }
+
+if (import.meta.vitest) {
+    const { describe, expect, it } = import.meta.vitest
+
+    describe('timestampToDateTime', () => {
+        it('formats various timestamps correctly', () => {
+            let date = new Date(2022, 0, 15, 0, 0, 0, 0)
+            expect(timestampToDateTime(date.getTime())).toEqual('1/15/2022 12:00:00 AM')
+
+            date = new Date(2020, 5, 25, 15, 23, 55, 0)
+            expect(timestampToDateTime(date.getTime())).toEqual('6/25/2020 3:23:55 PM')
+
+            date = new Date(2021, 11, 0, 23, 0, 41, 0)
+            expect(timestampToDateTime(date.getTime())).toEqual('11/30/2021 11:00:41 PM')
+        })
+    })
+}
