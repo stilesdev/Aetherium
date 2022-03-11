@@ -11,9 +11,9 @@
     import { useStore } from '@/composables/useStore'
     import type { Solve } from '@/classes/solve'
     import type { ChartSeries, ChartSeriesEntry } from '@/types'
-    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
-    import { millisToShortTimerFormat } from '@/composables/millisToShortTimerFormat'
-    import { timestampToDateTime } from '@/composables/timestampToDateTime'
+    import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
+    import { millisToShortTimerFormat } from '@/functions/millisToShortTimerFormat'
+    import { timestampToDateTime } from '@/functions/timestampToDateTime'
 
     const store = useStore()
 

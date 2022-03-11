@@ -1,9 +1,9 @@
 import type { DataSnapshot } from 'firebase/database'
 import type { ISolve } from '@/types'
 import type { SolvePenalty } from '@/types/firebase'
-import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
-import { millisToShortTimerFormat } from '@/composables/millisToShortTimerFormat'
-import { timestampToDateTime } from '@/composables/timestampToDateTime'
+import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
+import { millisToShortTimerFormat } from '@/functions/millisToShortTimerFormat'
+import { timestampToDateTime } from '@/functions/timestampToDateTime'
 
 export class Solve implements ISolve {
     public static fromSnapshot(solveSnapshot: DataSnapshot): Solve {

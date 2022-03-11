@@ -80,7 +80,7 @@
 <script lang="ts" setup>
     import { computed, ref, watch } from 'vue'
     import { useStore } from '@/composables/useStore'
-    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
+    import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import { get, limitToLast, orderByChild, query } from 'firebase/database'
     import { Solve } from '@/classes/solve'
     import { Stats } from '@/util/stats'

@@ -21,8 +21,8 @@
     import { computed, onMounted, watch } from 'vue'
     import { useStore } from '@/composables/useStore'
     import type { ChartSeries } from '@/types'
-    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
-    import { millisToShortTimerFormat } from '@/composables/millisToShortTimerFormat'
+    import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
+    import { millisToShortTimerFormat } from '@/functions/millisToShortTimerFormat'
 
     const store = useStore()
 

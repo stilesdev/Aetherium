@@ -55,7 +55,7 @@
 <script lang="ts" setup>
     import { computed } from 'vue'
     import { useStore } from '@/composables/useStore'
-    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
+    import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import type { StatisticsPayload } from '@/types/firebase'
     import type { Statistics } from '@/types'
 

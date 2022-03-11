@@ -61,7 +61,7 @@
     import TimerStateMachine from '@/util/timer-state-machine'
     import { TimerState } from '@/types'
     import { Actions, Mutations } from '@/types/store'
-    import { millisToTimerFormat } from '@/composables/millisToTimerFormat'
+    import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import { TimerTrigger } from '@/types/firebase'
 
     const store = useStore()
