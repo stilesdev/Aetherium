@@ -1,8 +1,7 @@
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { child, type DatabaseReference, onValue, push, ref, remove, serverTimestamp, set, update, getDatabase } from 'firebase/database'
 import moment, { type Moment } from 'moment'
 import { type ActionContext, createStore as _createStore, type MutationPayload, Store } from 'vuex'
-import { Actions, Mutations, References, type RootState, type ScramblePayload } from '@/types/store'
+import { Actions, Mutations, References, type RootState } from '@/types/store'
 import FirebaseManager from '@/util/firebase-manager'
 import { Stats } from '@/util/stats'
 import type { ISolve } from '@/types'
@@ -10,6 +9,7 @@ import type { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPa
 import { SolvePenalty, TimerTrigger } from '@/types/firebase'
 import type { Pinia } from 'pinia'
 import { useScramble } from './stores/scramble'
+import { useUser } from './stores/user'
 
 export function createStore(pinia: Pinia): Store<RootState> {
     const db = getDatabase()
@@ -19,7 +19,6 @@ export function createStore(pinia: Pinia): Store<RootState> {
         state: {
             hideUI: false,
             puzzles: undefined,
-            userId: undefined,
             options: {
                 showTimer: true,
                 timerTrigger: TimerTrigger.SPACEBAR,
@@ -36,41 +35,43 @@ export function createStore(pinia: Pinia): Store<RootState> {
             allStats: undefined,
         },
         getters: {
-            isLoggedIn(state: RootState): boolean {
-                return state.userId !== undefined
-            },
             puzzlesRef(): DatabaseReference {
                 return ref(db, '/puzzles')
             },
-            optionsRef(state: RootState): DatabaseReference {
-                return ref(db, `/users/${state.userId}/options`)
+            optionsRef(): DatabaseReference {
+                const user = useUser(pinia)
+                return ref(db, `/users/${user.userId}/options`)
             },
-            currentSessionIdRef(state: RootState): DatabaseReference {
-                return ref(db, `/users/${state.userId}/currentSessionId`)
+            currentSessionIdRef(): DatabaseReference {
+                const user = useUser(pinia)
+                return ref(db, `/users/${user.userId}/currentSessionId`)
             },
-            currentPuzzleRef(state: RootState): DatabaseReference {
-                return ref(db, `/users/${state.userId}/currentPuzzle`)
+            currentPuzzleRef(): DatabaseReference {
+                const user = useUser(pinia)
+                return ref(db, `/users/${user.userId}/currentPuzzle`)
             },
-            sessionsRef(state: RootState): DatabaseReference {
-                return ref(db, `/users/${state.userId}/sessions`)
+            sessionsRef(): DatabaseReference {
+                const user = useUser(pinia)
+                return ref(db, `/users/${user.userId}/sessions`)
             },
             currentSessionRef(state: RootState): DatabaseReference {
-                return ref(db, `/users/${state.userId}/sessions/${state.sessionId}`)
+                const user = useUser(pinia)
+                return ref(db, `/users/${user.userId}/sessions/${state.sessionId}`)
             },
             solvesRef(state: RootState): DatabaseReference {
-                return ref(db, `/solves/${state.userId}/${state.activePuzzle}`)
+                const user = useUser(pinia)
+                return ref(db, `/solves/${user.userId}/${state.activePuzzle}`)
             },
             statsRef(state: RootState): DatabaseReference {
-                return ref(db, `/stats/${state.userId}/${state.activePuzzle}`)
+                const user = useUser(pinia)
+                return ref(db, `/stats/${user.userId}/${state.activePuzzle}`)
             },
             sessionStatsRef(state: RootState): DatabaseReference {
-                return ref(db, `/stats/${state.userId}/${state.activePuzzle}/${state.sessionId}`)
+                const user = useUser(pinia)
+                return ref(db, `/stats/${user.userId}/${state.activePuzzle}/${state.sessionId}`)
             },
         },
         mutations: {
-            [Mutations.RECEIVE_USER_ID](state: RootState, userId: string): void {
-                state.userId = userId
-            },
             [Mutations.RECEIVE_SESSION_ID](state: RootState, sessionId: string): void {
                 state.sessionId = sessionId
             },
@@ -216,46 +217,21 @@ export function createStore(pinia: Pinia): Store<RootState> {
         },
         plugins: [
             (store) => {
-                onAuthStateChanged(getAuth(), (user) => {
-                    if (user) {
-                        const userRef = ref(db, `users/${user.uid}`)
-                        get(userRef).then((snapshot) => {
-                            if (!snapshot.exists()) {
-                                set(userRef, {
-                                    currentPuzzle: '333',
-                                    email: user.email,
-                                    options: {
-                                        showTimer: true,
-                                        timerTrigger: 'spacebar',
-                                        holdToStart: true,
-                                        useInspection: true,
-                                    },
-                                })
-                            }
+                const user = useUser(pinia)
+                user.$subscribe((_, state) => {
+                    // TODO: move this to pinia? create a firebase store for all these refs instead of bespoke FirebaseManager?
+                    FirebaseManager.disconnectAllRefs()
 
-                            store.commit(Mutations.RECEIVE_USER_ID, user.uid)
-                        })
-                    } else {
-                        store.commit(Mutations.RECEIVE_USER_ID, undefined)
+                    if (state.userId) {
+                        FirebaseManager.connectRef(References.OPTIONS, store)
+                        FirebaseManager.connectRef(References.CURRENT_SESSION_ID, store)
+                        FirebaseManager.connectRef(References.CURRENT_PUZZLE, store)
                     }
                 })
             },
             (store) =>
                 onValue(store.getters.puzzlesRef, (snapshot) => {
                     store.commit(Mutations.RECEIVE_PUZZLES, snapshot.val())
-                }),
-            (store) =>
-                store.subscribe((mutation: MutationPayload, state: RootState) => {
-                    if (mutation.type === Mutations.RECEIVE_USER_ID) {
-                        // TODO: move this to pinia? create a firebase store for all these refs instead of bespoke FirebaseManager?
-                        FirebaseManager.disconnectAllRefs()
-
-                        if (state.userId) {
-                            FirebaseManager.connectRef(References.OPTIONS, store)
-                            FirebaseManager.connectRef(References.CURRENT_SESSION_ID, store)
-                            FirebaseManager.connectRef(References.CURRENT_PUZZLE, store)
-                        }
-                    }
                 }),
             (store) =>
                 store.subscribe((mutation: MutationPayload, state: RootState) => {

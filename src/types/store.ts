@@ -4,7 +4,6 @@ import type { ISolve } from '@/types/index'
 export interface RootState {
     hideUI: boolean
     puzzles?: FirebaseList<Puzzle>
-    userId?: string
     options: ProfileOptions
     sessionId?: string
     sessionDate?: string
@@ -32,7 +31,6 @@ export enum References {
 }
 
 export enum Mutations {
-    RECEIVE_USER_ID = 'RECEIVE_USER_ID',
     RECEIVE_SESSION_ID = 'RECEIVE_SESSION_ID',
     RECEIVE_PUZZLES = 'RECEIVE_PUZZLES',
     RECEIVE_SESSION_DATE = 'RECEIVE_SESSION_DATE',
