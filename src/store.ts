@@ -1,7 +1,5 @@
-import { type FirebaseApp, initializeApp } from 'firebase/app'
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { child, type DatabaseReference, get, getDatabase, onValue, push, ref, remove, serverTimestamp, set, update } from 'firebase/database'
+import { child, type DatabaseReference, get, onValue, push, ref, remove, serverTimestamp, set, update, getDatabase } from 'firebase/database'
 import moment, { type Moment } from 'moment'
 import { type ActionContext, createStore as _createStore, type MutationPayload, Store } from 'vuex'
 import { Actions, Mutations, References, type RootState, type ScramblePayload } from '@/types/store'
@@ -9,28 +7,12 @@ import FirebaseManager from '@/util/firebase-manager'
 import { Stats } from '@/util/stats'
 import type { ISolve } from '@/types'
 import { ScramblerWorker } from '@/workers'
-import firebaseConfig from '../firebase.config'
 import type { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
 import { SolvePenalty, TimerTrigger } from '@/types/firebase'
 
-let firebaseApp: FirebaseApp
-if (import.meta.env.PROD) {
-    firebaseApp = initializeApp(firebaseConfig.production)
-} else {
-    firebaseApp = initializeApp(firebaseConfig.development)
-}
-
-if (import.meta.env.VITE_APPCHECK_DEBUG_TOKEN) {
-    console.log('[app-check]', 'initializing app-check with debug token: ' + import.meta.env.VITE_APPCHECK_DEBUG_TOKEN)
-    self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN
-}
-initializeAppCheck(firebaseApp, {
-    provider: new ReCaptchaV3Provider(firebaseConfig.reCaptchaV3SiteKey),
-})
-
-const db = getDatabase(firebaseApp)
-
 export function createStore(): Store<RootState> {
+    const db = getDatabase()
+
     return _createStore({
         strict: import.meta.env.DEV,
         state: {
