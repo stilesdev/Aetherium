@@ -1,13 +1,13 @@
 import { createRouter as _createRouter, createWebHistory } from 'vue-router'
-import type { Store } from 'vuex'
-import type { RootState } from '@/types/store'
+import type { Pinia } from 'pinia'
+import { useUser } from '@/stores/user'
 const LoginView = () => import('@/components/views/LoginView.vue')
 const TimerView = () => import('@/components/views/TimerView.vue')
 const StatsView = () => import('@/components/views/StatsView.vue')
 const HistoryView = () => import('@/components/views/HistoryView.vue')
 const PersonalBestsView = () => import('@/components/views/PersonalBestsView.vue')
 
-export function createRouter(store: Store<RootState>) {
+export function createRouter(pinia: Pinia) {
     const router = _createRouter({
         history: createWebHistory(),
         routes: [
@@ -45,7 +45,8 @@ export function createRouter(store: Store<RootState>) {
     })
 
     router.beforeEach((to) => {
-        if (!store.getters.isLoggedIn && to.name !== 'Login') {
+        const user = useUser(pinia)
+        if (!user.isLoggedIn && to.name !== 'Login') {
             return { name: 'Login' }
         }
     })

@@ -33,17 +33,16 @@
 <script lang="ts" setup>
     import { computed, ref, watch } from 'vue'
     import { useRouter } from 'vue-router'
-    import { useStore } from '@/composables/useStore'
-    import { type AuthError, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+    import { useUser } from '@/stores/user'
 
-    const store = useStore()
     const router = useRouter()
+    const user = useUser()
 
     const email = ref('')
     const password = ref('')
     const loginError = ref('')
 
-    const isLoggedIn = computed<boolean>(() => store.getters.isLoggedIn)
+    const isLoggedIn = computed(() => user.isLoggedIn)
 
     watch(isLoggedIn, () => {
         if (isLoggedIn.value) {
@@ -52,22 +51,8 @@
     })
 
     const submit = () => {
-        signInWithEmailAndPassword(getAuth(), email.value, password.value).catch((error: AuthError) => {
-            switch (error.code) {
-                case 'auth/too-many-requests':
-                    loginError.value = 'Too many login attempts. Wait a while and try again.'
-                    break
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                case 'auth/invalid-email':
-                case 'auth/user-disabled':
-                    loginError.value = 'Invalid username or password.'
-                    break
-                default:
-                    loginError.value = 'Unknown error'
-                    console.error(`${error.code}: ${error.message}`)
-                    break
-            }
+        user.login(email.value, password.value).catch((errorMessage: string) => {
+            loginError.value = errorMessage
         })
     }
 </script>

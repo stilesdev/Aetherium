@@ -43,16 +43,18 @@
     import { get, getDatabase, ref as dbRef } from 'firebase/database'
     import { computed, onMounted, ref } from 'vue'
     import { useStore } from '@/composables/useStore'
+    import { useUser } from '@/stores/user'
     import type { FirebaseList, StatisticsPayload } from '@/types/firebase'
     import type { Statistics } from '@/types'
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import { millisToShortTimerFormat } from '@/functions/millisToShortTimerFormat'
 
     const store = useStore()
+    const user = useUser()
 
     const personalBests = ref<Record<string, Record<string, { time: string; date: string | undefined }>>>({}) // TODO: define a type for this
 
-    const userId = computed(() => store.state.userId)
+    const userId = computed(() => user.userId)
     const puzzles = computed(() => {
         const puzzles = store.state.puzzles
         return puzzles ? Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) : []

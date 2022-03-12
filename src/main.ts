@@ -10,10 +10,11 @@ import App from './components/App.vue'
 
 const app = createApp(App)
 
-app.use(createFirebase())
-app.use(createPinia())
+const pinia = createPinia()
+app.use(pinia)
+app.use(createFirebase(pinia))
 const store = createStore()
 app.use(store)
-app.use(createRouter(store))
+app.use(createRouter(pinia))
 
 app.mount('#app')

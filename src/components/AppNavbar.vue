@@ -223,7 +223,7 @@
     import { computed, ref } from 'vue'
     import { useRouter } from 'vue-router'
     import { useStore } from '@/composables/useStore'
-    import { getAuth } from 'firebase/auth'
+    import { useUser } from '@/stores/user'
     import type { ThemeData } from '@/types'
     import { Actions } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
@@ -232,6 +232,7 @@
 
     const router = useRouter()
     const store = useStore()
+    const user = useUser()
 
     const options = ref<ProfileOptions>({
         showTimer: true,
@@ -320,7 +321,7 @@
     }
 
     const openImportModal = () => {
-        solveImporter.value = new SolveImporter(store.state.userId)
+        solveImporter.value = new SolveImporter(user.userId)
         $('#importModal').modal()
     }
 
@@ -337,10 +338,9 @@
     }
 
     const logout = () => {
-        getAuth()
-            .signOut()
+        user.logout()
             .then(() => router.push('/login'))
-            .catch((error: Error) => alert(error.message))
+            .catch((errorMessage: string) => alert(errorMessage))
     }
 </script>
 
