@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <link rel="stylesheet" :href="themeUrl" />
+        <link rel="stylesheet" :href="options.themeUrl" />
         <transition name="fade">
             <navbar v-if="showNavbar"></navbar>
         </transition>
@@ -23,12 +23,13 @@
     import { computed } from 'vue'
     import { useRoute } from 'vue-router'
     import { useStore } from '@/composables/useStore'
+    import { useOptions } from '@/stores/options'
 
     const store = useStore()
+    const options = useOptions()
     const route = useRoute()
 
     const showNavbar = computed(() => !store.state.hideUI && route.name !== 'Login')
-    const themeUrl = computed(() => store.state.options.themeUrl)
 </script>
 
 <style>

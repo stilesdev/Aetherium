@@ -3,8 +3,12 @@ import type { Store } from 'vuex'
 import { Mutations, References, type RootState } from '@/types/store'
 import { Solve } from '@/classes/solve'
 import { type DatabaseReference, equalTo, off, onChildAdded, onChildChanged, onChildRemoved, onValue, orderByChild, query } from 'firebase/database'
+import type { Pinia } from 'pinia'
+import { useOptions } from '@/stores/options'
 
 class FirebaseManager {
+    constructor(private pinia: Pinia) {}
+
     private previousRefs: { [key in References]?: DatabaseReference } = {}
 
     public connectRef(ref: References, store: Store<RootState>): void {
@@ -12,11 +16,14 @@ class FirebaseManager {
             case References.OPTIONS:
                 this.previousRefs[ref] = store.getters.optionsRef
                 onValue(store.getters.optionsRef, (snapshot) => {
-                    store.commit(Mutations.SET_OPTION_SHOWTIMER, snapshot.val().showTimer)
-                    store.commit(Mutations.SET_OPTION_TIMERTRIGGER, snapshot.val().timerTrigger)
-                    store.commit(Mutations.SET_OPTION_THEME_URL, snapshot.val().themeUrl)
-                    store.commit(Mutations.SET_OPTION_HOLD_TO_START, snapshot.val().holdToStart)
-                    store.commit(Mutations.SET_OPTION_USE_INSPECTION, snapshot.val().useInspection)
+                    const options = useOptions(this.pinia)
+                    options.$patch({
+                        showTimer: snapshot.val().showTimer,
+                        timerTrigger: snapshot.val().timerTrigger,
+                        themeUrl: snapshot.val().themeUrl,
+                        holdToStart: snapshot.val().holdToStart,
+                        useInspection: snapshot.val().useInspection,
+                    })
                 })
                 break
             case References.CURRENT_SESSION_ID:
@@ -106,4 +113,4 @@ class FirebaseManager {
     }
 }
 
-export default new FirebaseManager()
+export default FirebaseManager

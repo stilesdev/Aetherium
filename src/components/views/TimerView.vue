@@ -57,6 +57,7 @@
     import $ from 'jquery'
     import { computed, onUnmounted, ref, watch } from 'vue'
     import { useStore } from '@/composables/useStore'
+    import { useOptions } from '@/stores/options'
     import { useScramble } from '@/stores/scramble'
     import Stackmat, { type Packet } from 'stackmat'
     import TimerStateMachine from '@/util/timer-state-machine'
@@ -66,6 +67,7 @@
     import { TimerTrigger } from '@/types/firebase'
 
     const store = useStore()
+    const options = useOptions()
     const scramble = useScramble()
 
     const timerStart = ref(0)
@@ -78,10 +80,9 @@
     const stackmat = new Stackmat()
 
     const hideUI = computed(() => (timerState.value ? !(timerState.value.state === TimerState.IDLE || timerState.value.state === TimerState.COMPLETE) : false))
-    const timerTrigger = computed(() => store.state.options.timerTrigger)
-    const showTimer = computed(() => store.state.options.showTimer)
-    const holdToStart = computed(() => store.state.options.holdToStart)
-    const useInspection = computed(() => store.state.options.useInspection)
+    const timerTrigger = computed(() => options.timerTrigger)
+    const holdToStart = computed(() => options.holdToStart)
+    const useInspection = computed(() => options.useInspection)
     const timerClass = computed(() => {
         if (timerState.value) {
             switch (timerState.value.state) {
@@ -200,7 +201,7 @@
         clearInterval(inspectionTimer.value)
         inspectionTimer.value = undefined
 
-        if (showTimer.value) {
+        if (options.showTimer) {
             setTimeout(updateTimer, 10)
         } else {
             timerLabel.value = 'Solve!'

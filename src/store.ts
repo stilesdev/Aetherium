@@ -2,30 +2,24 @@ import { child, type DatabaseReference, onValue, push, ref, remove, serverTimest
 import moment, { type Moment } from 'moment'
 import { type ActionContext, createStore as _createStore, type MutationPayload, Store } from 'vuex'
 import { Actions, Mutations, References, type RootState } from '@/types/store'
-import FirebaseManager from '@/util/firebase-manager'
+import _FirebaseManager from '@/util/firebase-manager'
 import { Stats } from '@/util/stats'
 import type { ISolve } from '@/types'
-import type { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
-import { SolvePenalty, TimerTrigger } from '@/types/firebase'
+import type { FirebaseList, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
+import type { SolvePenalty } from '@/types/firebase'
 import type { Pinia } from 'pinia'
 import { useScramble } from './stores/scramble'
 import { useUser } from './stores/user'
 
 export function createStore(pinia: Pinia): Store<RootState> {
     const db = getDatabase()
+    const FirebaseManager = new _FirebaseManager(pinia)
 
     return _createStore({
         strict: import.meta.env.DEV,
         state: {
             hideUI: false,
             puzzles: undefined,
-            options: {
-                showTimer: true,
-                timerTrigger: TimerTrigger.SPACEBAR,
-                themeUrl: '/themes/default.min.css',
-                holdToStart: true,
-                useInspection: true,
-            },
             sessionId: undefined,
             sessionDate: undefined,
             activePuzzle: '333',
@@ -87,21 +81,6 @@ export function createStore(pinia: Pinia): Store<RootState> {
             [Mutations.RECEIVE_ACTIVE_PUZZLE](state: RootState, payload: string): void {
                 state.activePuzzle = payload
             },
-            [Mutations.SET_OPTION_SHOWTIMER](state: RootState, showTimer: boolean): void {
-                state.options.showTimer = showTimer
-            },
-            [Mutations.SET_OPTION_TIMERTRIGGER](state: RootState, timerTrigger: TimerTrigger): void {
-                state.options.timerTrigger = timerTrigger
-            },
-            [Mutations.SET_OPTION_THEME_URL](state: RootState, themeUrl: string): void {
-                state.options.themeUrl = themeUrl
-            },
-            [Mutations.SET_OPTION_HOLD_TO_START](state: RootState, holdToStart: boolean): void {
-                state.options.holdToStart = holdToStart
-            },
-            [Mutations.SET_OPTION_USE_INSPECTION](state: RootState, useInspection: boolean): void {
-                state.options.useInspection = useInspection
-            },
             [Mutations.CLEAR_SOLVES](state: RootState): void {
                 state.solves = []
             },
@@ -132,9 +111,6 @@ export function createStore(pinia: Pinia): Store<RootState> {
             },
         },
         actions: {
-            [Actions.SET_OPTIONS](context: ActionContext<RootState, RootState>, payload: ProfileOptions): void {
-                set(context.getters.optionsRef, payload)
-            },
             [Actions.SET_ACTIVE_PUZZLE](context: ActionContext<RootState, RootState>, payload: { puzzle: string }): void {
                 set(context.getters.currentPuzzleRef, payload.puzzle)
             },

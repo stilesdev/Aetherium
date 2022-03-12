@@ -1,10 +1,9 @@
-import type { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
+import type { FirebaseList, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
 import type { ISolve } from '@/types/index'
 
 export interface RootState {
     hideUI: boolean
     puzzles?: FirebaseList<Puzzle>
-    options: ProfileOptions
     sessionId?: string
     sessionDate?: string
     activePuzzle: string
@@ -34,11 +33,6 @@ export enum Mutations {
     RECEIVE_SESSION_ID = 'RECEIVE_SESSION_ID',
     RECEIVE_PUZZLES = 'RECEIVE_PUZZLES',
     RECEIVE_SESSION_DATE = 'RECEIVE_SESSION_DATE',
-    SET_OPTION_SHOWTIMER = 'SET_OPTION_SHOWTIMER',
-    SET_OPTION_TIMERTRIGGER = 'SET_OPTION_TIMERTRIGGER',
-    SET_OPTION_THEME_URL = 'SET_OPTION_THEME_URL',
-    SET_OPTION_HOLD_TO_START = 'SET_OPTION_HOLD_TO_START',
-    SET_OPTION_USE_INSPECTION = 'SET_OPTION_USE_INSPECTION',
     SET_HIDE_UI = 'SET_HIDE_UI',
     RECEIVE_ACTIVE_PUZZLE = 'RECEIVE_ACTIVE_PUZZLE',
     CLEAR_SOLVES = 'CLEAR_SOLVES',
@@ -51,7 +45,6 @@ export enum Mutations {
 }
 
 export enum Actions {
-    SET_OPTIONS = 'SET_OPTIONS',
     SET_ACTIVE_PUZZLE = 'SET_ACTIVE_PUZZLE',
     UPDATE_SESSION_DATE = 'UPDATE_SESSION_DATE',
     CHECK_SESSION = 'CHECK_SESSION',

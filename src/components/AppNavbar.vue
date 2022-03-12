@@ -224,6 +224,7 @@
     import { useRouter } from 'vue-router'
     import { useStore } from '@/composables/useStore'
     import { useUser } from '@/stores/user'
+    import { useOptions } from '@/stores/options'
     import type { ThemeData } from '@/types'
     import { Actions } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
@@ -233,6 +234,7 @@
     const router = useRouter()
     const store = useStore()
     const user = useUser()
+    const storeOptions = useOptions()
 
     const options = ref<ProfileOptions>({
         showTimer: true,
@@ -279,11 +281,6 @@
         set: (value) => store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value }),
     })
 
-    const storeOptions = computed({
-        get: () => store.state.options,
-        set: (value) => store.dispatch(Actions.SET_OPTIONS, value),
-    })
-
     const sessionDate = computed({
         get: () => {
             let temp
@@ -312,12 +309,12 @@
     }
 
     const openOptionsModal = () => {
-        options.value = Object.assign({}, store.state.options)
+        options.value = Object.assign({}, storeOptions.$state)
         $('#optionsModal').modal()
     }
 
     const onOptionsModalSave = () => {
-        storeOptions.value = Object.assign({}, options.value)
+        storeOptions.setOptions(options.value)
     }
 
     const openImportModal = () => {
