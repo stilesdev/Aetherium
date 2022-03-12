@@ -35,9 +35,9 @@ self.generateScramble = function (scrambler) {
             const scramble = puzzle.generateScramble()
             // eslint-disable-next-line no-undef
             const svg = tnoodlejs.scrambleToSvg(scramble, puzzle, 0, 0)
-            self.postMessage({ scramble: scramble, svg: svg })
+            self.postMessage({ text: scramble, svg: svg })
         } else {
-            self.postMessage({ scramble: undefined, svg: undefined })
+            self.postMessage(undefined)
         }
     } else {
         setTimeout(self.generateScramble, 100, scrambler)

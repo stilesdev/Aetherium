@@ -3,8 +3,6 @@ import type { ISolve } from '@/types/index'
 
 export interface RootState {
     hideUI: boolean
-    scramblerWorker: Worker
-    scramble: ScramblePayload
     puzzles?: FirebaseList<Puzzle>
     userId?: string
     options: ProfileOptions
@@ -45,7 +43,6 @@ export enum Mutations {
     SET_OPTION_USE_INSPECTION = 'SET_OPTION_USE_INSPECTION',
     SET_HIDE_UI = 'SET_HIDE_UI',
     RECEIVE_ACTIVE_PUZZLE = 'RECEIVE_ACTIVE_PUZZLE',
-    RECEIVE_SCRAMBLE = 'RECEIVE_SCRAMBLE',
     CLEAR_SOLVES = 'CLEAR_SOLVES',
     ADD_SOLVE = 'ADD_SOLVE',
     UPDATE_SOLVE = 'UPDATE_SOLVE',
@@ -59,7 +56,6 @@ export enum Actions {
     SET_OPTIONS = 'SET_OPTIONS',
     SET_ACTIVE_PUZZLE = 'SET_ACTIVE_PUZZLE',
     UPDATE_SESSION_DATE = 'UPDATE_SESSION_DATE',
-    REQUEST_SCRAMBLE = 'REQUEST_SCRAMBLE',
     CHECK_SESSION = 'CHECK_SESSION',
     CLOSE_SESSION = 'CLOSE_SESSION',
     STORE_SOLVE = 'STORE_SOLVE',

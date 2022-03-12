@@ -13,7 +13,7 @@ const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
 app.use(createFirebase(pinia))
-const store = createStore()
+const store = createStore(pinia)
 app.use(store)
 app.use(createRouter(pinia))
 

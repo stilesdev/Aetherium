@@ -6,7 +6,7 @@
                 <div class="row">
                     <transition name="fade">
                         <div id="scrambleArea" class="col-md-10 col-md-offset-1" v-if="!hideUI">
-                            <h3>{{ scramble }}</h3>
+                            <h3>{{ scramble.text }}</h3>
                         </div>
                     </transition>
                 </div>
@@ -57,6 +57,7 @@
     import $ from 'jquery'
     import { computed, onUnmounted, ref, watch } from 'vue'
     import { useStore } from '@/composables/useStore'
+    import { useScramble } from '@/stores/scramble'
     import Stackmat, { type Packet } from 'stackmat'
     import TimerStateMachine from '@/util/timer-state-machine'
     import { TimerState } from '@/types'
@@ -65,6 +66,7 @@
     import { TimerTrigger } from '@/types/firebase'
 
     const store = useStore()
+    const scramble = useScramble()
 
     const timerStart = ref(0)
     const timerLabel = ref('00:00:00')
@@ -75,7 +77,6 @@
     const inspectionTimer = ref<number | undefined>(undefined)
     const stackmat = new Stackmat()
 
-    const scramble = computed(() => store.state.scramble?.text)
     const hideUI = computed(() => (timerState.value ? !(timerState.value.state === TimerState.IDLE || timerState.value.state === TimerState.COMPLETE) : false))
     const timerTrigger = computed(() => store.state.options.timerTrigger)
     const showTimer = computed(() => store.state.options.showTimer)

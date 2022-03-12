@@ -1,6 +1,6 @@
 <template>
     <panel panelTitle="Scramble Image">
-        <div v-html="scrambleImage"></div>
+        <div v-html="scramble.svg"></div>
     </panel>
 </template>
 
@@ -15,10 +15,7 @@
 </script>
 
 <script lang="ts" setup>
-    import { computed } from 'vue'
-    import { useStore } from '@/composables/useStore'
+    import { useScramble } from '@/stores/scramble'
 
-    const store = useStore()
-
-    const scrambleImage = computed(() => store.state.scramble.svg)
+    const scramble = useScramble()
 </script>

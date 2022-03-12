@@ -1,27 +1,23 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { child, type DatabaseReference, get, onValue, push, ref, remove, serverTimestamp, set, update, getDatabase } from 'firebase/database'
+import { child, type DatabaseReference, onValue, push, ref, remove, serverTimestamp, set, update, getDatabase } from 'firebase/database'
 import moment, { type Moment } from 'moment'
 import { type ActionContext, createStore as _createStore, type MutationPayload, Store } from 'vuex'
 import { Actions, Mutations, References, type RootState, type ScramblePayload } from '@/types/store'
 import FirebaseManager from '@/util/firebase-manager'
 import { Stats } from '@/util/stats'
 import type { ISolve } from '@/types'
-import { ScramblerWorker } from '@/workers'
 import type { FirebaseList, ProfileOptions, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
 import { SolvePenalty, TimerTrigger } from '@/types/firebase'
+import type { Pinia } from 'pinia'
+import { useScramble } from './stores/scramble'
 
-export function createStore(): Store<RootState> {
+export function createStore(pinia: Pinia): Store<RootState> {
     const db = getDatabase()
 
     return _createStore({
         strict: import.meta.env.DEV,
         state: {
             hideUI: false,
-            scramblerWorker: new ScramblerWorker(),
-            scramble: {
-                text: 'Generating scramble...',
-                svg: undefined,
-            },
             puzzles: undefined,
             userId: undefined,
             options: {
@@ -90,9 +86,6 @@ export function createStore(): Store<RootState> {
             [Mutations.RECEIVE_ACTIVE_PUZZLE](state: RootState, payload: string): void {
                 state.activePuzzle = payload
             },
-            [Mutations.RECEIVE_SCRAMBLE](state: RootState, scramble: ScramblePayload): void {
-                state.scramble = scramble
-            },
             [Mutations.SET_OPTION_SHOWTIMER](state: RootState, showTimer: boolean): void {
                 state.options.showTimer = showTimer
             },
@@ -150,18 +143,6 @@ export function createStore(): Store<RootState> {
                     timestamp: payload.moment.valueOf(),
                 })
             },
-            [Actions.REQUEST_SCRAMBLE](context: ActionContext<RootState, RootState>): void {
-                context.commit(Mutations.RECEIVE_SCRAMBLE, {
-                    text: 'Generating scramble...',
-                    svg: undefined,
-                })
-
-                if (context.state.puzzles) {
-                    context.state.scramblerWorker.postMessage({
-                        scrambler: context.state.puzzles[context.state.activePuzzle].scrambler,
-                    })
-                }
-            },
             [Actions.CHECK_SESSION](context: ActionContext<RootState, RootState>): Promise<void> {
                 return new Promise((resolve) => {
                     if (!context.state.sessionId) {
@@ -186,16 +167,19 @@ export function createStore(): Store<RootState> {
                 set(context.getters.currentSessionIdRef, undefined)
             },
             [Actions.STORE_SOLVE](context: ActionContext<RootState, RootState>, delta: number): void {
+                const scramble = useScramble(pinia)
                 context.dispatch(Actions.CHECK_SESSION).then(() => {
                     push(context.getters.solvesRef, {
                         sessionId: context.state.sessionId,
                         time: delta,
                         timestamp: serverTimestamp(),
-                        scramble: context.state.scramble.text,
+                        scramble: scramble.text,
                         penalty: '',
                     }).then(() => context.dispatch(Actions.UPDATE_STATS))
 
-                    context.dispatch(Actions.REQUEST_SCRAMBLE)
+                    if (context.state.puzzles) {
+                        scramble.request(context.state.puzzles[context.state.activePuzzle])
+                    }
                 })
             },
             [Actions.SET_PENALTY](context: ActionContext<RootState, RootState>, payload: { solve: ISolve; penalty: SolvePenalty }): void {
@@ -257,26 +241,13 @@ export function createStore(): Store<RootState> {
                 })
             },
             (store) =>
-                store.state.scramblerWorker.addEventListener('message', (event: MessageEvent) => {
-                    if (event.data === undefined) {
-                        store.commit(Mutations.RECEIVE_SCRAMBLE, {
-                            text: 'No valid scrambler for this puzzle',
-                            svg: undefined,
-                        })
-                    } else {
-                        store.commit(Mutations.RECEIVE_SCRAMBLE, {
-                            text: event.data.scramble,
-                            svg: event.data.svg,
-                        })
-                    }
-                }),
-            (store) =>
                 onValue(store.getters.puzzlesRef, (snapshot) => {
                     store.commit(Mutations.RECEIVE_PUZZLES, snapshot.val())
                 }),
             (store) =>
                 store.subscribe((mutation: MutationPayload, state: RootState) => {
                     if (mutation.type === Mutations.RECEIVE_USER_ID) {
+                        // TODO: move this to pinia? create a firebase store for all these refs instead of bespoke FirebaseManager?
                         FirebaseManager.disconnectAllRefs()
 
                         if (state.userId) {
@@ -309,7 +280,11 @@ export function createStore(): Store<RootState> {
                         FirebaseManager.connectRef(References.SESSION_STATS, store)
                         FirebaseManager.connectRef(References.ALL_SESSIONS, store)
                         FirebaseManager.connectRef(References.ALL_STATS, store)
-                        store.dispatch(Actions.REQUEST_SCRAMBLE)
+
+                        const scramble = useScramble(pinia)
+                        if (store.state.puzzles) {
+                            scramble.request(store.state.puzzles[store.state.activePuzzle])
+                        }
                     }
                 }),
             (store) => {
