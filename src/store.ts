@@ -1,15 +1,16 @@
-import { child, type DatabaseReference, onValue, push, ref, remove, serverTimestamp, set, update, getDatabase } from 'firebase/database'
+import { child, type DatabaseReference, push, ref, remove, serverTimestamp, set, update, getDatabase } from 'firebase/database'
 import moment, { type Moment } from 'moment'
 import { type ActionContext, createStore as _createStore, type MutationPayload, Store } from 'vuex'
 import { Actions, Mutations, References, type RootState } from '@/types/store'
 import _FirebaseManager from '@/util/firebase-manager'
 import { Stats } from '@/util/stats'
 import type { ISolve } from '@/types'
-import type { FirebaseList, Puzzle, SessionPayload, StatisticsPayload } from '@/types/firebase'
+import type { FirebaseList, SessionPayload, StatisticsPayload } from '@/types/firebase'
 import type { SolvePenalty } from '@/types/firebase'
 import type { Pinia } from 'pinia'
 import { useScramble } from './stores/scramble'
 import { useUser } from './stores/user'
+import { usePuzzles } from './stores/puzzles'
 
 export function createStore(pinia: Pinia): Store<RootState> {
     const db = getDatabase()
@@ -19,19 +20,14 @@ export function createStore(pinia: Pinia): Store<RootState> {
         strict: import.meta.env.DEV,
         state: {
             hideUI: false,
-            puzzles: undefined,
             sessionId: undefined,
             sessionDate: undefined,
-            activePuzzle: '333',
             solves: [],
             sessionStats: undefined,
             allSessions: undefined,
             allStats: undefined,
         },
         getters: {
-            puzzlesRef(): DatabaseReference {
-                return ref(db, '/puzzles')
-            },
             optionsRef(): DatabaseReference {
                 const user = useUser(pinia)
                 return ref(db, `/users/${user.userId}/options`)
@@ -52,34 +48,31 @@ export function createStore(pinia: Pinia): Store<RootState> {
                 const user = useUser(pinia)
                 return ref(db, `/users/${user.userId}/sessions/${state.sessionId}`)
             },
-            solvesRef(state: RootState): DatabaseReference {
+            solvesRef(): DatabaseReference {
                 const user = useUser(pinia)
-                return ref(db, `/solves/${user.userId}/${state.activePuzzle}`)
+                const puzzles = usePuzzles(pinia)
+                return ref(db, `/solves/${user.userId}/${puzzles.selectedPuzzleId}`)
             },
-            statsRef(state: RootState): DatabaseReference {
+            statsRef(): DatabaseReference {
                 const user = useUser(pinia)
-                return ref(db, `/stats/${user.userId}/${state.activePuzzle}`)
+                const puzzles = usePuzzles(pinia)
+                return ref(db, `/stats/${user.userId}/${puzzles.selectedPuzzleId}`)
             },
             sessionStatsRef(state: RootState): DatabaseReference {
                 const user = useUser(pinia)
-                return ref(db, `/stats/${user.userId}/${state.activePuzzle}/${state.sessionId}`)
+                const puzzles = usePuzzles(pinia)
+                return ref(db, `/stats/${user.userId}/${puzzles.selectedPuzzleId}/${state.sessionId}`)
             },
         },
         mutations: {
             [Mutations.RECEIVE_SESSION_ID](state: RootState, sessionId: string): void {
                 state.sessionId = sessionId
             },
-            [Mutations.RECEIVE_PUZZLES](state: RootState, puzzles: FirebaseList<Puzzle>): void {
-                state.puzzles = puzzles
-            },
             [Mutations.RECEIVE_SESSION_DATE](state: RootState, payload: { moment: string }): void {
                 state.sessionDate = payload.moment
             },
             [Mutations.SET_HIDE_UI](state: RootState, hide: boolean): void {
                 state.hideUI = hide
-            },
-            [Mutations.RECEIVE_ACTIVE_PUZZLE](state: RootState, payload: string): void {
-                state.activePuzzle = payload
             },
             [Mutations.CLEAR_SOLVES](state: RootState): void {
                 state.solves = []
@@ -111,9 +104,6 @@ export function createStore(pinia: Pinia): Store<RootState> {
             },
         },
         actions: {
-            [Actions.SET_ACTIVE_PUZZLE](context: ActionContext<RootState, RootState>, payload: { puzzle: string }): void {
-                set(context.getters.currentPuzzleRef, payload.puzzle)
-            },
             [Actions.UPDATE_SESSION_DATE](context: ActionContext<RootState, RootState>, payload: { moment: Moment }): void {
                 update(context.getters.currentSessionRef, {
                     date: payload.moment.format('M/D/YYYY'),
@@ -154,9 +144,7 @@ export function createStore(pinia: Pinia): Store<RootState> {
                         penalty: '',
                     }).then(() => context.dispatch(Actions.UPDATE_STATS))
 
-                    if (context.state.puzzles) {
-                        scramble.request(context.state.puzzles[context.state.activePuzzle])
-                    }
+                    scramble.requestNew()
                 })
             },
             [Actions.SET_PENALTY](context: ActionContext<RootState, RootState>, payload: { solve: ISolve; penalty: SolvePenalty }): void {
@@ -206,10 +194,6 @@ export function createStore(pinia: Pinia): Store<RootState> {
                 })
             },
             (store) =>
-                onValue(store.getters.puzzlesRef, (snapshot) => {
-                    store.commit(Mutations.RECEIVE_PUZZLES, snapshot.val())
-                }),
-            (store) =>
                 store.subscribe((mutation: MutationPayload, state: RootState) => {
                     if (mutation.type === Mutations.RECEIVE_SESSION_ID) {
                         FirebaseManager.disconnectRef(References.SESSION)
@@ -219,9 +203,12 @@ export function createStore(pinia: Pinia): Store<RootState> {
                         }
                     }
                 }),
-            (store) =>
-                store.subscribe((mutation: MutationPayload) => {
-                    if (mutation.type === Mutations.RECEIVE_ACTIVE_PUZZLE) {
+            (store) => {
+                const puzzles = usePuzzles(pinia)
+                puzzles.$subscribe((_, state) => {
+                    const user = useUser(pinia)
+
+                    if (user.isLoggedIn && state.allPuzzles) {
                         FirebaseManager.disconnectRef(References.SOLVES)
                         FirebaseManager.disconnectRef(References.SESSION_STATS)
                         FirebaseManager.disconnectRef(References.ALL_SESSIONS)
@@ -234,11 +221,10 @@ export function createStore(pinia: Pinia): Store<RootState> {
                         FirebaseManager.connectRef(References.ALL_STATS, store)
 
                         const scramble = useScramble(pinia)
-                        if (store.state.puzzles) {
-                            scramble.request(store.state.puzzles[store.state.activePuzzle])
-                        }
+                        scramble.requestNew()
                     }
-                }),
+                })
+            },
             (store) => {
                 if (import.meta.env.DEV) {
                     store.subscribe((mutation: MutationPayload) => {

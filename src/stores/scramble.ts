@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import type { Puzzle } from '@/types/firebase'
 import type { ScramblePayload } from '@/types/store'
+import { usePuzzles } from './puzzles'
 
 interface ScrambleState {
     _worker?: Worker
@@ -34,13 +34,17 @@ export const useScramble = defineStore('scramble', {
         },
     },
     actions: {
-        request(puzzle: Puzzle) {
+        requestNew() {
             this.text = 'Generating scramble...'
             this.svg = undefined
 
-            this.worker.postMessage({
-                scrambler: puzzle.scrambler,
-            })
+            const puzzles = usePuzzles()
+
+            if (puzzles.selectedPuzzle) {
+                this.worker.postMessage({
+                    scrambler: puzzles.selectedPuzzle.scrambler,
+                })
+            }
         },
     },
 })

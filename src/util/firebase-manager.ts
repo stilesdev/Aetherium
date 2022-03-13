@@ -5,6 +5,7 @@ import { Solve } from '@/classes/solve'
 import { type DatabaseReference, equalTo, off, onChildAdded, onChildChanged, onChildRemoved, onValue, orderByChild, query } from 'firebase/database'
 import type { Pinia } from 'pinia'
 import { useOptions } from '@/stores/options'
+import { usePuzzles } from '@/stores/puzzles'
 
 class FirebaseManager {
     constructor(private pinia: Pinia) {}
@@ -46,7 +47,8 @@ class FirebaseManager {
             case References.CURRENT_PUZZLE:
                 this.previousRefs[ref] = store.getters.currentPuzzleRef
                 onValue(store.getters.currentPuzzleRef, (snapshot) => {
-                    store.commit(Mutations.RECEIVE_ACTIVE_PUZZLE, snapshot.val())
+                    const puzzles = usePuzzles(this.pinia)
+                    puzzles.selectedPuzzleId = snapshot.val()
                 })
                 break
             case References.SESSION:

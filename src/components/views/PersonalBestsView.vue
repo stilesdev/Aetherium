@@ -13,7 +13,7 @@
                 </tr>
             </thead>
             <tbody>
-                <template v-for="puzzle in puzzles">
+                <template v-for="puzzle in allPuzzles">
                     <tr class="h4" :key="puzzle.key" v-if="personalBests[puzzle.key]">
                         <td rowspan="2">
                             <h3>{{ puzzle.name }}</h3>
@@ -43,6 +43,7 @@
     import { get, getDatabase, ref as dbRef } from 'firebase/database'
     import { computed, onMounted, ref } from 'vue'
     import { useStore } from '@/composables/useStore'
+    import { usePuzzles } from '@/stores/puzzles'
     import { useUser } from '@/stores/user'
     import type { FirebaseList, StatisticsPayload } from '@/types/firebase'
     import type { Statistics } from '@/types'
@@ -50,15 +51,13 @@
     import { millisToShortTimerFormat } from '@/functions/millisToShortTimerFormat'
 
     const store = useStore()
+    const puzzles = usePuzzles()
     const user = useUser()
 
     const personalBests = ref<Record<string, Record<string, { time: string; date: string | undefined }>>>({}) // TODO: define a type for this
 
     const userId = computed(() => user.userId)
-    const puzzles = computed(() => {
-        const puzzles = store.state.puzzles
-        return puzzles ? Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) : []
-    })
+    const allPuzzles = computed(() => (puzzles.allPuzzles ? Object.values(puzzles.allPuzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) : []))
     const allSessions = computed(() => store.state.allSessions)
     const puzzleStatsRef = computed(() => (puzzle: string) => dbRef(getDatabase(), `/stats/${userId.value}/${puzzle}`))
 
@@ -88,7 +87,7 @@
     }
 
     onMounted(() => {
-        puzzles.value.forEach((puzzle) => {
+        allPuzzles.value.forEach((puzzle) => {
             get(puzzleStatsRef.value(puzzle.key)).then((snapshot) => {
                 const allStats: FirebaseList<Statistics> = snapshot.val()
                 const sessions: Statistics[] = []

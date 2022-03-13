@@ -37,10 +37,10 @@
                         </router-link>
                     </ul>
 
-                    <form class="navbar-form navbar-left" v-if="puzzles">
+                    <form class="navbar-form navbar-left" v-if="allPuzzles">
                         <div class="form-group">
-                            <select class="form-control" v-model="activePuzzle">
-                                <option v-for="puzzle in puzzles" :key="puzzle.key" :value="puzzle.key">{{ puzzle.name }}</option>
+                            <select class="form-control" v-model="selectedPuzzle">
+                                <option v-for="puzzle in allPuzzles" :key="puzzle.key" :value="puzzle.key">{{ puzzle.name }}</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -223,6 +223,7 @@
     import { computed, ref } from 'vue'
     import { useRouter } from 'vue-router'
     import { useStore } from '@/composables/useStore'
+    import { usePuzzles } from '@/stores/puzzles'
     import { useUser } from '@/stores/user'
     import { useOptions } from '@/stores/options'
     import type { ThemeData } from '@/types'
@@ -233,6 +234,7 @@
 
     const router = useRouter()
     const store = useStore()
+    const puzzles = usePuzzles()
     const user = useUser()
     const storeOptions = useOptions()
 
@@ -267,18 +269,11 @@
         { name: 'Yeti', url: '/themes/yeti.min.css' },
     ]
 
-    const puzzles = computed(() => {
-        if (store.state.puzzles) {
-            const puzzles = store.state.puzzles
-            return Object.values(puzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-        } else {
-            return []
-        }
-    })
+    const allPuzzles = computed(() => (puzzles.allPuzzles ? Object.values(puzzles.allPuzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) : []))
 
-    const activePuzzle = computed({
-        get: () => store.state.activePuzzle,
-        set: (value) => store.dispatch(Actions.SET_ACTIVE_PUZZLE, { puzzle: value }),
+    const selectedPuzzle = computed({
+        get: () => puzzles.selectedPuzzleId,
+        set: (value) => puzzles.setSelectedPuzzle(value),
     })
 
     const sessionDate = computed({
