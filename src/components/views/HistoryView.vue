@@ -19,24 +19,24 @@
     import { Chart } from 'highcharts'
     import moment from 'moment'
     import { computed, onMounted, watch } from 'vue'
-    import { useStore } from '@/composables/useStore'
+    import { useSession } from '@/stores/session'
     import type { ChartSeries } from '@/types'
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import { millisToShortTimerFormat } from '@/functions/millisToShortTimerFormat'
 
-    const store = useStore()
+    const session = useSession()
 
     let sessionHistoryChart: Chart | undefined
 
     const sessionMeans = computed<ChartSeries>(() => {
-        const sessions = store.state.allSessions
-        const stats = store.state.allStats
+        const sessions = session.allSessions
+        const stats = session.allStats
         return sessions && stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].mean]) : []
     })
 
     const sessionBests = computed<ChartSeries>(() => {
-        const sessions = store.state.allSessions
-        const stats = store.state.allStats
+        const sessions = session.allSessions
+        const stats = session.allStats
         return sessions && stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].best]) : []
     })
 

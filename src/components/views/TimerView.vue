@@ -57,16 +57,18 @@
     import $ from 'jquery'
     import { computed, onUnmounted, ref, watch } from 'vue'
     import { useStore } from '@/composables/useStore'
+    import { useDatabase } from '@/stores/database'
     import { useOptions } from '@/stores/options'
     import { useScramble } from '@/stores/scramble'
     import Stackmat, { type Packet } from 'stackmat'
     import TimerStateMachine from '@/util/timer-state-machine'
     import { TimerState } from '@/types'
-    import { Actions, Mutations } from '@/types/store'
+    import { Mutations } from '@/types/store'
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import { TimerTrigger } from '@/types/firebase'
 
     const store = useStore()
+    const database = useDatabase()
     const options = useOptions()
     const scramble = useScramble()
 
@@ -230,7 +232,7 @@
     const completeSolve = (delta: number) => {
         timerLabel.value = millisToTimerFormat(delta)
         stackmatLastTime.value = 0
-        store.dispatch(Actions.STORE_SOLVE, delta)
+        database.storeNewSolve(delta)
     }
 
     const onTouchStart = () => {

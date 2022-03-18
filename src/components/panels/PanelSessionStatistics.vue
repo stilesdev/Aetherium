@@ -79,22 +79,24 @@
 
 <script lang="ts" setup>
     import { computed, ref, watch } from 'vue'
-    import { useStore } from '@/composables/useStore'
+    import { useDatabase } from '@/stores/database'
+    import { useSession } from '@/stores/session'
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
-    import { get, limitToLast, orderByChild, query } from 'firebase/database'
+    import { get, getDatabase, limitToLast, orderByChild, query, ref as dbRef } from 'firebase/database'
     import { Solve } from '@/classes/solve'
     import { Stats } from '@/util/stats'
 
-    const store = useStore()
+    const database = useDatabase()
+    const session = useSession()
 
     const ao1000 = ref(0)
 
-    const stats = computed(() => store.state.sessionStats)
+    const stats = computed(() => session.sessionStats)
 
     const formatSolve = millisToTimerFormat
 
     const calculateAo1000 = () => {
-        get(query(store.getters.solvesRef, orderByChild('timestamp'), limitToLast(1000))).then((solveSnapshot) => {
+        get(query(dbRef(getDatabase(), database.solvesRef), orderByChild('timestamp'), limitToLast(1000))).then((solveSnapshot) => {
             const solves: Solve[] = []
             solveSnapshot.forEach((childSnapshot) => {
                 solves.push(Solve.fromSnapshot(childSnapshot))

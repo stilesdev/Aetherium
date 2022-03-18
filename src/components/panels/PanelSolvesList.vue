@@ -63,21 +63,22 @@
 
 <script lang="ts" setup>
     import { computed } from 'vue'
-    import { useStore } from '@/composables/useStore'
+    import { useDatabase } from '@/stores/database'
+    import { useSession } from '@/stores/session'
     import type { ISolve } from '@/types'
-    import { Actions } from '@/types/store'
     import { SolvePenalty } from '@/types/firebase'
 
-    const store = useStore()
+    const database = useDatabase()
+    const session = useSession()
 
-    const solves = computed(() => store.state.solves)
+    const solves = computed(() => session.solves)
 
     const setPenalty = (solve: ISolve, penalty: SolvePenalty) => {
-        store.dispatch(Actions.SET_PENALTY, { solve, penalty })
+        database.setSolvePenalty(solve, penalty)
     }
 
     const deleteSolve = (solveId: string) => {
-        store.dispatch(Actions.DELETE_SOLVE, solveId)
+        database.deleteSolve(solveId)
     }
 </script>
 

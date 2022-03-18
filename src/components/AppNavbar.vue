@@ -120,18 +120,18 @@
                             <label
                                 class="btn btn-default"
                                 :class="{
-                                    active: options.timerTrigger === TimerTrigger.SPACEBAR,
+                                    active: tempOptions.timerTrigger === TimerTrigger.SPACEBAR,
                                 }"
-                                @click="options.timerTrigger = TimerTrigger.SPACEBAR"
+                                @click="tempOptions.timerTrigger = TimerTrigger.SPACEBAR"
                             >
                                 <input type="radio" name="timerTriggerOptions" id="spacebarTimerTrigger" autocomplete="off" />Spacebar
                             </label>
                             <label
                                 class="btn btn-default"
                                 :class="{
-                                    active: options.timerTrigger === TimerTrigger.STACKMAT,
+                                    active: tempOptions.timerTrigger === TimerTrigger.STACKMAT,
                                 }"
-                                @click="options.timerTrigger = TimerTrigger.STACKMAT"
+                                @click="tempOptions.timerTrigger = TimerTrigger.STACKMAT"
                             >
                                 <input type="radio" name="timerTriggerOptions" id="stackmatTimerTrigger" autocomplete="off" />Stackmat
                             </label>
@@ -139,24 +139,24 @@
 
                         <hr />
 
-                        <input type="checkbox" id="showTimerCheckbox" v-model="options.showTimer" />
+                        <input type="checkbox" id="showTimerCheckbox" v-model="tempOptions.showTimer" />
                         <label for="showTimerCheckbox">Show timer while solving</label>
 
                         <hr />
 
-                        <input type="checkbox" id="holdToStartCheckbox" v-model="options.holdToStart" />
+                        <input type="checkbox" id="holdToStartCheckbox" v-model="tempOptions.holdToStart" />
                         <label for="holdToStartCheckbox">Hold spacebar/touchscreen to start timer</label>
 
                         <hr />
 
-                        <input type="checkbox" id="useInspectionCheckbox" v-model="options.useInspection" />
+                        <input type="checkbox" id="useInspectionCheckbox" v-model="tempOptions.useInspection" />
                         <label for="useInspectionCheckbox">Use inspection</label>
 
                         <hr />
 
                         <div class="form-group form-inline">
                             <label for="themeSelector">Theme</label>
-                            <select class="form-control" id="themeSelector" v-model="options.themeUrl">
+                            <select class="form-control" id="themeSelector" v-model="tempOptions.themeUrl">
                                 <option v-for="theme in themes" :key="theme.name" :value="theme.url">{{ theme.name }}</option>
                             </select>
                         </div>
@@ -222,23 +222,24 @@
     import $ from 'jquery'
     import { computed, ref } from 'vue'
     import { useRouter } from 'vue-router'
-    import { useStore } from '@/composables/useStore'
+    import { useDatabase } from '@/stores/database'
     import { usePuzzles } from '@/stores/puzzles'
     import { useUser } from '@/stores/user'
     import { useOptions } from '@/stores/options'
+    import { useSession } from '@/stores/session'
     import type { ThemeData } from '@/types'
-    import { Actions } from '@/types/store'
     import { SolveImporter } from '@/util/solve-importer'
     import type { ProfileOptions } from '@/types/firebase'
     import { TimerTrigger } from '@/types/firebase'
 
     const router = useRouter()
-    const store = useStore()
+    const database = useDatabase()
     const puzzles = usePuzzles()
     const user = useUser()
-    const storeOptions = useOptions()
+    const options = useOptions()
+    const session = useSession()
 
-    const options = ref<ProfileOptions>({
+    const tempOptions = ref<ProfileOptions>({
         showTimer: true,
         timerTrigger: TimerTrigger.SPACEBAR,
         holdToStart: true,
@@ -273,15 +274,15 @@
 
     const selectedPuzzle = computed({
         get: () => puzzles.selectedPuzzleId,
-        set: (value) => puzzles.setSelectedPuzzle(value),
+        set: (value) => database.setSelectedPuzzle(value),
     })
 
     const sessionDate = computed({
         get: () => {
             let temp
 
-            if (moment.isMoment(store.state.sessionDate)) {
-                temp = store.state.sessionDate
+            if (moment.isMoment(session.sessionDate)) {
+                temp = session.sessionDate
             } else {
                 temp = moment()
             }
@@ -289,9 +290,7 @@
             return moment().utc().dayOfYear(temp.dayOfYear()).startOf('day').format('YYYY-MM-DD')
         },
         set: (value) => {
-            store.dispatch(Actions.UPDATE_SESSION_DATE, {
-                moment: moment().utc().dayOfYear(moment(value, 'YYYY-MM-DD').dayOfYear()).startOf('day'),
-            })
+            database.setCurrentSessionDate(moment().utc().dayOfYear(moment(value, 'YYYY-MM-DD').dayOfYear()).startOf('day'))
         },
     })
 
@@ -300,16 +299,16 @@
     }
 
     const onCloseSessionConfirm = () => {
-        store.dispatch(Actions.CLOSE_SESSION)
+        database.closeCurrentSession()
     }
 
     const openOptionsModal = () => {
-        options.value = Object.assign({}, storeOptions.$state)
+        tempOptions.value = Object.assign({}, options.$state)
         $('#optionsModal').modal()
     }
 
     const onOptionsModalSave = () => {
-        storeOptions.setOptions(options.value)
+        database.setOptions(tempOptions.value)
     }
 
     const openImportModal = () => {

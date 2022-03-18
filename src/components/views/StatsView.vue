@@ -8,18 +8,18 @@
     import { Chart } from 'highcharts'
     import moment from 'moment'
     import { computed, onMounted, watch } from 'vue'
-    import { useStore } from '@/composables/useStore'
+    import { useSession } from '@/stores/session'
     import type { Solve } from '@/classes/solve'
     import type { ChartSeries, ChartSeriesEntry } from '@/types'
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import { millisToShortTimerFormat } from '@/functions/millisToShortTimerFormat'
     import { timestampToDateTime } from '@/functions/timestampToDateTime'
 
-    const store = useStore()
+    const session = useSession()
 
     let sessionChart: Chart | undefined
 
-    const allSolves = computed<ChartSeries>(() => store.state.solves.map((solve: Solve) => [solve.timestamp, solve.time] as ChartSeriesEntry).reverse())
+    const allSolves = computed<ChartSeries>(() => session.solves.map((solve: Solve) => [solve.timestamp, solve.time] as ChartSeriesEntry).reverse())
     const bestSolves = computed(() => {
         const bestSolves: ChartSeries = []
 
