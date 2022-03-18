@@ -1,8 +1,6 @@
 import { createStore as _createStore, Store } from 'vuex'
 import { Mutations, type RootState } from '@/types/store'
 import type { Pinia } from 'pinia'
-import { useUser } from './stores/user'
-import { useDatabaseListener } from './stores/databaseListener'
 
 export function createStore(pinia: Pinia): Store<RootState> {
     return _createStore({
@@ -15,15 +13,5 @@ export function createStore(pinia: Pinia): Store<RootState> {
                 state.hideUI = hide
             },
         },
-        plugins: [
-            () => {
-                const user = useUser(pinia)
-                user.$subscribe(() => {
-                    // TODO: move this somewhere else
-                    const databaseListener = useDatabaseListener(pinia)
-                    databaseListener.setUpDatabaseOnAuthStateChanged()
-                })
-            },
-        ],
     })
 }
