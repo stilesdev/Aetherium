@@ -4,7 +4,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import type { Pinia } from 'pinia'
 import type { Plugin } from 'vue'
 import firebaseConfig from '@/../firebase.config'
-import { getDatabase, get, ref, set } from 'firebase/database'
+import { useDatabase } from '@/stores/database'
 import { useUser } from '@/stores/user'
 
 export const createFirebase = (pinia: Pinia): Plugin => ({
@@ -25,29 +25,13 @@ export const createFirebase = (pinia: Pinia): Plugin => ({
             provider: new ReCaptchaV3Provider(firebaseConfig.reCaptchaV3SiteKey),
         })
 
-        onAuthStateChanged(getAuth(firebaseApp), (firebaseUser) => {
-            const db = getDatabase(firebaseApp)
+        onAuthStateChanged(getAuth(firebaseApp), async (firebaseUser) => {
+            const database = useDatabase(pinia)
             const user = useUser(pinia)
 
-            if (firebaseUser) {
-                // TODO: refactor this initial profile creation to a separate area?
-                const userRef = ref(db, `users/${firebaseUser.uid}`)
-                get(userRef).then((snapshot) => {
-                    if (!snapshot.exists()) {
-                        set(userRef, {
-                            currentPuzzle: '333',
-                            email: firebaseUser.email,
-                            options: {
-                                showTimer: true,
-                                timerTrigger: 'spacebar',
-                                holdToStart: true,
-                                useInspection: true,
-                            },
-                        })
-                    }
-
+            if (firebaseUser && firebaseUser.email) {
                     user.userId = firebaseUser.uid
-                })
+                await database.createUserProfileIfNotExists(firebaseUser.email)
             } else {
                 user.userId = undefined
             }

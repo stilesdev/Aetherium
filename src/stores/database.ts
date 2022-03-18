@@ -1,4 +1,4 @@
-import { child, getDatabase, push, ref, remove, serverTimestamp, set, update } from 'firebase/database'
+import { child, get, getDatabase, push, ref, remove, serverTimestamp, set, update } from 'firebase/database'
 import { defineStore } from 'pinia'
 import { useUser } from '@/stores/user'
 import { usePuzzles } from './puzzles'
@@ -11,6 +11,10 @@ import { Stats } from '@/util/stats'
 
 export const useDatabase = defineStore('database', {
     getters: {
+        userRef() {
+            const user = useUser()
+            return `/users/${user.userId}`
+        },
         optionsRef() {
             const user = useUser()
             return `/users/${user.userId}/options`
@@ -50,7 +54,27 @@ export const useDatabase = defineStore('database', {
         },
     },
     actions: {
-        // external calls: things that modify the database from various areas in the app
+        createUserProfileIfNotExists(email: string) {
+            return new Promise<void>((resolve) => {
+                const userRef = ref(getDatabase(), this.userRef)
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        resolve()
+                    } else {
+                        set(userRef, {
+                            currentPuzzle: '333',
+                            email: email,
+                            options: {
+                                showTimer: true,
+                                timerTrigger: 'spacebar',
+                                holdToStart: true,
+                                useInspection: true,
+                            },
+                        }).finally(() => resolve())
+                    }
+                })
+            })
+        },
         setOptions(options: ProfileOptions) {
             set(ref(getDatabase(), this.optionsRef), options)
         },
