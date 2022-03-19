@@ -99,7 +99,7 @@
             ],
             tooltip: {
                 formatter() {
-                    return `<b>${timestampToDateTime(this.x)}</b><br/>${millisToTimerFormat(this.y)}`
+                    return `<b>${timestampToDateTime(this.x as number)}</b><br/>${millisToTimerFormat(this.y as number)}`
                 },
             },
         })

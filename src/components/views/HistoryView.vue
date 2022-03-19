@@ -129,7 +129,7 @@
             ],
             tooltip: {
                 formatter(): string {
-                    return `<b>${moment(this.x).utc().format('M/D/YYYY')}</b><br/>${millisToTimerFormat(this.y)}`
+                    return `<b>${moment(this.x).utc().format('M/D/YYYY')}</b><br/>${millisToTimerFormat(this.y as number)}`
                 },
             },
         })
