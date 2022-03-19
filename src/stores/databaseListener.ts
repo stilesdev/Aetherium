@@ -6,6 +6,7 @@ import { useOptions } from './options'
 import { usePuzzles } from './puzzles'
 import { useScramble } from './scramble'
 import { useSession } from './session'
+import { useSessionHistory } from './sessionHistory'
 import { useUser } from './user'
 
 interface DatabaseState {
@@ -153,19 +154,19 @@ export const useDatabaseListener = defineStore('databaseListener', {
         connectAllSessionsRef() {
             debug('connectAllSessionsRef')
             const database = useDatabase()
-            const session = useSession()
+            const sessionHistory = useSessionHistory()
             this.previousAllSessionsRef = database.allSessionsRef
             onValue(ref(getDatabase(), database.allSessionsRef), (snapshot) => {
-                session.allSessions = snapshot.val()
+                sessionHistory.allSessions = snapshot.val()
             })
         },
         connectAllStatsRef() {
             debug('connectAllStatsRef')
             const database = useDatabase()
-            const session = useSession()
+            const sessionHistory = useSessionHistory()
             this.previousAllStatsRef = database.allStatsRef
             onValue(ref(getDatabase(), database.allStatsRef), (snapshot) => {
-                session.allStats = snapshot.val()
+                sessionHistory.allStats = snapshot.val()
             })
         },
         disconnectOptionsRef() {

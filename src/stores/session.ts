@@ -1,5 +1,4 @@
 import type { ISolve, Statistics } from '@/types'
-import type { SessionPayload } from '@/types/firebase'
 import moment, { type Moment } from 'moment'
 import { defineStore } from 'pinia'
 
@@ -8,8 +7,6 @@ interface SessionState {
     sessionDate?: Moment
     solves: ISolve[]
     sessionStats?: Statistics
-    allSessions?: Record<string, SessionPayload>
-    allStats?: Record<string, Statistics>
 }
 
 export const useSession = defineStore('session', {
@@ -18,9 +15,6 @@ export const useSession = defineStore('session', {
         sessionDate: undefined,
         solves: [],
         sessionStats: undefined,
-        // TODO: move allSessions and allStats to a separate store?
-        allSessions: undefined,
-        allStats: undefined,
     }),
     actions: {
         updateSessionDate(timestamp: number) {

@@ -54,20 +54,20 @@
 
 <script lang="ts" setup>
     import { computed } from 'vue'
-    import { useSession } from '@/stores/session'
+    import { useSessionHistory } from '@/stores/sessionHistory'
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import type { StatisticsPayload } from '@/types/firebase'
     import type { Statistics } from '@/types'
 
-    const session = useSession()
+    const sessionHistory = useSessionHistory()
 
     const sessionsArray = computed<Statistics[]>(() => {
         const sessions: Statistics[] = []
-        if (session.allSessions && session.allStats) {
-            Object.entries(session.allStats).forEach((entry) => {
+        if (sessionHistory.allSessions && sessionHistory.allStats) {
+            Object.entries(sessionHistory.allStats).forEach((entry) => {
                 const sessionId = entry[0]
                 const stat = Object.assign({}, entry[1]) as Statistics
-                stat.date = session.allSessions?.[sessionId].date
+                stat.date = sessionHistory.allSessions?.[sessionId].date
                 sessions.push(stat)
             })
         }

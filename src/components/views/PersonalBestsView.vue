@@ -44,7 +44,7 @@
     import { computed, onMounted, ref } from 'vue'
     import { usePuzzles } from '@/stores/puzzles'
     import { useUser } from '@/stores/user'
-    import { useSession } from '@/stores/session'
+    import { useSessionHistory } from '@/stores/sessionHistory'
     import type { FirebaseList, StatisticsPayload } from '@/types/firebase'
     import type { Statistics } from '@/types'
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
@@ -52,13 +52,13 @@
 
     const puzzles = usePuzzles()
     const user = useUser()
-    const session = useSession()
+    const sessionHistory = useSessionHistory()
 
     const personalBests = ref<Record<string, Record<string, { time: string; date: string | undefined }>>>({}) // TODO: define a type for this
 
     const userId = computed(() => user.userId)
     const allPuzzles = computed(() => (puzzles.allPuzzles ? Object.values(puzzles.allPuzzles).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) : []))
-    const allSessions = computed(() => session.allSessions)
+    const allSessions = computed(() => sessionHistory.allSessions)
     const puzzleStatsRef = computed(() => (puzzle: string) => dbRef(getDatabase(), `/stats/${userId.value}/${puzzle}`))
 
     const findBestStatistic = (sessions: Statistics[], statistic: keyof StatisticsPayload): { time: string; date: string | undefined } => {
