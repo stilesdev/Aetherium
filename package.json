@@ -27,8 +27,7 @@
     "stackmat": "^1.0.0",
     "url": "^0.11.0",
     "vue": "^3.2.31",
-    "vue-router": "^4.0.12",
-    "vuex": "^4.0.2"
+    "vue-router": "^4.0.12"
   },
   "devDependencies": {
     "@rollup/plugin-inject": "^4.0.4",
