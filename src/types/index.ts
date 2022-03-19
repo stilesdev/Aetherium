@@ -18,6 +18,11 @@ export interface ISession {
     deleteSolve: (solveUid: string) => void
 }
 
+export interface ScramblePayload {
+    text: string
+    svg?: string
+}
+
 export interface Statistics extends StatisticsPayload {
     date?: string
 }

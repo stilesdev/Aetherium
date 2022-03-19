@@ -22,14 +22,15 @@
 <script lang="ts" setup>
     import { computed } from 'vue'
     import { useRoute } from 'vue-router'
-    import { useStore } from '@/composables/useStore'
     import { useOptions } from '@/stores/options'
+    import { useIsSolving } from '@/composables/useIsSolving'
 
-    const store = useStore()
     const options = useOptions()
     const route = useRoute()
 
-    const showNavbar = computed(() => !store.state.hideUI && route.name !== 'Login')
+    const { isSolving } = useIsSolving()
+
+    const showNavbar = computed(() => !isSolving.value && route.name !== 'Login')
 </script>
 
 <style>

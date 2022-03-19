@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { ScramblePayload } from '@/types/store'
+import type { ScramblePayload } from '@/types'
 import { usePuzzles } from './puzzles'
 
 interface ScrambleState {

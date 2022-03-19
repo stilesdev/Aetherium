@@ -56,18 +56,16 @@
     import moment from 'moment'
     import $ from 'jquery'
     import { computed, onUnmounted, ref, watch } from 'vue'
-    import { useStore } from '@/composables/useStore'
     import { useDatabase } from '@/stores/database'
     import { useOptions } from '@/stores/options'
     import { useScramble } from '@/stores/scramble'
     import Stackmat, { type Packet } from 'stackmat'
     import TimerStateMachine from '@/util/timer-state-machine'
     import { TimerState } from '@/types'
-    import { Mutations } from '@/types/store'
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import { TimerTrigger } from '@/types/firebase'
+    import { useIsSolving } from '@/composables/useIsSolving'
 
-    const store = useStore()
     const database = useDatabase()
     const options = useOptions()
     const scramble = useScramble()
@@ -244,7 +242,8 @@
     }
 
     watch(hideUI, (newValue: boolean) => {
-        store.commit(Mutations.SET_HIDE_UI, newValue)
+        const { isSolving } = useIsSolving()
+        isSolving.value = newValue
     })
 
     watch(timerTrigger, (newTrigger, oldTrigger) => {
