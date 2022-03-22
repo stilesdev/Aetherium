@@ -1,4 +1,5 @@
 import StateMachine, { type LifeCycle } from 'javascript-state-machine'
+import { debugLog } from '@/functions/debugLog'
 import { TimerState, type TimerStateMachineOptions } from '@/types'
 
 export default class TimerStateMachine {
@@ -66,9 +67,7 @@ export default class TimerStateMachine {
                     return lifecycle.from !== lifecycle.to
                 },
                 onTransition(lifecycle: LifeCycle): boolean {
-                    if (import.meta.env.DEV) {
-                        console.debug(`[timer-state] TRANSITION: ${lifecycle.transition}, FROM: ${lifecycle.from}, TO: ${lifecycle.to}`)
-                    }
+                    debugLog(`[timer-state] TRANSITION: ${lifecycle.transition}, FROM: ${lifecycle.from}, TO: ${lifecycle.to}`)
                     return true
                 },
             },

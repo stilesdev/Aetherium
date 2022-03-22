@@ -1,6 +1,7 @@
 import { equalTo, getDatabase, off, onChildAdded, onChildChanged, onChildRemoved, onValue, orderByChild, query, ref } from 'firebase/database'
 import { defineStore } from 'pinia'
 import { Solve } from '@/classes/solve'
+import { debugLog } from '@/functions/debugLog'
 import { useDatabase } from './database'
 import { useOptions } from './options'
 import { usePuzzles } from './puzzles'
@@ -20,13 +21,6 @@ interface DatabaseState {
     previousAllStatsRef?: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function debug(...args: any[]) {
-    if (import.meta.env.DEV) {
-        console.debug('[database]', ...args)
-    }
-}
-
 export const useDatabaseListener = defineStore('databaseListener', {
     state: (): DatabaseState => ({
         previousOptionsRef: undefined,
@@ -41,7 +35,7 @@ export const useDatabaseListener = defineStore('databaseListener', {
     actions: {
         // move this to a watcher somehow? don't want to rewrite this whole store as a setup function, but this currently needs to be called when the user is signed in or out
         setUpDatabaseOnAuthStateChanged() {
-            debug('setUpDatabaseOnAuthStateChanged')
+            debugLog('setUpDatabaseOnAuthStateChanged')
             const user = useUser()
 
             this.disconnectAllRefs()
@@ -54,7 +48,7 @@ export const useDatabaseListener = defineStore('databaseListener', {
             }
         },
         connectOptionsRef() {
-            debug('connectOptionsRef')
+            debugLog('connectOptionsRef')
             const database = useDatabase()
             const options = useOptions()
             this.previousOptionsRef = database.optionsRef
@@ -69,7 +63,7 @@ export const useDatabaseListener = defineStore('databaseListener', {
             })
         },
         connectCurrentSessionIdRef() {
-            debug('connectCurrentSessionIdRef')
+            debugLog('connectCurrentSessionIdRef')
             const database = useDatabase()
             const session = useSession()
             const user = useUser()
@@ -87,7 +81,7 @@ export const useDatabaseListener = defineStore('databaseListener', {
             })
         },
         connectCurrentPuzzleRef() {
-            debug('connectCurrentPuzzleRef')
+            debugLog('connectCurrentPuzzleRef')
             const database = useDatabase()
             const puzzles = usePuzzles()
             const scramble = useScramble()
@@ -113,7 +107,7 @@ export const useDatabaseListener = defineStore('databaseListener', {
             })
         },
         connectCurrentSessionRef() {
-            debug('connectCurrentSessionRef')
+            debugLog('connectCurrentSessionRef')
             const database = useDatabase()
             const session = useSession()
             this.previousCurrentSessionRef = database.currentSessionRef
@@ -124,7 +118,7 @@ export const useDatabaseListener = defineStore('databaseListener', {
             })
         },
         connectSolvesRef() {
-            debug('connectSolvesRef')
+            debugLog('connectSolvesRef')
             const database = useDatabase()
             const session = useSession()
             this.previousSolvesRef = database.solvesRef
@@ -143,7 +137,7 @@ export const useDatabaseListener = defineStore('databaseListener', {
             })
         },
         connectSessionStatsRef() {
-            debug('connectSessionStatsRef')
+            debugLog('connectSessionStatsRef')
             const database = useDatabase()
             const session = useSession()
             this.previousSessionStatsRef = database.sessionStatsRef
@@ -152,7 +146,7 @@ export const useDatabaseListener = defineStore('databaseListener', {
             })
         },
         connectAllSessionsRef() {
-            debug('connectAllSessionsRef')
+            debugLog('connectAllSessionsRef')
             const database = useDatabase()
             const sessionHistory = useSessionHistory()
             this.previousAllSessionsRef = database.allSessionsRef
@@ -161,7 +155,7 @@ export const useDatabaseListener = defineStore('databaseListener', {
             })
         },
         connectAllStatsRef() {
-            debug('connectAllStatsRef')
+            debugLog('connectAllStatsRef')
             const database = useDatabase()
             const sessionHistory = useSessionHistory()
             this.previousAllStatsRef = database.allStatsRef
@@ -170,35 +164,35 @@ export const useDatabaseListener = defineStore('databaseListener', {
             })
         },
         disconnectOptionsRef() {
-            debug('disconnectOptionsRef')
+            debugLog('disconnectOptionsRef')
             if (this.previousOptionsRef) {
                 off(ref(getDatabase(), this.previousOptionsRef))
                 this.previousOptionsRef = undefined
             }
         },
         disconnectCurrentSessionIdRef() {
-            debug('disconnectCurrentSessionIdRef')
+            debugLog('disconnectCurrentSessionIdRef')
             if (this.previousCurrentSessionIdRef) {
                 off(ref(getDatabase(), this.previousCurrentSessionIdRef))
                 this.previousCurrentSessionIdRef = undefined
             }
         },
         disconnectCurrentPuzzleRef() {
-            debug('disconnectCurrentPuzzleRef')
+            debugLog('disconnectCurrentPuzzleRef')
             if (this.previousCurrentPuzzleRef) {
                 off(ref(getDatabase(), this.previousCurrentPuzzleRef))
                 this.previousCurrentPuzzleRef = undefined
             }
         },
         disconnectCurrentSessionRef() {
-            debug('disconnectCurrentSessionRef')
+            debugLog('disconnectCurrentSessionRef')
             if (this.previousCurrentSessionRef) {
                 off(ref(getDatabase(), this.previousCurrentSessionRef))
                 this.previousCurrentSessionRef = undefined
             }
         },
         disconnectSolvesRef() {
-            debug('disconnectSolvesRef')
+            debugLog('disconnectSolvesRef')
             const session = useSession()
             session.clearSolves()
 
@@ -208,28 +202,28 @@ export const useDatabaseListener = defineStore('databaseListener', {
             }
         },
         disconnectSessionStatsRef() {
-            debug('disconnectSessionStatsRef')
+            debugLog('disconnectSessionStatsRef')
             if (this.previousSessionStatsRef) {
                 off(ref(getDatabase(), this.previousSessionStatsRef))
                 this.previousSessionStatsRef = undefined
             }
         },
         disconnectAllSessionsRef() {
-            debug('disconnectAllSessionsRef')
+            debugLog('disconnectAllSessionsRef')
             if (this.previousAllSessionsRef) {
                 off(ref(getDatabase(), this.previousAllSessionsRef))
                 this.previousAllSessionsRef = undefined
             }
         },
         disconnectAllStatsRef() {
-            debug('disconnectAllStatsRef')
+            debugLog('disconnectAllStatsRef')
             if (this.previousAllStatsRef) {
                 off(ref(getDatabase(), this.previousAllStatsRef))
                 this.previousAllStatsRef = undefined
             }
         },
         disconnectAllRefs() {
-            debug('disconnectAllRefs')
+            debugLog('disconnectAllRefs')
             this.disconnectOptionsRef()
             this.disconnectCurrentSessionIdRef()
             this.disconnectCurrentPuzzleRef()
