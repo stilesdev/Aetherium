@@ -45,7 +45,9 @@
     onMounted(() => {
         sessionHistoryChart = new Chart('session-history-chart', {
             chart: {
-                zoomType: 'x',
+                zooming: {
+                    type: 'x',
+                },
                 type: 'line',
             },
             title: {

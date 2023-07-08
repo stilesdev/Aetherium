@@ -33,7 +33,9 @@
     onMounted(() => {
         sessionChart = new Chart('session-chart', {
             chart: {
-                zoomType: 'x',
+                zooming: {
+                    type: 'x',
+                },
                 type: 'line',
             },
             title: {
