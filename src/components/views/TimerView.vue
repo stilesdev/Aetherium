@@ -1,57 +1,3 @@
-<template>
-    <div id="app">
-        <div class="container-fluid">
-            <div id="timerTouchArea" @touchstart="onTouchStart" @touchend="onTouchEnd">
-                <!-- this needs to go to 100vh height when timing -->
-                <div class="row">
-                    <transition name="fade">
-                        <div id="scrambleArea" class="col-md-10 col-md-offset-1" v-if="!hideUI">
-                            <h3>{{ scramble.text }}</h3>
-                        </div>
-                    </transition>
-                </div>
-
-                <div class="row">
-                    <!-- This needs to be verically aligned in the parent div -->
-                    <div id="timerArea">
-                        <h1 id="timerLabel" :class="timerClass">
-                            {{ timerLabel }}
-                        </h1>
-                    </div>
-                </div>
-            </div>
-
-            <transition name="fade">
-                <div id="timerInfoArea" v-if="!hideUI">
-                    <div class="col-md-3 visible-md visible-lg">
-                        <stats-panel></stats-panel>
-                    </div>
-                    <div class="col-md-6 col-xs-12 col-sm-12">
-                        <solves-panel></solves-panel>
-                    </div>
-                    <div class="col-md-3 visible-md visible-lg">
-                        <scramble-panel></scramble-panel>
-                    </div>
-                </div>
-            </transition>
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
-    import PanelSessionStatistics from '@/components/panels/PanelSessionStatistics.vue'
-    import PanelSolvesList from '@/components/panels/PanelSolvesList.vue'
-    import PanelScrambleImage from '@/components/panels/PanelScrambleImage.vue'
-
-    export default {
-        components: {
-            'stats-panel': PanelSessionStatistics,
-            'solves-panel': PanelSolvesList,
-            'scramble-panel': PanelScrambleImage,
-        },
-    }
-</script>
-
 <script lang="ts" setup>
     import moment from 'moment'
     import $ from 'jquery'
@@ -65,6 +11,9 @@
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import { TimerTrigger } from '@/types/firebase'
     import { useIsSolving } from '@/composables/useIsSolving'
+    import StatsPanel from '@/components/panels/PanelSessionStatistics.vue'
+    import SolvesPanel from '@/components/panels/PanelSolvesList.vue'
+    import ScramblePanel from '@/components/panels/PanelScrambleImage.vue'
 
     const database = useDatabase()
     const options = useOptions()
@@ -89,9 +38,9 @@
                 case TimerState.INSPECTION:
                     return 'timer-color-inspection timer-size-inspection'
                 case TimerState.STARTING:
-                    return 'timer-color-starting ' + (useInspection.value ? 'timer-size-inspection' : 'timer-size-active')
+                    return `timer-color-starting ${useInspection.value ? 'timer-size-inspection' : 'timer-size-active'}`
                 case TimerState.READY:
-                    return 'timer-color-ready ' + (useInspection.value ? 'timer-size-inspection' : 'timer-size-active')
+                    return `timer-color-ready ${useInspection.value ? 'timer-size-inspection' : 'timer-size-active'}`
                 case TimerState.RUNNING:
                     return 'timer-color-running timer-size-active'
             }
@@ -271,5 +220,45 @@
     createTimerState()
     initTimers()
 </script>
+
+<template>
+    <div id="app">
+        <div class="container-fluid">
+            <div id="timer-touch-area" @touchstart="onTouchStart" @touchend="onTouchEnd">
+                <!-- this needs to go to 100vh height when timing -->
+                <div class="row">
+                    <Transition name="fade">
+                        <div v-if="!hideUI" id="scramble-area" class="col-md-10 col-md-offset-1">
+                            <h3>{{ scramble.text }}</h3>
+                        </div>
+                    </Transition>
+                </div>
+
+                <div class="row">
+                    <!-- This needs to be verically aligned in the parent div -->
+                    <div id="timerArea">
+                        <h1 id="timer-label" :class="timerClass">
+                            {{ timerLabel }}
+                        </h1>
+                    </div>
+                </div>
+            </div>
+
+            <Transition name="fade">
+                <div v-if="!hideUI" id="timer-info-area">
+                    <div class="col-md-3 visible-md visible-lg">
+                        <StatsPanel />
+                    </div>
+                    <div class="col-md-6 col-xs-12 col-sm-12">
+                        <SolvesPanel />
+                    </div>
+                    <div class="col-md-3 visible-md visible-lg">
+                        <ScramblePanel />
+                    </div>
+                </div>
+            </Transition>
+        </div>
+    </div>
+</template>
 
 <style src="./TimerView.css"></style>

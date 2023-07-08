@@ -8,6 +8,7 @@ import { timestampToDateTime } from '@/functions/timestampToDateTime'
 export class Solve implements ISolve {
     public static fromSnapshot(solveSnapshot: DataSnapshot): Solve {
         const val = solveSnapshot.val()
+
         return new Solve(solveSnapshot.key as string, val.sessionId, val.time, val.timestamp, val.scramble, val.penalty)
     }
 

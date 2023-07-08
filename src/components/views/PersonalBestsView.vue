@@ -1,44 +1,3 @@
-<template>
-    <div class="container-fluid">
-        <table class="table table-striped text-center">
-            <thead>
-                <tr class="h3">
-                    <td></td>
-                    <td>Single</td>
-                    <td>Mean of 3</td>
-                    <td>Avg of 5</td>
-                    <td>Avg of 12</td>
-                    <td>Avg of 50</td>
-                    <td>Avg of 100</td>
-                </tr>
-            </thead>
-            <tbody>
-                <template v-for="puzzle in allPuzzles">
-                    <tr class="h4" :key="puzzle.key" v-if="personalBests[puzzle.key]">
-                        <td rowspan="2">
-                            <h3>{{ puzzle.name }}</h3>
-                        </td>
-                        <td>{{ personalBests[puzzle.key].best.time }}</td>
-                        <td>{{ personalBests[puzzle.key].bestMo3.time }}</td>
-                        <td>{{ personalBests[puzzle.key].bestAo5.time }}</td>
-                        <td>{{ personalBests[puzzle.key].bestAo12.time }}</td>
-                        <td>{{ personalBests[puzzle.key].bestAo50.time }}</td>
-                        <td>{{ personalBests[puzzle.key].bestAo100.time }}</td>
-                    </tr>
-                    <tr :key="puzzle.key + '-date'" v-if="personalBests[puzzle.key]">
-                        <td>{{ personalBests[puzzle.key].best.date }}</td>
-                        <td>{{ personalBests[puzzle.key].bestMo3.date }}</td>
-                        <td>{{ personalBests[puzzle.key].bestAo5.date }}</td>
-                        <td>{{ personalBests[puzzle.key].bestAo12.date }}</td>
-                        <td>{{ personalBests[puzzle.key].bestAo50.date }}</td>
-                        <td>{{ personalBests[puzzle.key].bestAo100.date }}</td>
-                    </tr>
-                </template>
-            </tbody>
-        </table>
-    </div>
-</template>
-
 <script lang="ts" setup>
     import { get, getDatabase, ref as dbRef } from 'firebase/database'
     import { computed, onMounted, ref } from 'vue'
@@ -66,6 +25,7 @@
 
         if (filteredSessions.length > 0) {
             const session = filteredSessions.reduce((previous, current) => (previous[statistic] < current[statistic] ? previous : current))
+
             return {
                 time: millisToShortTimerFormat(session[statistic]),
                 date: session.date,
@@ -105,3 +65,44 @@
         })
     })
 </script>
+
+<template>
+    <div class="container-fluid">
+        <table class="table table-striped text-center">
+            <thead>
+                <tr class="h3">
+                    <td />
+                    <td>Single</td>
+                    <td>Mean of 3</td>
+                    <td>Avg of 5</td>
+                    <td>Avg of 12</td>
+                    <td>Avg of 50</td>
+                    <td>Avg of 100</td>
+                </tr>
+            </thead>
+            <tbody>
+                <template v-for="puzzle in allPuzzles">
+                    <tr v-if="personalBests[puzzle.key]" :key="puzzle.key" class="h4">
+                        <td rowspan="2">
+                            <h3>{{ puzzle.name }}</h3>
+                        </td>
+                        <td>{{ personalBests[puzzle.key].best.time }}</td>
+                        <td>{{ personalBests[puzzle.key].bestMo3.time }}</td>
+                        <td>{{ personalBests[puzzle.key].bestAo5.time }}</td>
+                        <td>{{ personalBests[puzzle.key].bestAo12.time }}</td>
+                        <td>{{ personalBests[puzzle.key].bestAo50.time }}</td>
+                        <td>{{ personalBests[puzzle.key].bestAo100.time }}</td>
+                    </tr>
+                    <tr v-if="personalBests[puzzle.key]" :key="`${puzzle.key}-date`">
+                        <td>{{ personalBests[puzzle.key].best.date }}</td>
+                        <td>{{ personalBests[puzzle.key].bestMo3.date }}</td>
+                        <td>{{ personalBests[puzzle.key].bestAo5.date }}</td>
+                        <td>{{ personalBests[puzzle.key].bestAo12.date }}</td>
+                        <td>{{ personalBests[puzzle.key].bestAo50.date }}</td>
+                        <td>{{ personalBests[puzzle.key].bestAo100.date }}</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</template>

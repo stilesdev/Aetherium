@@ -1,43 +1,28 @@
-#timerTouchArea {
+#timer-touch-area {
     -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
     height: 50vh;
 }
 
-#timeList {
-    display: -webkit-flex;
-    display: -moz-flex;
-    display: -ms-flex;
-    display: -o-flex;
-    -webkit-flex-direction: column-reverse;
-    -moz-flex-direction: column-reverse;
-    -ms-flex-direction: column-reverse;
-    -o-flex-direction: column-reverse;
-}
-
 @media (min-width: 992px) {
-    #timerInfoArea #panel-body {
+    #timer-info-area #panel-body {
         height: 30vh;
     }
 }
 
 @media (max-width: 992px) {
-    #timerInfoArea #panel-body {
+    #timer-info-area #panel-body {
         height: 26vh;
     }
 }
 
-#scrambleArea {
+#scramble-area {
     font-size: 2em;
     text-align: justify;
     text-align-last: center;
 }
 
-#timerLabel {
+#timer-label {
     text-align: center;
 }
 
@@ -84,6 +69,7 @@
 .fade-leave-active {
     transition: opacity 0.5s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;

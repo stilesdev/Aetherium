@@ -1,5 +1,53 @@
+<script lang="ts" setup>
+    import { computed } from 'vue'
+    import { useSessionHistory } from '@/stores/sessionHistory'
+    import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
+    import type { StatisticsPayload } from '@/types/firebase'
+    import type { Statistics } from '@/types'
+    import Panel from './PanelRoot.vue'
+
+    const sessionHistory = useSessionHistory()
+
+    const sessionsArray = computed<Statistics[]>(() => {
+        const sessions: Statistics[] = []
+        if (sessionHistory.allSessions && sessionHistory.allStats) {
+            Object.entries(sessionHistory.allStats).forEach((entry) => {
+                const sessionId = entry[0]
+                const stat = Object.assign({}, entry[1]) as Statistics
+                stat.date = sessionHistory.allSessions?.[sessionId].date
+                sessions.push(stat)
+            })
+        }
+
+        return sessions
+    })
+
+    const bestDailyMean = computed(() => findBestSession('mean'))
+    const bestSingle = computed(() => findBestSession('best'))
+    const bestMo3 = computed(() => findBestSession('bestMo3'))
+    const bestAo5 = computed(() => findBestSession('bestAo5'))
+    const bestAo12 = computed(() => findBestSession('bestAo12'))
+    const bestAo50 = computed(() => findBestSession('bestAo50'))
+    const bestAo100 = computed(() => findBestSession('bestAo100'))
+
+    const findBestSession = (statistic: keyof StatisticsPayload): { time: string; date?: string } => {
+        const filteredSessions = sessionsArray.value.filter((session: Statistics) => session[statistic] > 0)
+
+        if (filteredSessions.length > 0) {
+            const session = filteredSessions.reduce((previous, current) => (previous[statistic] < current[statistic] ? previous : current))
+
+            return {
+                time: millisToTimerFormat(session[statistic]),
+                date: session.date,
+            }
+        } else {
+            return { time: millisToTimerFormat(0), date: undefined }
+        }
+    }
+</script>
+
 <template>
-    <panel panelTitle="Statistics">
+    <Panel panel-title="Statistics">
         <table class="table table-condensed">
             <tbody>
                 <tr>
@@ -39,60 +87,5 @@
                 </tr>
             </tbody>
         </table>
-    </panel>
+    </Panel>
 </template>
-
-<script lang="ts">
-    import PanelRoot from './PanelRoot.vue'
-
-    export default {
-        components: {
-            panel: PanelRoot,
-        },
-    }
-</script>
-
-<script lang="ts" setup>
-    import { computed } from 'vue'
-    import { useSessionHistory } from '@/stores/sessionHistory'
-    import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
-    import type { StatisticsPayload } from '@/types/firebase'
-    import type { Statistics } from '@/types'
-
-    const sessionHistory = useSessionHistory()
-
-    const sessionsArray = computed<Statistics[]>(() => {
-        const sessions: Statistics[] = []
-        if (sessionHistory.allSessions && sessionHistory.allStats) {
-            Object.entries(sessionHistory.allStats).forEach((entry) => {
-                const sessionId = entry[0]
-                const stat = Object.assign({}, entry[1]) as Statistics
-                stat.date = sessionHistory.allSessions?.[sessionId].date
-                sessions.push(stat)
-            })
-        }
-        return sessions
-    })
-
-    const bestDailyMean = computed(() => findBestSession('mean'))
-    const bestSingle = computed(() => findBestSession('best'))
-    const bestMo3 = computed(() => findBestSession('bestMo3'))
-    const bestAo5 = computed(() => findBestSession('bestAo5'))
-    const bestAo12 = computed(() => findBestSession('bestAo12'))
-    const bestAo50 = computed(() => findBestSession('bestAo50'))
-    const bestAo100 = computed(() => findBestSession('bestAo100'))
-
-    const findBestSession = (statistic: keyof StatisticsPayload): { time: string; date?: string } => {
-        const filteredSessions = sessionsArray.value.filter((session: Statistics) => session[statistic] > 0)
-
-        if (filteredSessions.length > 0) {
-            const session = filteredSessions.reduce((previous, current) => (previous[statistic] < current[statistic] ? previous : current))
-            return {
-                time: millisToTimerFormat(session[statistic]),
-                date: session.date,
-            }
-        } else {
-            return { time: millisToTimerFormat(0), date: undefined }
-        }
-    }
-</script>

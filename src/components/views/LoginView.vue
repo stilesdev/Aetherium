@@ -1,35 +1,3 @@
-<template>
-    <div id="app">
-        <div class="container">
-            <div class="login">
-                <form @submit.prevent="submit">
-                    <div class="form-group">
-                        <label for="emailInput">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                            <input type="email" class="form-control" id="emailInput" placeholder="Email Address" autocomplete="email" v-model="email" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="passwordInput">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                            <input type="password" class="form-control" id="passwordInput" placeholder="Password" autocomplete="current-password" v-model="password" />
-                        </div>
-                    </div>
-                    <div v-if="loginError" class="alert alert-danger alert-dismissible" role="alert">
-                        <button @click="loginError = ''" type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <strong>Error:</strong> {{ loginError }}
-                    </div>
-                    <button class="btn btn-default">Login</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</template>
-
 <script lang="ts" setup>
     import { computed, ref, watch } from 'vue'
     import { useRouter } from 'vue-router'
@@ -56,6 +24,54 @@
         })
     }
 </script>
+
+<template>
+    <div id="app">
+        <div class="container">
+            <div class="login">
+                <form @submit.prevent="submit">
+                    <div class="form-group">
+                        <label for="emailInput">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-envelope" /></span>
+                            <input
+                                id="emailInput"
+                                v-model="email"
+                                type="email"
+                                class="form-control"
+                                placeholder="Email Address"
+                                autocomplete="email"
+                            >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordInput">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock" /></span>
+                            <input
+                                id="passwordInput"
+                                v-model="password"
+                                type="password"
+                                class="form-control"
+                                placeholder="Password"
+                                autocomplete="current-password"
+                            >
+                        </div>
+                    </div>
+                    <div v-if="loginError" class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close" @click="loginError = ''">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Error:</strong> {{ loginError }}
+                    </div>
+                    <button type="button" class="btn btn-default">
+                        Login
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
 
 <style>
     .login {

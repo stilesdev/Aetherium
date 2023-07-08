@@ -68,6 +68,7 @@ export default class TimerStateMachine {
                 },
                 onTransition(lifecycle: LifeCycle): boolean {
                     debugLog(`[timer-state] TRANSITION: ${lifecycle.transition}, FROM: ${lifecycle.from}, TO: ${lifecycle.to}`)
+
                     return true
                 },
             },
@@ -108,6 +109,7 @@ export default class TimerStateMachine {
                 if (!this.useInspection) {
                     if (this.holdToStart) {
                         this.readyTimer = window.setTimeout(() => this.stateMachine.timerReady(), 500)
+
                         return TimerState.STARTING
                     } else {
                         return TimerState.READY
@@ -119,6 +121,7 @@ export default class TimerStateMachine {
             case TimerState.INSPECTION:
                 if (this.holdToStart) {
                     this.readyTimer = window.setTimeout(() => this.stateMachine.timerReady(), 500)
+
                     return TimerState.STARTING
                 } else {
                     return TimerState.READY
@@ -133,6 +136,7 @@ export default class TimerStateMachine {
             case TimerState.RUNNING:
                 this.onSolveComplete()
                 setTimeout(() => this.stateMachine.timerReset(), 2000)
+
                 return TimerState.COMPLETE
 
             case TimerState.COMPLETE:
@@ -145,6 +149,7 @@ export default class TimerStateMachine {
             case TimerState.IDLE:
                 if (this.useInspection) {
                     this.onInspectionStart()
+
                     return TimerState.INSPECTION
                 } else {
                     return TimerState.IDLE
@@ -155,10 +160,12 @@ export default class TimerStateMachine {
 
             case TimerState.STARTING:
                 clearTimeout(this.readyTimer)
+
                 return this.useInspection ? TimerState.INSPECTION : TimerState.IDLE
 
             case TimerState.READY:
                 this.onSolveStart()
+
                 return TimerState.RUNNING
 
             case TimerState.RUNNING:
@@ -174,6 +181,7 @@ export default class TimerStateMachine {
             case TimerState.IDLE:
                 if (this.useInspection && newState === TimerState.INSPECTION) {
                     this.onInspectionStart()
+
                     return TimerState.INSPECTION
                 } else if (newState === TimerState.STARTING) {
                     return TimerState.STARTING
@@ -189,6 +197,7 @@ export default class TimerStateMachine {
                     return this.useInspection ? TimerState.INSPECTION : TimerState.IDLE
                 } else if (newState === TimerState.RUNNING) {
                     this.onSolveStart()
+
                     return TimerState.RUNNING
                 } else {
                     return TimerState.STARTING
@@ -196,6 +205,7 @@ export default class TimerStateMachine {
             case TimerState.READY:
                 if (newState === TimerState.RUNNING) {
                     this.onSolveStart()
+
                     return TimerState.RUNNING
                 } else {
                     return TimerState.READY
@@ -204,6 +214,7 @@ export default class TimerStateMachine {
                 if (newState === TimerState.COMPLETE) {
                     this.onSolveComplete()
                     setTimeout(() => this.stateMachine.timerReset(), 2000)
+
                     return TimerState.COMPLETE
                 } else {
                     return TimerState.RUNNING

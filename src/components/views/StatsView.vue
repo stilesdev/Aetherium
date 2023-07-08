@@ -1,9 +1,3 @@
-<template>
-    <div class="container-fluid">
-        <div id="sessionChart"></div>
-    </div>
-</template>
-
 <script lang="ts" setup>
     import { Chart } from 'highcharts'
     import moment from 'moment'
@@ -37,7 +31,7 @@
     watch(bestSolves, (newValue) => sessionChart?.series[1].setData(newValue), { deep: true })
 
     onMounted(() => {
-        sessionChart = new Chart('sessionChart', {
+        sessionChart = new Chart('session-chart', {
             chart: {
                 zoomType: 'x',
                 type: 'line',
@@ -106,8 +100,14 @@
     })
 </script>
 
+<template>
+    <div class="container-fluid">
+        <div id="session-chart" />
+    </div>
+</template>
+
 <style>
-    #sessionChart {
+    #session-chart {
         height: 80vh;
         width: 95vw;
     }

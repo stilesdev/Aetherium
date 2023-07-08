@@ -8,7 +8,7 @@ export function millisToTimerFormat(milliseconds: number): string {
 
     const d = new Date(milliseconds)
 
-    return d.getMinutes().toString().padStart(2, '0') + ':' + d.getSeconds().toString().padStart(2, '0') + '.' + d.getMilliseconds().toString().padStart(3, '0')
+    return `${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}.${d.getMilliseconds().toString().padStart(3, '0')}`
 }
 
 if (import.meta.vitest) {

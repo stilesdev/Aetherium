@@ -1,20 +1,3 @@
-<template>
-    <div class="container-fluid">
-        <div id="sessionHistoryChart"></div>
-        <panel-history-statistics></panel-history-statistics>
-    </div>
-</template>
-
-<script lang="ts">
-    import PanelHistoryStatistics from '@/components/panels/PanelHistoryStatistics.vue'
-
-    export default {
-        components: {
-            PanelHistoryStatistics,
-        },
-    }
-</script>
-
 <script lang="ts" setup>
     import { Chart } from 'highcharts'
     import moment from 'moment'
@@ -23,6 +6,7 @@
     import type { ChartSeries } from '@/types'
     import { millisToTimerFormat } from '@/functions/millisToTimerFormat'
     import { millisToShortTimerFormat } from '@/functions/millisToShortTimerFormat'
+    import PanelHistoryStatistics from '@/components/panels/PanelHistoryStatistics.vue'
 
     const sessionHistory = useSessionHistory()
 
@@ -31,12 +15,14 @@
     const sessionMeans = computed<ChartSeries>(() => {
         const sessions = sessionHistory.allSessions
         const stats = sessionHistory.allStats
+
         return sessions && stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].mean]) : []
     })
 
     const sessionBests = computed<ChartSeries>(() => {
         const sessions = sessionHistory.allSessions
         const stats = sessionHistory.allStats
+
         return sessions && stats ? Object.entries(stats).map((stat) => [sessions[stat[0]].timestamp, stat[1].best]) : []
     })
 
@@ -57,7 +43,7 @@
     watch(personalBests, (newValue) => sessionHistoryChart?.series[2].setData(newValue), { deep: true })
 
     onMounted(() => {
-        sessionHistoryChart = new Chart('sessionHistoryChart', {
+        sessionHistoryChart = new Chart('session-history-chart', {
             chart: {
                 zoomType: 'x',
                 type: 'line',
@@ -136,8 +122,15 @@
     })
 </script>
 
+<template>
+    <div class="container-fluid">
+        <div id="session-history-chart" />
+        <PanelHistoryStatistics />
+    </div>
+</template>
+
 <style>
-    #sessionHistoryChart {
+    #session-history-chart {
         height: 60vh;
         width: 95vw;
     }

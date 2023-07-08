@@ -1,6 +1,7 @@
 import { createRouter as _createRouter, createWebHistory } from 'vue-router'
 import type { Pinia } from 'pinia'
 import { useUser } from '@/stores/user'
+
 const LoginView = () => import('@/components/views/LoginView.vue')
 const TimerView = () => import('@/components/views/TimerView.vue')
 const StatsView = () => import('@/components/views/StatsView.vue')

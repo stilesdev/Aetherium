@@ -30,13 +30,13 @@ export const useSession = defineStore('session', {
             this.solves.splice(
                 this.solves.findIndex((solve) => solve.uid === solveUid),
                 1,
-                payload
+                payload,
             )
         },
         removeSolve(solveUid: string) {
             this.solves.splice(
                 this.solves.findIndex((solve) => solve.uid === solveUid),
-                1
+                1,
             )
         },
     },

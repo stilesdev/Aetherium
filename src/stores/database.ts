@@ -13,43 +13,52 @@ export const useDatabase = defineStore('database', {
     getters: {
         userRef() {
             const user = useUser()
+
             return `/users/${user.userId}`
         },
         optionsRef() {
             const user = useUser()
+
             return `/users/${user.userId}/options`
         },
         currentSessionIdRef() {
             const user = useUser()
+
             return `/users/${user.userId}/currentSessionId`
         },
         currentPuzzleRef() {
             const user = useUser()
+
             return `/users/${user.userId}/currentPuzzle`
         },
         currentSessionRef() {
             const user = useUser()
             const session = useSession()
+
             return `/users/${user.userId}/sessions/${session.sessionId}`
         },
         solvesRef() {
             const user = useUser()
             const puzzles = usePuzzles()
+
             return `/solves/${user.userId}/${puzzles.selectedPuzzleId}`
         },
         sessionStatsRef() {
             const user = useUser()
             const puzzles = usePuzzles()
             const session = useSession()
+
             return `/stats/${user.userId}/${puzzles.selectedPuzzleId}/${session.sessionId}`
         },
         allSessionsRef() {
             const user = useUser()
+
             return `/users/${user.userId}/sessions`
         },
         allStatsRef() {
             const user = useUser()
             const puzzles = usePuzzles()
+
             return `/stats/${user.userId}/${puzzles.selectedPuzzleId}`
         },
     },
