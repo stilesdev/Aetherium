@@ -64,7 +64,7 @@
                         </button>
                         <strong>Error:</strong> {{ loginError }}
                     </div>
-                    <button type="button" class="btn btn-default">
+                    <button type="submit" class="btn btn-default">
                         Login
                     </button>
                 </form>
